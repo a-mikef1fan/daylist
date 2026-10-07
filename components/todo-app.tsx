@@ -25,6 +25,7 @@ import {
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
+import { getTaskIcon } from '@/lib/task-icon'
 import { getTaskSubheader } from '@/lib/task-subheader'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -334,7 +335,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
-                    <div className="task-copy"><span className="task-title">{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <div className="task-copy"><span className="task-title"><span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
                   </li>
                 ))}
