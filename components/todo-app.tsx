@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
@@ -26,6 +26,15 @@ import type { Task, TaskPriority } from '@/lib/db/schema'
 type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
+const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
+const SIDEBAR_DEFAULT_WIDTH = 248
+const SIDEBAR_MIN_WIDTH = 200
+const SIDEBAR_MAX_WIDTH = 420
+const SIDEBAR_KEY_STEP = 16
+
+function clampSidebarWidth(value: number) {
+  return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, Math.round(value)))
+}
 
 const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo }[] = [
   { id: 'all', label: 'All tasks', icon: ListTodo },
@@ -62,13 +71,18 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
   const [collapsed, setCollapsed] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH)
+  const [resizing, setResizing] = useState(false)
   const [sidebarReady, setSidebarReady] = useState(false)
+  const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
     try {
       setCollapsed(window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true')
+      const savedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY))
+      if (Number.isFinite(savedWidth) && savedWidth > 0) setSidebarWidth(clampSidebarWidth(savedWidth))
     } catch {
       // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
     }
@@ -83,6 +97,47 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     } catch {
       // Ignore storage failures; the toggle still works for this visit.
     }
+  }
+
+  function saveSidebarWidth(width: number) {
+    try {
+      window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(width))
+    } catch {
+      // Ignore storage failures; the new width still applies for this visit.
+    }
+  }
+
+  function setAndSaveSidebarWidth(width: number) {
+    const next = clampSidebarWidth(width)
+    setSidebarWidth(next)
+    saveSidebarWidth(next)
+  }
+
+  function handleResizeStart(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragRef.current = { startX: event.clientX, startWidth: sidebarWidth, width: sidebarWidth }
+    setResizing(true)
+  }
+
+  function handleResizeMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!resizing) return
+    const width = clampSidebarWidth(dragRef.current.startWidth + event.clientX - dragRef.current.startX)
+    dragRef.current.width = width
+    setSidebarWidth(width)
+  }
+
+  function handleResizeEnd(event: React.PointerEvent<HTMLDivElement>) {
+    if (!resizing) return
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    setResizing(false)
+    saveSidebarWidth(dragRef.current.width)
+  }
+
+  function handleResizeKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    event.preventDefault()
+    setAndSaveSidebarWidth(sidebarWidth + (event.key === 'ArrowRight' ? SIDEBAR_KEY_STEP : -SIDEBAR_KEY_STEP))
   }
 
   const counts = useMemo(() => {
@@ -170,7 +225,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   return (
-    <main className={`app-shell${collapsed ? ' is-collapsed' : ''}${sidebarReady ? ' is-ready' : ''}`}>
+    <main className={`app-shell${collapsed ? ' is-collapsed' : ''}${sidebarReady ? ' is-ready' : ''}${resizing ? ' is-resizing' : ''}`} style={collapsed ? undefined : ({ '--rail-width': `${sidebarWidth}px` } as React.CSSProperties)}>
       <aside id="side-rail" className="side-rail" aria-label="Task navigation">
         <div className="rail-header">
           <a href="/" className="brand-mark" aria-label="daylist home"><span className="brand-icon"><Check aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
@@ -188,6 +243,25 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </nav>
         <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
         <button className="sign-out-button" type="button" onClick={handleSignOut} title={collapsed ? 'Sign out' : undefined}><LogOut aria-hidden="true" /><span className="rail-label">Sign out</span></button>
+        {!collapsed && (
+          <div
+            className="rail-resize-handle"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize sidebar"
+            aria-controls="side-rail"
+            aria-valuenow={sidebarWidth}
+            aria-valuemin={SIDEBAR_MIN_WIDTH}
+            aria-valuemax={SIDEBAR_MAX_WIDTH}
+            tabIndex={0}
+            onPointerDown={handleResizeStart}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+            onPointerCancel={handleResizeEnd}
+            onKeyDown={handleResizeKeyDown}
+            onDoubleClick={() => setAndSaveSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
+          />
+        )}
       </aside>
 
       <section className="todo-main">
