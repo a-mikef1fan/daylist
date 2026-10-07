@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
@@ -12,6 +12,8 @@ import {
   Clock3,
   ListTodo,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
   Sparkles,
@@ -22,6 +24,8 @@ import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
+
+const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 
 const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo }[] = [
   { id: 'all', label: 'All tasks', icon: ListTodo },
@@ -57,7 +61,29 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [priority, setPriority] = useState<TaskPriority>('normal')
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [collapsed, setCollapsed] = useState(false)
+  const [sidebarReady, setSidebarReady] = useState(false)
   const router = useRouter()
+
+  // Restore the saved sidebar state after mount so server and client markup match on hydration.
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true')
+    } catch {
+      // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
+    }
+    setSidebarReady(true)
+  }, [])
+
+  function toggleSidebar() {
+    const next = !collapsed
+    setCollapsed(next)
+    try {
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next))
+    } catch {
+      // Ignore storage failures; the toggle still works for this visit.
+    }
+  }
 
   const counts = useMemo(() => {
     const today = dateKey(new Date())
@@ -144,19 +170,24 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   return (
-    <main className="app-shell">
-      <aside className="side-rail" aria-label="Task navigation">
-        <a href="/" className="brand-mark"><span className="brand-icon"><Check aria-hidden="true" /></span><span>daylist</span></a>
+    <main className={`app-shell${collapsed ? ' is-collapsed' : ''}${sidebarReady ? ' is-ready' : ''}`}>
+      <aside id="side-rail" className="side-rail" aria-label="Task navigation">
+        <div className="rail-header">
+          <a href="/" className="brand-mark" aria-label="daylist home"><span className="brand-icon"><Check aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
+          <button className="rail-toggle" type="button" onClick={toggleSidebar} aria-expanded={!collapsed} aria-controls="side-rail" aria-label="Toggle sidebar" title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
+          </button>
+        </div>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
           {filterOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined}>
-              <Icon aria-hidden="true" /> <span>{label}</span><span className="filter-count">{counts[id]}</span>
+            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
         </nav>
         <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
-        <button className="sign-out-button" type="button" onClick={handleSignOut}><LogOut aria-hidden="true" /><span>Sign out</span></button>
+        <button className="sign-out-button" type="button" onClick={handleSignOut} title={collapsed ? 'Sign out' : undefined}><LogOut aria-hidden="true" /><span className="rail-label">Sign out</span></button>
       </aside>
 
       <section className="todo-main">
