@@ -11,6 +11,7 @@ import {
   CircleCheck,
   Clock3,
   Flame,
+  Gamepad2,
   ListTodo,
   LogOut,
   PanelLeftClose,
@@ -19,12 +20,20 @@ import {
   Search,
   Sparkles,
   Trash2,
+  Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
+
+type GameKey = 'snake'
+
+const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
+  { id: 'snake', label: 'Snake', icon: Worm },
+]
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
@@ -66,6 +75,7 @@ function formatDueDate(value: string | null) {
 export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; userName: string }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
+  const [activeGame, setActiveGame] = useState<GameKey | null>(null)
   const [search, setSearch] = useState('')
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -240,8 +250,16 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
           {filterOptions.map(({ id, label, icon: Icon, urgent }) => (
-            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="rail-caption fun-caption">JUST FOR FUN</div>
+        <nav className="filter-nav fun-nav" aria-label="Games">
+          {gameOptions.map(({ id, label, icon: Icon }) => (
+            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => setActiveGame(id)} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span>
             </button>
           ))}
         </nav>
@@ -276,6 +294,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </header>
 
         <div className="dashboard-content">
+          {activeGame === 'snake' ? <SnakeGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
@@ -324,6 +343,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><CheckCheck aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
+          </>)}
           <footer className="dashboard-footer"><span><CircleCheck aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
         </div>
       </section>
