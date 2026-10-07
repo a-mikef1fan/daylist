@@ -178,6 +178,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .is-complete .complete-button { color: var(--sage-deep); }
 .task-copy { min-width: 0; flex: 1; }
 .task-title { display: block; overflow: hidden; color: var(--foreground); font-size: 13px; font-weight: 560; text-overflow: ellipsis; white-space: nowrap; }
+.task-icon { display: inline-block; margin-right: 7px; font-size: 14px; line-height: 1; vertical-align: -1px; }
+.is-complete .task-icon { opacity: .55; filter: grayscale(.6); }
 .is-complete .task-title { color: var(--muted-foreground); text-decoration: line-through; }
 .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--muted-foreground); font-size: 10px; }
 .priority-dot { width: 6px; height: 6px; border-radius: 50%; background: oklch(0.68 0.025 157); }
@@ -376,6 +378,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .search-field { width: 133px; }
   .task-row { min-height: 66px; gap: 8px; padding: 10px 9px; }
   .task-title { font-size: 12px; }
+  .task-icon { margin-right: 5px; font-size: 13px; }
   .task-meta { font-size: 9px; gap: 5px; }
   .delete-task-button { width: 28px; height: 28px; color: var(--muted-foreground); }
   .dashboard-footer { margin-top: 32px; font-size: 9px; }
