@@ -14,6 +14,7 @@ function toOrigin(value: string | undefined) {
 
 const deploymentOrigins = [
   toOrigin(process.env.VERCEL_URL),
+  toOrigin(process.env.VERCEL_BRANCH_URL),
   toOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL),
 ].filter((origin): origin is string => Boolean(origin))
 
@@ -24,8 +25,11 @@ const previewOrigins = [
   toOrigin(process.env.V0_SANDBOX_URL),
 ].filter((origin): origin is string => Boolean(origin))
 
+const isVercelPreview = process.env.VERCEL_ENV === 'preview'
+
 const baseURL =
   process.env.BETTER_AUTH_URL ??
+  (isVercelPreview ? toOrigin(process.env.VERCEL_URL) : undefined) ??
   toOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
   toOrigin(process.env.VERCEL_URL) ??
   toOrigin(process.env.V0_RUNTIME_URL) ??
