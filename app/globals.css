@@ -93,6 +93,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .filter-link > svg { width: 17px; height: 17px; }
 .filter-link:hover { background: oklch(0.93 0.018 100); }
 .filter-link.is-active { background: oklch(0.91 0.04 153); color: var(--sage-deep); font-weight: 650; }
+.filter-link.is-urgent > svg { color: var(--coral); }
+.filter-link.is-urgent .filter-count { color: oklch(0.55 0.13 39); font-weight: 650; }
+.filter-link.is-urgent.is-active { background: oklch(0.94 0.045 55); color: oklch(0.45 0.13 39); }
 .filter-count { margin-left: auto; color: var(--muted-foreground); font-size: 11px; }
 .rail-tip { display: flex; gap: 11px; align-items: flex-start; margin-top: auto; border: 1px solid oklch(0.91 0.035 88); border-radius: 13px; background: var(--warm); padding: 15px 13px; color: var(--coral); }
 .rail-tip > svg { flex: none; width: 17px; height: 17px; margin-top: 1px; }

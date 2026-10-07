@@ -10,6 +10,7 @@ import {
   Circle,
   CircleCheck,
   Clock3,
+  Flame,
   ListTodo,
   LogOut,
   PanelLeftClose,
@@ -23,7 +24,7 @@ import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/task
 import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
-type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
+type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
@@ -36,10 +37,11 @@ function clampSidebarWidth(value: number) {
   return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, Math.round(value)))
 }
 
-const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo }[] = [
+const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo; urgent?: boolean }[] = [
   { id: 'all', label: 'All tasks', icon: ListTodo },
   { id: 'today', label: 'Today', icon: CalendarDays },
   { id: 'upcoming', label: 'Upcoming', icon: Clock3 },
+  { id: 'urgent', label: 'Urgent', icon: Flame, urgent: true },
   { id: 'completed', label: 'Completed', icon: CheckCheck },
 ]
 
@@ -146,6 +148,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       all: tasks.filter((task) => !task.completed).length,
       today: tasks.filter((task) => !task.completed && task.dueDate === today).length,
       upcoming: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate > today).length,
+      urgent: tasks.filter((task) => !task.completed && task.priority === 'high').length,
       completed: tasks.filter((task) => task.completed).length,
     }
   }, [tasks])
@@ -157,6 +160,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       .filter((task) => {
         if (filter === 'today' && (task.completed || task.dueDate !== today)) return false
         if (filter === 'upcoming' && (task.completed || !task.dueDate || task.dueDate <= today)) return false
+        if (filter === 'urgent' && (task.completed || task.priority !== 'high')) return false
         if (filter === 'completed' && !task.completed) return false
         if (filter === 'all' && task.completed) return false
         return !normalizedSearch || task.title.toLowerCase().includes(normalizedSearch)
@@ -235,8 +239,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </div>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
-          {filterOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+          {filterOptions.map(({ id, label, icon: Icon, urgent }) => (
+            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
@@ -316,7 +320,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
+              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><CheckCheck aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
