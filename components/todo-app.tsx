@@ -12,6 +12,8 @@ import {
   Clock3,
   ListTodo,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
   Sparkles,
@@ -56,6 +58,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
   const [message, setMessage] = useState('')
+  const [railCollapsed, setRailCollapsed] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -144,23 +147,26 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   return (
-    <main className="app-shell">
-      <aside className="side-rail" aria-label="Task navigation">
-        <a href="/" className="brand-mark"><span className="brand-icon"><Check aria-hidden="true" /></span><span>daylist</span></a>
+    <main className={`app-shell${railCollapsed ? ' is-collapsed' : ''}`}>
+      <aside id="side-rail" className="side-rail" aria-label="Task navigation">
+        <a href="/" className="brand-mark"><span className="brand-icon"><Check aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
           {filterOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined}>
-              <Icon aria-hidden="true" /> <span>{label}</span><span className="filter-count">{counts[id]}</span>
+            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined} title={railCollapsed ? label : undefined}>
+              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
         </nav>
         <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
-        <button className="sign-out-button" type="button" onClick={handleSignOut}><LogOut aria-hidden="true" /><span>Sign out</span></button>
+        <button className="sign-out-button" type="button" onClick={handleSignOut} title={railCollapsed ? 'Sign out' : undefined}><LogOut aria-hidden="true" /><span className="rail-label">Sign out</span></button>
       </aside>
 
       <section className="todo-main">
         <header className="topbar">
+          <button className="sidebar-toggle" type="button" onClick={() => setRailCollapsed((value) => !value)} aria-expanded={!railCollapsed} aria-controls="side-rail" aria-label="Toggle sidebar" title={railCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {railCollapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
+          </button>
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
           <button className="avatar-button" type="button" onClick={handleSignOut} aria-label={`Sign out ${firstName}`} title="Sign out">{firstName.slice(0, 1).toUpperCase()}</button>
