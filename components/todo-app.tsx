@@ -25,6 +25,7 @@ import {
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
+import { getTaskSubheader } from '@/lib/task-subheader'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
@@ -298,7 +299,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
-            <p>{counts.all === 0 ? 'You’ve made space for what matters.' : `You have ${counts.all} ${counts.all === 1 ? 'thing' : 'things'} on your list. You’ve got this.`}</p>
+            <p>{getTaskSubheader(counts.all)}</p>
           </div>
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
