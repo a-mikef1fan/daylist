@@ -5,10 +5,11 @@ import { tasks } from '@/lib/db/schema'
 import { eq, asc, desc } from 'drizzle-orm'
 import { AuthScreen } from '@/components/auth-screen'
 import { TodoApp } from '@/components/todo-app'
+import { isPreviewTestLoginEnabled } from '@/lib/preview-login'
 
 export default async function HomePage() {
   const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) return <AuthScreen />
+  if (!session?.user) return <AuthScreen previewTestLogin={isPreviewTestLoginEnabled()} />
 
   const userTasks = await db
     .select()

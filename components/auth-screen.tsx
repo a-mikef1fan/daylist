@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Check, CircleCheck, ListTodo, LockKeyhole, MoveRight } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 
-export function AuthScreen() {
+export function AuthScreen({ previewTestLogin = false }: { previewTestLogin?: boolean }) {
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-up')
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
@@ -25,6 +25,23 @@ export function AuthScreen() {
           : await authClient.signIn.email({ email, password })
       if (result.error) {
         setError('We couldn’t sign you in with those details. Please check them and try again.')
+        return
+      }
+      window.location.assign('/')
+    } catch {
+      setError('Something went wrong. Please try again in a moment.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  async function handlePreviewLogin() {
+    setError('')
+    setPending(true)
+    try {
+      const response = await fetch('/api/preview-login', { method: 'POST' })
+      if (!response.ok) {
+        setError('Test sign-in failed. Please try again.')
         return
       }
       window.location.assign('/')
@@ -81,6 +98,13 @@ export function AuthScreen() {
               {!pending && <MoveRight aria-hidden="true" />}
             </button>
           </form>
+          {previewTestLogin && (
+            <p className="auth-switch">
+              <button type="button" onClick={handlePreviewLogin} disabled={pending}>
+                Sign in as test user (preview only)
+              </button>
+            </p>
+          )}
           <p className="auth-switch">
             {mode === 'sign-up' ? 'Already have an account?' : 'New to daylist?'}{' '}
             <button type="button" onClick={() => { setError(''); setMode(mode === 'sign-up' ? 'sign-in' : 'sign-up') }}>
