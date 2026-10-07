@@ -12,12 +12,14 @@ import {
   Clock3,
   ListTodo,
   LogOut,
+  Pencil,
   Plus,
   Search,
   Sparkles,
   Trash2,
 } from 'lucide-react'
-import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { createTask, deleteTask, updateTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { TaskEditForm, focusEditButton, type TaskDraft } from '@/components/task-edit-form'
 import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -56,6 +58,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
   const [message, setMessage] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -116,6 +119,27 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         router.refresh()
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
+        setMessage('Could not update that task. Please try again.')
+      }
+    })
+  }
+
+  function closeEdit(task: Task) {
+    setEditingId(null)
+    focusEditButton(task.id)
+  }
+
+  function handleUpdate(task: Task, draft: TaskDraft) {
+    setMessage('')
+    closeEdit(task)
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, ...draft } : item))
+    startTransition(async () => {
+      try {
+        const updated = await updateTask(task.id, draft)
+        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        router.refresh()
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? task : item))
         setMessage('Could not update that task. Please try again.')
       }
     })
@@ -205,8 +229,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
+                    {editingId === task.id ? (
+                      <TaskEditForm task={task} pending={isPending} onSave={(draft) => handleUpdate(task, draft)} onCancel={() => closeEdit(task)} />
+                    ) : (<>
                     <div className="task-copy"><span className="task-title">{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <button className="delete-task-button te-edit-button" type="button" onClick={() => setEditingId(task.id)} data-te-edit={task.id} aria-label={`Edit ${task.title}`}><Pencil aria-hidden="true" /></button>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
+                    </>)}
                   </li>
                 ))}
               </ul>

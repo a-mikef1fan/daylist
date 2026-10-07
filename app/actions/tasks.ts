@@ -6,6 +6,7 @@ import { tasks, type TaskPriority } from '@/lib/db/schema'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { parseTaskFields } from '@/lib/task-validation'
 
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -58,6 +59,23 @@ export async function createTask(input: {
       priority: input.priority,
     })
     .returning()
+  revalidatePath('/')
+  return task
+}
+
+export async function updateTask(
+  id: string,
+  input: { title: string; dueDate: string | null; priority: TaskPriority },
+) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length > 80) throw new Error('Invalid task update')
+  const { title, dueDate, priority } = parseTaskFields(input)
+  const [task] = await db
+    .update(tasks)
+    .set({ title, dueDate, priority, updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning()
+  if (!task) throw new Error('Task not found')
   revalidatePath('/')
   return task
 }
