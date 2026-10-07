@@ -4,19 +4,6 @@ import { getPreviewTestCredentials } from '@/lib/preview-login'
 
 export const dynamic = 'force-dynamic'
 
-// TEMPORARY: remove once preview test login is verified
-export async function GET() {
-  if (process.env.VERCEL_ENV === 'production') {
-    return new NextResponse(null, { status: 404 })
-  }
-  return NextResponse.json({
-    vercelEnv: process.env.VERCEL_ENV ?? null,
-    emailSet: Boolean(process.env.PREVIEW_TEST_EMAIL),
-    passwordSet: Boolean(process.env.PREVIEW_TEST_PASSWORD),
-    branchUrlSet: Boolean(process.env.VERCEL_BRANCH_URL),
-  })
-}
-
 export async function POST(request: Request) {
   const credentials = getPreviewTestCredentials()
   if (!credentials) return new NextResponse(null, { status: 404 })
