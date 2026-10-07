@@ -1,0 +1,217 @@
+/*
+ * Color themes.
+ *
+ * The default "sage" theme is the :root palette in globals.css and is used when <html> has no
+ * data-theme attribute; nothing in this file applies to it. Every other theme sets
+ * <html data-theme="..."> (see lib/theme.ts) and overrides the same CSS variables.
+ *
+ * Light themes (ocean, sunset, lavender) share one template driven by a few inputs:
+ *   --hue  accent hue          --nh  hue used to tint the neutrals
+ *   --pl / --pc  lightness / chroma of the primary colour (tuned so white text stays >= 4.5:1)
+ *   --wh   hue of the warm tip card        --ch  hue of the "coral" highlight
+ * The dark theme (midnight) spells out its values.
+ *
+ * Colours that globals.css hard-codes (hover fills, borders, auth panel, ...) are re-pointed
+ * at --th-* variables in the second half of this file, so globals.css itself stays untouched.
+ */
+
+html[data-theme='ocean'] { --hue: 240; --nh: 245; --pl: 0.46; --pc: 0.12; --wh: 84; --ch: 39; }
+html[data-theme='sunset'] { --hue: 45; --nh: 70; --pl: 0.53; --pc: 0.15; --wh: 75; --ch: 20; }
+html[data-theme='lavender'] { --hue: 295; --nh: 300; --pl: 0.46; --pc: 0.13; --wh: 340; --ch: 10; }
+
+html[data-theme='ocean'],
+html[data-theme='sunset'],
+html[data-theme='lavender'] {
+  color-scheme: light;
+  --background: oklch(0.982 0.006 var(--nh));
+  --foreground: oklch(0.24 0.025 var(--hue));
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.025 var(--hue));
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.025 var(--hue));
+  --primary: oklch(var(--pl) var(--pc) var(--hue));
+  --primary-foreground: oklch(0.985 0.004 var(--nh));
+  --secondary: oklch(0.95 0.018 var(--nh));
+  --secondary-foreground: oklch(0.28 0.035 var(--hue));
+  --muted: oklch(0.955 0.01 var(--nh));
+  --muted-foreground: oklch(0.51 0.025 var(--hue));
+  --accent: oklch(0.94 0.025 var(--nh));
+  --accent-foreground: oklch(0.32 0.04 var(--hue));
+  --border: oklch(0.91 0.014 var(--nh));
+  --input: oklch(0.91 0.014 var(--nh));
+  --ring: oklch(0.58 0.12 var(--hue));
+  --sidebar: oklch(0.97 0.01 var(--nh));
+  --ink-soft: oklch(0.44 0.028 var(--hue));
+  --sage: oklch(0.92 0.045 var(--hue));
+  --sage-deep: oklch(calc(var(--pl) - 0.04) var(--pc) var(--hue));
+  --warm: oklch(0.95 0.045 var(--wh));
+  --coral: oklch(0.65 0.14 var(--ch));
+
+  --th-hover: oklch(0.93 0.018 var(--nh));
+  --th-active: oklch(0.91 0.04 var(--hue));
+  --th-rail-border: oklch(0.91 0.014 var(--nh) / 75%);
+  --th-tip-border: oklch(0.91 0.035 var(--wh));
+  --th-avatar-border: oklch(0.85 0.045 var(--hue));
+  --th-field: oklch(0.99 0.004 var(--nh));
+  --th-placeholder: oklch(0.6 0.018 var(--hue));
+  --th-idle-check: oklch(0.73 0.022 var(--hue));
+  --th-sep: oklch(0.76 0.018 var(--hue));
+  --th-neutral-dot: oklch(0.68 0.025 var(--hue));
+  --th-row-hover-border: oklch(0.83 0.035 var(--hue));
+  --th-empty-border: oklch(0.87 0.022 var(--hue));
+  --th-empty-bg: oklch(0.99 0.004 var(--nh) / 70%);
+  --th-on-deep: white;
+  --th-primary-hover: oklch(calc(var(--pl) - 0.07) var(--pc) var(--hue));
+  --th-nav: oklch(1 0 0 / 96%);
+  --th-auth-bg: oklch(0.92 0.052 var(--hue));
+  --th-auth-eyebrow: oklch(0.42 0.07 var(--hue));
+  --th-auth-title: oklch(0.24 0.045 var(--hue));
+  --th-auth-text: oklch(0.40 0.04 var(--hue));
+  --th-auth-benefit: oklch(0.34 0.06 var(--hue));
+  --th-auth-note: oklch(0.43 0.06 var(--hue));
+  --th-auth-footer: oklch(0.55 0.018 var(--hue));
+  --th-auth-placeholder: oklch(0.6 0.018 var(--hue));
+  --th-semantic-low-dot: oklch(0.66 0.07 155);
+  --th-semantic-low-text: oklch(0.48 0.08 155);
+  --th-semantic-high-text: oklch(0.55 0.13 39);
+  --th-semantic-overdue: oklch(0.56 0.17 31);
+  --th-delete-hover: oklch(0.96 0.025 30);
+}
+
+html[data-theme='midnight'] {
+  color-scheme: dark;
+  --background: oklch(0.2 0.02 260);
+  --foreground: oklch(0.94 0.012 250);
+  --card: oklch(0.25 0.022 260);
+  --card-foreground: oklch(0.94 0.012 250);
+  --popover: oklch(0.25 0.022 260);
+  --popover-foreground: oklch(0.94 0.012 250);
+  --primary: oklch(0.78 0.11 160);
+  --primary-foreground: oklch(0.2 0.03 160);
+  --secondary: oklch(0.29 0.022 260);
+  --secondary-foreground: oklch(0.9 0.015 250);
+  --muted: oklch(0.28 0.02 260);
+  --muted-foreground: oklch(0.74 0.02 250);
+  --accent: oklch(0.3 0.025 260);
+  --accent-foreground: oklch(0.9 0.02 250);
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(0.34 0.025 260);
+  --input: oklch(0.34 0.025 260);
+  --ring: oklch(0.72 0.11 160);
+  --sidebar: oklch(0.17 0.02 260);
+  --ink-soft: oklch(0.8 0.02 250);
+  --sage: oklch(0.32 0.05 165);
+  --sage-deep: oklch(0.78 0.11 160);
+  --warm: oklch(0.28 0.04 70);
+  --coral: oklch(0.76 0.13 45);
+
+  --th-hover: oklch(0.27 0.022 260);
+  --th-active: oklch(0.33 0.05 165);
+  --th-rail-border: oklch(0.3 0.025 260);
+  --th-tip-border: oklch(0.36 0.045 70);
+  --th-avatar-border: oklch(0.45 0.06 165);
+  --th-field: oklch(0.22 0.02 260);
+  --th-placeholder: oklch(0.68 0.02 250);
+  --th-idle-check: oklch(0.55 0.025 250);
+  --th-sep: oklch(0.5 0.02 250);
+  --th-neutral-dot: oklch(0.6 0.025 250);
+  --th-row-hover-border: oklch(0.48 0.06 165);
+  --th-empty-border: oklch(0.4 0.03 260);
+  --th-empty-bg: oklch(0.22 0.02 260 / 70%);
+  --th-on-deep: oklch(0.2 0.03 160);
+  --th-primary-hover: oklch(0.84 0.11 160);
+  --th-nav: oklch(0.2 0.02 260 / 94%);
+  --th-auth-bg: oklch(0.26 0.04 165);
+  --th-auth-eyebrow: oklch(0.82 0.08 160);
+  --th-auth-title: oklch(0.96 0.015 160);
+  --th-auth-text: oklch(0.86 0.025 160);
+  --th-auth-benefit: oklch(0.88 0.04 160);
+  --th-auth-note: oklch(0.82 0.04 160);
+  --th-auth-footer: oklch(0.7 0.02 250);
+  --th-auth-placeholder: oklch(0.68 0.02 250);
+  --th-semantic-low-dot: oklch(0.72 0.1 155);
+  --th-semantic-low-text: oklch(0.78 0.1 155);
+  --th-semantic-high-text: oklch(0.78 0.12 45);
+  --th-semantic-overdue: oklch(0.76 0.15 28);
+  --th-delete-hover: oklch(0.32 0.06 25);
+}
+
+/* ---- Re-point globals.css's hard-coded colours at theme variables ---- */
+
+html[data-theme] .side-rail { border-right-color: var(--th-rail-border); }
+html[data-theme] .brand-icon { color: var(--th-on-deep); }
+html[data-theme] .filter-link:hover,
+html[data-theme] .sign-out-button:hover { background: var(--th-hover); }
+html[data-theme] .filter-link.is-active { background: var(--th-active); }
+html[data-theme] .rail-tip { border-color: var(--th-tip-border); }
+html[data-theme] .topbar { border-bottom-color: color-mix(in oklch, var(--border) 65%, transparent); }
+html[data-theme] .avatar-button { border-color: var(--th-avatar-border); }
+html[data-theme] .quick-add-card,
+html[data-theme] .task-row { border-color: var(--border); }
+html[data-theme] .task-row:hover { border-color: var(--th-row-hover-border); }
+html[data-theme] .task-title-input { background: var(--th-field); }
+html[data-theme] .task-title-input::placeholder { color: var(--th-placeholder); }
+html[data-theme] .select-control,
+html[data-theme] .date-control,
+html[data-theme] .search-field,
+html[data-theme] .form-field input { background: var(--card); }
+html[data-theme] .add-task-button,
+html[data-theme] .auth-submit { color: var(--th-on-deep); }
+html[data-theme] .add-task-button:hover:not(:disabled),
+html[data-theme] .auth-submit:hover:not(:disabled) { background: var(--th-primary-hover); }
+html[data-theme] .complete-button { color: var(--th-idle-check); }
+html[data-theme] .complete-button:hover,
+html[data-theme] .is-complete .complete-button { color: var(--sage-deep); }
+html[data-theme] .priority-dot { background: var(--th-neutral-dot); }
+html[data-theme] .priority-dot.priority-high { background: var(--coral); }
+html[data-theme] .priority-dot.priority-low { background: var(--th-semantic-low-dot); }
+html[data-theme] .priority-text-high { color: var(--th-semantic-high-text); }
+html[data-theme] .priority-text-low { color: var(--th-semantic-low-text); }
+html[data-theme] .meta-separator { color: var(--th-sep); }
+html[data-theme] .due-label.is-overdue { color: var(--th-semantic-overdue); }
+html[data-theme] .delete-task-button:hover { background: var(--th-delete-hover); }
+html[data-theme] .empty-state { border-color: var(--th-empty-border); background: var(--th-empty-bg); }
+html[data-theme] .dashboard-footer { border-top-color: var(--th-rail-border); }
+
+html[data-theme] .auth-intro { background: var(--th-auth-bg); }
+html[data-theme] .auth-intro::after {
+  border-color: color-mix(in oklch, var(--primary) 10%, transparent);
+  box-shadow: 0 0 0 38px color-mix(in oklch, var(--primary) 4%, transparent), 0 0 0 78px color-mix(in oklch, var(--primary) 3%, transparent);
+}
+html[data-theme] .intro-copy .eyebrow { color: var(--th-auth-eyebrow); }
+html[data-theme] .intro-copy h1 { color: var(--th-auth-title); }
+html[data-theme] .intro-copy > p { color: var(--th-auth-text); }
+html[data-theme] .intro-benefits { color: var(--th-auth-benefit); }
+html[data-theme] .intro-note { color: var(--th-auth-note); }
+html[data-theme] .form-field input::placeholder { color: var(--th-auth-placeholder); }
+html[data-theme] .auth-footer { color: var(--th-auth-footer); }
+
+@media (max-width: 680px) {
+  html[data-theme] .side-rail { background: var(--th-nav); border-top-color: var(--border); }
+}
+
+/* ---- Theme picker ---- */
+
+.theme-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.theme-option { position: relative; display: inline-flex; cursor: pointer; }
+.theme-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.theme-swatch { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; box-shadow: inset 0 0 0 1px oklch(0.5 0 0 / 22%); color: white; transition: transform .15s, box-shadow .15s; }
+.theme-swatch svg { width: 13px; height: 13px; stroke-width: 3; opacity: 0; transition: opacity .15s; }
+.theme-option:hover .theme-swatch { transform: scale(1.08); }
+.theme-input:checked + .theme-swatch { box-shadow: inset 0 0 0 1px oklch(0.5 0 0 / 22%), 0 0 0 2px var(--sidebar), 0 0 0 4px var(--foreground); }
+.theme-input:checked + .theme-swatch svg { opacity: 1; }
+.theme-input:focus-visible + .theme-swatch { outline: 3px solid color-mix(in oklch, var(--ring) 70%, transparent); outline-offset: 5px; }
+
+.theme-block { margin-top: 18px; }
+.theme-block-caption { margin: 0 0 10px 11px; color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .13em; }
+.theme-block .theme-picker { padding: 0 6px; }
+.theme-strip { display: none; }
+
+@media (max-width: 680px) {
+  .theme-block { display: none; }
+  .theme-strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 19px 0; }
+  .theme-strip-label { color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .13em; }
+  .theme-strip .theme-picker { gap: 12px; }
+  .theme-strip .theme-swatch { width: 28px; height: 28px; }
+  .theme-strip .theme-input:checked + .theme-swatch { box-shadow: inset 0 0 0 1px oklch(0.5 0 0 / 22%), 0 0 0 2px var(--background), 0 0 0 4px var(--foreground); }
+}

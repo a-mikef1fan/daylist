@@ -20,6 +20,7 @@ import {
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
+import { ThemePicker } from '@/components/theme-picker'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
 
@@ -156,6 +157,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
           ))}
         </nav>
         <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
+        <div className="theme-block"><div className="theme-block-caption">THEME</div><ThemePicker /></div>
         <button className="sign-out-button" type="button" onClick={handleSignOut}><LogOut aria-hidden="true" /><span>Sign out</span></button>
       </aside>
 
@@ -165,6 +167,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
           <span className="topbar-date">{dateLabel}</span>
           <button className="avatar-button" type="button" onClick={handleSignOut} aria-label={`Sign out ${firstName}`} title="Sign out">{firstName.slice(0, 1).toUpperCase()}</button>
         </header>
+        <div className="theme-strip"><span className="theme-strip-label">THEME</span><ThemePicker /></div>
 
         <div className="dashboard-content">
           <div className="greeting-block">
