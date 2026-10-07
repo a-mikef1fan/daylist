@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { authClient } from '@/lib/auth-client'
+import { ThemeToggle } from '@/components/theme-toggle'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
@@ -163,6 +164,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
+          <ThemeToggle />
           <button className="avatar-button" type="button" onClick={handleSignOut} aria-label={`Sign out ${firstName}`} title="Sign out">{firstName.slice(0, 1).toUpperCase()}</button>
         </header>
 

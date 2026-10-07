@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Check, CircleCheck, ListTodo, LockKeyhole, MoveRight } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export function AuthScreen() {
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-up')
@@ -89,6 +90,7 @@ export function AuthScreen() {
           </p>
           <p className="privacy-note"><LockKeyhole aria-hidden="true" /> Your tasks are private and only visible to you.</p>
         </div>
+        <div className="auth-theme-toggle"><ThemeToggle /></div>
         <span className="auth-footer">Small steps. Clear mind.</span>
       </section>
     </main>

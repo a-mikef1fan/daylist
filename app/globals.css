@@ -185,6 +185,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .topbar { display: flex; min-height: 80px; align-items: center; justify-content: flex-end; gap: 16px; border-bottom: 1px solid var(--border-soft); padding: 0 clamp(24px, 6vw, 88px); }
 .topbar-date { color: var(--muted-foreground); font-size: 12px; }
 .avatar-button { width: 34px; height: 34px; border: 1px solid var(--sage-border); border-radius: 50%; background: var(--sage); color: var(--sage-deep); cursor: pointer; font-size: 13px; font-weight: 700; }
+.theme-toggle { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); padding: 2px; }
+.theme-toggle-option { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--muted-foreground); cursor: pointer; padding: 0; transition: background .15s, color .15s; }
+.theme-toggle-option svg { width: 14px; height: 14px; }
+.theme-toggle-option:hover { background: var(--hover); color: var(--foreground); }
+.theme-toggle-option[aria-pressed='true'] { background: var(--sage-active); color: var(--sage-deep); }
+.auth-theme-toggle { position: absolute; top: 22px; right: 28px; }
 .dashboard-content { max-width: 866px; margin: 0 auto; padding: 53px clamp(24px, 6vw, 88px) 30px; }
 .eyebrow { color: var(--muted-foreground); font-size: 10px; font-weight: 750; letter-spacing: .14em; }
 .greeting-block h1 { margin: 10px 0 8px; font-size: clamp(30px, 3.4vw, 39px); font-weight: 680; letter-spacing: -.055em; line-height: 1.15; }
@@ -313,8 +319,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .mobile-brand { display: inline-flex; align-items: center; gap: 8px; color: var(--foreground); font-size: 17px; font-weight: 750; letter-spacing: -.05em; }
   .mobile-brand .brand-icon { width: 27px; height: 27px; border-radius: 8px; }
   .mobile-brand .brand-icon svg { width: 15px; height: 15px; }
-  .topbar-date { margin-left: auto; font-size: 10px; }
+  .topbar { gap: 8px; }
+  .topbar-date { margin-left: auto; font-size: 10px; white-space: nowrap; }
   .avatar-button { width: 30px; height: 30px; }
+  .theme-toggle-option { width: 26px; height: 26px; }
+  .auth-theme-toggle { top: 20px; right: 0; }
   .dashboard-content { padding: 37px 18px 24px; }
   .greeting-block h1 { font-size: 31px; }
   .greeting-block > p { font-size: 12px; }
