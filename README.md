@@ -8,6 +8,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Mark tasks complete or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
+- **My day**: a monday.com style view of your tasks grouped into Overdue, Today, This week, Later, and No date, with inline status (Not started, Working on it, Stuck, Done) and due date editing, a status filter, Hide done, search, and a summary row
 - Per-user data: every task query is scoped to the signed-in user
 
 ## Tech stack
@@ -56,7 +57,9 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `status`, `createdAt`, `updatedAt`)
+
+If your `tasks` table predates the `status` column (used by My day), run `db/migrations/0001_add_task_status.sql` once. It is idempotent and marks existing completed tasks as Done.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -83,16 +86,19 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, updateTaskStatus, updateTaskDueDate, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  my-day.tsx                  My day view (grouped by due date, inline status and date edit)
+  status-pill.tsx             Shared status pill
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  my-day.ts                   My day grouping and date helpers
   utils.ts                    Helpers
 ```

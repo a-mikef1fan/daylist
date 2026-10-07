@@ -64,12 +64,14 @@ export const tasks = pgTable('tasks', {
   dueDate: date('dueDate'),
   priority: text('priority').notNull().default('normal'),
   completed: boolean('completed').notNull().default(false),
+  status: text('status').$type<TaskStatus>().notNull().default('not_started'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
 export type Task = typeof tasks.$inferSelect
 export type TaskPriority = 'low' | 'normal' | 'high'
+export type TaskStatus = 'not_started' | 'working' | 'stuck' | 'done'
 export type NewTaskInput = {
   title: string
   dueDate: string
