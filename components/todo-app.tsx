@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
@@ -10,23 +10,47 @@ import {
   Circle,
   CircleCheck,
   Clock3,
+  Flame,
+  Gamepad2,
   ListTodo,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
   Sparkles,
   Trash2,
+  Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
-type FilterKey = 'all' | 'today' | 'upcoming' | 'completed'
+type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo }[] = [
+type GameKey = 'snake'
+
+const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
+  { id: 'snake', label: 'Snake', icon: Worm },
+]
+
+const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
+const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
+const SIDEBAR_DEFAULT_WIDTH = 248
+const SIDEBAR_MIN_WIDTH = 200
+const SIDEBAR_MAX_WIDTH = 420
+const SIDEBAR_KEY_STEP = 16
+
+function clampSidebarWidth(value: number) {
+  return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, Math.round(value)))
+}
+
+const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo; urgent?: boolean }[] = [
   { id: 'all', label: 'All tasks', icon: ListTodo },
   { id: 'today', label: 'Today', icon: CalendarDays },
   { id: 'upcoming', label: 'Upcoming', icon: Clock3 },
+  { id: 'urgent', label: 'Urgent', icon: Flame, urgent: true },
   { id: 'completed', label: 'Completed', icon: CheckCheck },
 ]
 
@@ -51,13 +75,82 @@ function formatDueDate(value: string | null) {
 export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; userName: string }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
+  const [activeGame, setActiveGame] = useState<GameKey | null>(null)
   const [search, setSearch] = useState('')
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [collapsed, setCollapsed] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH)
+  const [resizing, setResizing] = useState(false)
+  const [sidebarReady, setSidebarReady] = useState(false)
+  const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
+
+  // Restore the saved sidebar state after mount so server and client markup match on hydration.
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true')
+      const savedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY))
+      if (Number.isFinite(savedWidth) && savedWidth > 0) setSidebarWidth(clampSidebarWidth(savedWidth))
+    } catch {
+      // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
+    }
+    setSidebarReady(true)
+  }, [])
+
+  function toggleSidebar() {
+    const next = !collapsed
+    setCollapsed(next)
+    try {
+      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next))
+    } catch {
+      // Ignore storage failures; the toggle still works for this visit.
+    }
+  }
+
+  function saveSidebarWidth(width: number) {
+    try {
+      window.localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(width))
+    } catch {
+      // Ignore storage failures; the new width still applies for this visit.
+    }
+  }
+
+  function setAndSaveSidebarWidth(width: number) {
+    const next = clampSidebarWidth(width)
+    setSidebarWidth(next)
+    saveSidebarWidth(next)
+  }
+
+  function handleResizeStart(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragRef.current = { startX: event.clientX, startWidth: sidebarWidth, width: sidebarWidth }
+    setResizing(true)
+  }
+
+  function handleResizeMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!resizing) return
+    const width = clampSidebarWidth(dragRef.current.startWidth + event.clientX - dragRef.current.startX)
+    dragRef.current.width = width
+    setSidebarWidth(width)
+  }
+
+  function handleResizeEnd(event: React.PointerEvent<HTMLDivElement>) {
+    if (!resizing) return
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    setResizing(false)
+    saveSidebarWidth(dragRef.current.width)
+  }
+
+  function handleResizeKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    event.preventDefault()
+    setAndSaveSidebarWidth(sidebarWidth + (event.key === 'ArrowRight' ? SIDEBAR_KEY_STEP : -SIDEBAR_KEY_STEP))
+  }
 
   const counts = useMemo(() => {
     const today = dateKey(new Date())
@@ -65,6 +158,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       all: tasks.filter((task) => !task.completed).length,
       today: tasks.filter((task) => !task.completed && task.dueDate === today).length,
       upcoming: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate > today).length,
+      urgent: tasks.filter((task) => !task.completed && task.priority === 'high').length,
       completed: tasks.filter((task) => task.completed).length,
     }
   }, [tasks])
@@ -76,6 +170,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       .filter((task) => {
         if (filter === 'today' && (task.completed || task.dueDate !== today)) return false
         if (filter === 'upcoming' && (task.completed || !task.dueDate || task.dueDate <= today)) return false
+        if (filter === 'urgent' && (task.completed || task.priority !== 'high')) return false
         if (filter === 'completed' && !task.completed) return false
         if (filter === 'all' && task.completed) return false
         return !normalizedSearch || task.title.toLowerCase().includes(normalizedSearch)
@@ -144,19 +239,51 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   return (
-    <main className="app-shell">
-      <aside className="side-rail" aria-label="Task navigation">
-        <a href="/" className="brand-mark"><span className="brand-icon"><Check aria-hidden="true" /></span><span>daylist</span></a>
+    <main className={`app-shell${collapsed ? ' is-collapsed' : ''}${sidebarReady ? ' is-ready' : ''}${resizing ? ' is-resizing' : ''}`} style={collapsed ? undefined : ({ '--rail-width': `${sidebarWidth}px` } as React.CSSProperties)}>
+      <aside id="side-rail" className="side-rail" aria-label="Task navigation">
+        <div className="rail-header">
+          <a href="/" className="brand-mark" aria-label="daylist home"><span className="brand-icon"><Check aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
+          <button className="rail-toggle" type="button" onClick={toggleSidebar} aria-expanded={!collapsed} aria-controls="side-rail" aria-label="Toggle sidebar" title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
+          </button>
+        </div>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
-          {filterOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${filter === id ? ' is-active' : ''}`} onClick={() => setFilter(id)} aria-current={filter === id ? 'page' : undefined}>
-              <Icon aria-hidden="true" /> <span>{label}</span><span className="filter-count">{counts[id]}</span>
+          {filterOptions.map(({ id, label, icon: Icon, urgent }) => (
+            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="rail-caption fun-caption">JUST FOR FUN</div>
+        <nav className="filter-nav fun-nav" aria-label="Games">
+          {gameOptions.map(({ id, label, icon: Icon }) => (
+            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => setActiveGame(id)} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span>
             </button>
           ))}
         </nav>
         <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
-        <button className="sign-out-button" type="button" onClick={handleSignOut}><LogOut aria-hidden="true" /><span>Sign out</span></button>
+        <button className="sign-out-button" type="button" onClick={handleSignOut} title={collapsed ? 'Sign out' : undefined}><LogOut aria-hidden="true" /><span className="rail-label">Sign out</span></button>
+        {!collapsed && (
+          <div
+            className="rail-resize-handle"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize sidebar"
+            aria-controls="side-rail"
+            aria-valuenow={sidebarWidth}
+            aria-valuemin={SIDEBAR_MIN_WIDTH}
+            aria-valuemax={SIDEBAR_MAX_WIDTH}
+            tabIndex={0}
+            onPointerDown={handleResizeStart}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+            onPointerCancel={handleResizeEnd}
+            onKeyDown={handleResizeKeyDown}
+            onDoubleClick={() => setAndSaveSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
+          />
+        )}
       </aside>
 
       <section className="todo-main">
@@ -167,6 +294,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </header>
 
         <div className="dashboard-content">
+          {activeGame === 'snake' ? <SnakeGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
@@ -211,10 +339,11 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
+              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><CheckCheck aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
+          </>)}
           <footer className="dashboard-footer"><span><CircleCheck aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
         </div>
       </section>
