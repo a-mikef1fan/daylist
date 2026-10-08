@@ -314,6 +314,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .auth-footer { right: 0; bottom: 22px; left: 0; text-align: center; }
 }
 
+/* Account menu and dialogs */
+.avatar-button:hover, .avatar-button[data-popup-open] { background: oklch(0.89 0.05 153); }
+.user-menu-positioner { z-index: 60; }
+.user-menu { min-width: 224px; border: 1px solid var(--border); border-radius: 13px; background: var(--popover); padding: 6px; box-shadow: 0 14px 36px oklch(0.28 0.04 157 / 12%); font-family: var(--font-sans); outline: none; }
+.user-menu-header { display: flex; flex-direction: column; gap: 2px; padding: 9px 10px 10px; font-size: 13px; }
+.user-menu-header strong { overflow: hidden; max-width: 260px; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+.user-menu-label { color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.user-menu-item { display: flex; align-items: center; gap: 11px; border-radius: 9px; padding: 9px 10px; color: var(--ink-soft); cursor: pointer; font-size: 13px; outline: none; user-select: none; }
+.user-menu-item svg { width: 16px; height: 16px; flex: none; }
+.user-menu-item[data-highlighted] { background: oklch(0.93 0.018 100); color: var(--foreground); }
+.user-menu-separator { height: 1px; margin: 5px 4px; background: var(--border); }
+.dialog-backdrop { position: fixed; inset: 0; z-index: 70; background: oklch(0.24 0.025 158 / 35%); }
+.dialog-popup { position: fixed; top: 50%; left: 50%; z-index: 71; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto; transform: translate(-50%, -50%); border: 1px solid var(--border); border-radius: 18px; background: var(--card); padding: 28px; box-shadow: 0 24px 60px oklch(0.28 0.04 157 / 18%); outline: none; }
+.dialog-title { margin: 0 0 6px; font-size: 24px; font-weight: 650; letter-spacing: -.03em; }
+.dialog-description { margin: 0 0 20px; color: var(--muted-foreground); font-size: 13px; line-height: 1.6; }
+.dialog-close { position: absolute; top: 16px; right: 16px; display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer; }
+.dialog-close:hover { background: oklch(0.93 0.018 100); color: var(--foreground); }
+.dialog-close svg { width: 16px; height: 16px; }
+.dialog-body { gap: 14px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.dialog-submit { margin-top: 0; padding: 0 18px; }
+.dialog-cancel { height: 46px; border: 1px solid var(--border); border-radius: 9px; background: transparent; padding: 0 16px; color: var(--ink-soft); cursor: pointer; font-size: 12px; font-weight: 650; }
+.dialog-cancel:hover { background: oklch(0.95 0.012 100); }
+.check-field { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); cursor: pointer; font-size: 12px; }
+.check-field input { width: 16px; height: 16px; accent-color: var(--sage-deep); }
+.form-success { margin: 0; border-radius: 9px; background: var(--sage); padding: 12px 14px; color: var(--sage-deep); font-size: 13px; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
