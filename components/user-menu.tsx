@@ -1,10 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
-import { KeyRound, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { Check, ChevronRight, KeyRound, LogOut, Palette, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import {
+  DEFAULT_THEME_MODE,
+  DEFAULT_THEME_PALETTE,
+  THEME_MODES,
+  THEME_PALETTES,
+  applyTheme,
+  isThemeMode,
+  isThemePalette,
+  readStoredTheme,
+  saveTheme,
+  type ThemeMode,
+  type ThemePalette,
+} from '@/lib/theme'
 import { useRouter } from 'next/navigation'
 
 // Matches the minimum enforced on the sign-up form in auth-screen.tsx.
@@ -18,7 +31,33 @@ type UserMenuProps = {
 
 export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
   const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
+  const [themeMode, setThemeMode] = useState<ThemeMode>(DEFAULT_THEME_MODE)
+  const [themePalette, setThemePalette] = useState<ThemePalette>(DEFAULT_THEME_PALETTE)
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
+
+  // Restore the saved theme after mount so server and client markup match on hydration.
+  // The page itself is already themed by the inline script in layout.tsx.
+  useEffect(() => {
+    const stored = readStoredTheme()
+    setThemeMode(stored.mode)
+    setThemePalette(stored.palette)
+  }, [])
+
+  // In System mode, follow the OS setting as it changes.
+  useEffect(() => {
+    if (themeMode !== 'system') return
+    const query = window.matchMedia('(prefers-color-scheme: dark)')
+    const sync = () => applyTheme('system', themePalette)
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [themeMode, themePalette])
+
+  function updateTheme(mode: ThemeMode, palette: ThemePalette) {
+    setThemeMode(mode)
+    setThemePalette(palette)
+    applyTheme(mode, palette)
+    saveTheme(mode, palette)
+  }
 
   async function handleChangeUser() {
     try {
@@ -43,6 +82,39 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
               </div>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('password')}><KeyRound aria-hidden="true" />Change password</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('preferences')}><SlidersHorizontal aria-hidden="true" />User preferences</Menu.Item>
+              <Menu.SubmenuRoot>
+                <Menu.SubmenuTrigger className="user-menu-item"><Palette aria-hidden="true" />Theme<ChevronRight className="user-menu-chevron" aria-hidden="true" /></Menu.SubmenuTrigger>
+                <Menu.Portal>
+                  <Menu.Positioner className="user-menu-positioner" side="right" align="start" sideOffset={6} alignOffset={-6}>
+                    <Menu.Popup className="user-menu">
+                      <Menu.Group>
+                        <Menu.GroupLabel className="user-menu-label user-menu-group-label">Appearance</Menu.GroupLabel>
+                        <Menu.RadioGroup value={themeMode} onValueChange={(value) => isThemeMode(value) && updateTheme(value, themePalette)}>
+                          {THEME_MODES.map((mode) => (
+                            <Menu.RadioItem key={mode.value} className="user-menu-item" value={mode.value}>
+                              {mode.label}
+                              <Menu.RadioItemIndicator className="user-menu-check"><Check aria-hidden="true" /></Menu.RadioItemIndicator>
+                            </Menu.RadioItem>
+                          ))}
+                        </Menu.RadioGroup>
+                      </Menu.Group>
+                      <Menu.Separator className="user-menu-separator" />
+                      <Menu.Group>
+                        <Menu.GroupLabel className="user-menu-label user-menu-group-label">Color palette</Menu.GroupLabel>
+                        <Menu.RadioGroup value={themePalette} onValueChange={(value) => isThemePalette(value) && updateTheme(themeMode, value)}>
+                          {THEME_PALETTES.map((palette) => (
+                            <Menu.RadioItem key={palette.value} className="user-menu-item" value={palette.value}>
+                              <span className="theme-swatch" style={{ background: palette.swatch }} aria-hidden="true" />
+                              {palette.label}
+                              <Menu.RadioItemIndicator className="user-menu-check"><Check aria-hidden="true" /></Menu.RadioItemIndicator>
+                            </Menu.RadioItem>
+                          ))}
+                        </Menu.RadioGroup>
+                      </Menu.Group>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.SubmenuRoot>
               <Menu.Separator className="user-menu-separator" />
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><UserRoundCog aria-hidden="true" />Change user</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><LogOut aria-hidden="true" />Sign out</Menu.Item>

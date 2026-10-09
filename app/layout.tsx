@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { THEME_INIT_SCRIPT } from '@/lib/theme'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
@@ -22,15 +23,22 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f7f7f3',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f7f3' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1b19' },
+  ],
   width: 'device-width',
   initialScale: 1,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    // The theme script sets `class` and `data-palette` on <html> before hydration, so React must not flag the mismatch.
+    <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
