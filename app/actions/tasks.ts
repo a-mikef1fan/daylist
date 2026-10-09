@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { tasks, type TaskPriority, type TaskStatus } from '@/lib/db/schema'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -35,7 +35,7 @@ export async function createTask(input: {
     throw new Error('Invalid task priority')
   }
   if (input.dueDate !== null) {
-    if (typeof input.dueDate !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.dueDate)) {
+    if (typeof input.dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
       throw new Error('Invalid due date')
     }
     const parsedDate = new Date(`${input.dueDate}T00:00:00.000Z`)
@@ -69,7 +69,7 @@ export async function updateTaskCompletion(id: string, completed: boolean) {
   }
   const [task] = await db
     .update(tasks)
-    .set({ completed, updatedAt: new Date() })
+    .set({ completed, status: completed ? 'done' : 'not_started', updatedAt: new Date() })
     .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
     .returning()
   if (!task) throw new Error('Task not found')
@@ -82,4 +82,42 @@ export async function deleteTask(id: string) {
   if (typeof id !== 'string' || id.length < 1 || id.length > 80) throw new Error('Invalid task')
   await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
   revalidatePath('/')
+}
+
+const TASK_STATUSES: TaskStatus[] = ['not_started', 'working', 'stuck', 'done']
+
+export async function updateTaskStatus(id: string, status: TaskStatus) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length > 80 || !TASK_STATUSES.includes(status)) {
+    throw new Error('Invalid task update')
+  }
+  // "completed" stays in sync so the existing list, counts and filters keep working.
+  const [task] = await db
+    .update(tasks)
+    .set({ status, completed: status === 'done', updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning()
+  if (!task) throw new Error('Task not found')
+  revalidatePath('/')
+  return task
+}
+
+export async function updateTaskDueDate(id: string, dueDate: string | null) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length > 80) throw new Error('Invalid task update')
+  if (dueDate !== null) {
+    if (typeof dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) throw new Error('Invalid due date')
+    const parsedDate = new Date(`${dueDate}T00:00:00.000Z`)
+    if (Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== dueDate) {
+      throw new Error('Invalid due date')
+    }
+  }
+  const [task] = await db
+    .update(tasks)
+    .set({ dueDate, updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning()
+  if (!task) throw new Error('Task not found')
+  revalidatePath('/')
+  return task
 }

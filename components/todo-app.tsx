@@ -19,15 +19,17 @@ import {
   Plus,
   Search,
   Sparkles,
+  SunMedium,
   Trash2,
   Worm,
 } from 'lucide-react'
-import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { createTask, deleteTask, updateTaskCompletion, updateTaskDueDate, updateTaskStatus } from '@/app/actions/tasks'
+import { MyDay } from '@/components/my-day'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { Task, TaskPriority } from '@/lib/db/schema'
+import type { Task, TaskPriority, TaskStatus } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
@@ -79,6 +81,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
+  const [myDayActive, setMyDayActive] = useState(false)
   const [search, setSearch] = useState('')
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -174,6 +177,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       upcoming: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate > today).length,
       urgent: tasks.filter((task) => !task.completed && task.priority === 'high').length,
       completed: tasks.filter((task) => task.completed).length,
+      myDay: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate <= today).length,
     }
   }, [tasks])
 
@@ -217,17 +221,56 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   }
 
   function handleToggle(task: Task) {
-    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed, status: item.completed ? 'not_started' : 'done' } : item))
     startTransition(async () => {
       try {
         const updated = await updateTaskCompletion(task.id, !task.completed)
         setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
         router.refresh()
       } catch {
-        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed, status: task.status } : item))
         setMessage('Could not update that task. Please try again.')
       }
     })
+  }
+
+  function handleStatusChange(task: Task, status: TaskStatus) {
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, status, completed: status === 'done' } : item))
+    startTransition(async () => {
+      try {
+        const updated = await updateTaskStatus(task.id, status)
+        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        router.refresh()
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, status: task.status, completed: task.completed } : item))
+        setMessage('Could not update that task. Please try again.')
+      }
+    })
+  }
+
+  function handleDueDateChange(task: Task, nextDueDate: string | null) {
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, dueDate: nextDueDate } : item))
+    startTransition(async () => {
+      try {
+        const updated = await updateTaskDueDate(task.id, nextDueDate)
+        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        router.refresh()
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, dueDate: task.dueDate } : item))
+        setMessage('Could not update that due date. Please try again.')
+      }
+    })
+  }
+
+  // Quick add from My day: the task is due today, and the input keeps focus for the next one.
+  function handleMyDayAdd(newTitle: string, newDueDate: string) {
+    setMessage('')
+    createTask({ title: newTitle, dueDate: newDueDate, priority: 'normal' })
+      .then((task) => {
+        setTasks((current) => [task, ...current])
+        router.refresh()
+      })
+      .catch(() => setMessage('Could not save that task. Please try again.'))
   }
 
   function handleDelete(task: Task) {
@@ -261,18 +304,26 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
             {collapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
           </button>
         </div>
-        <div className="rail-caption">YOUR SPACE</div>
+        <div className="rail-primary">
+        <div className="rail-caption">MY DAY</div>
+        <nav className="filter-nav myday-nav" aria-label="My day">
+          <button type="button" className={`filter-link${myDayActive && !activeGame ? ' is-active' : ''}`} onClick={() => { setMyDayActive(true); setActiveGame(null) }} aria-current={myDayActive && !activeGame ? 'page' : undefined} title={collapsed ? 'My day' : undefined}>
+            <SunMedium aria-hidden="true" /> <span className="rail-label">My day</span><span className="filter-count">{counts.myDay}</span>
+          </button>
+        </nav>
+        <div className="rail-caption fun-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
           {filterOptions.map(({ id, label, icon: Icon, urgent }) => (
-            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && !myDayActive && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null); setMyDayActive(false) }} aria-current={!activeGame && !myDayActive && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
         </nav>
+        </div>
         <div className="rail-caption fun-caption">JUST FOR FUN</div>
         <nav className="filter-nav fun-nav" aria-label="Games">
           {gameOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => setActiveGame(id)} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => { setActiveGame(id); setMyDayActive(false) }} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <Icon aria-hidden="true" /> <span className="rail-label">{label}</span>
             </button>
           ))}
@@ -308,7 +359,10 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : myDayActive ? (<>
+          {message && <p className="task-message" role="alert">{message}</p>}
+          <MyDay tasks={tasks} firstName={firstName} onStatusChange={handleStatusChange} onDueDateChange={handleDueDateChange} onDelete={handleDelete} onAdd={handleMyDayAdd} />
+          </>) : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
