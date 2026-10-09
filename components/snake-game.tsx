@@ -161,7 +161,7 @@ export function SnakeGame() {
             {status === 'over' ? (
               <button className="snake-action" type="button" onClick={restart}><RotateCcw aria-hidden="true" /> Play again</button>
             ) : (
-              <button className="snake-action" type="button" onClick={() => setStatus('running')}><Play aria-hidden="true" /> {status === 'paused' ? 'Resume' : 'Start'}</button>
+              <button className="snake-action" type="button"><Play aria-hidden="true" /> {status === 'paused' ? 'Resume' : 'Start'}</button>
             )}
           </div>
         )}
