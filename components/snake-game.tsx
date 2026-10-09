@@ -35,6 +35,7 @@ export function SnakeGame() {
   const [game, setGame] = useState<SnakeState>(() => createSnake())
   const [status, setStatus] = useState<Status>('ready')
   const [best, setBest] = useState(0)
+  const [themeVersion, setThemeVersion] = useState(0)
   const gameRef = useRef(game)
   const queueRef = useRef<Direction[]>([])
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -78,6 +79,13 @@ export function SnakeGame() {
     return () => window.clearInterval(id)
   }, [status, speed, commit])
 
+  // The canvas reads theme colors from CSS variables, so repaint it when the theme changes.
+  useEffect(() => {
+    const observer = new MutationObserver(() => setThemeVersion((version) => version + 1))
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-palette'] })
+    return () => observer.disconnect()
+  }, [])
+
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
@@ -96,7 +104,7 @@ export function SnakeGame() {
       context.fillStyle = index === 0 ? color('--sage-deep', '#2f5d46') : color('--primary', '#3d6b52')
       context.fillRect(part.x * CELL + 1, part.y * CELL + 1, CELL - 2, CELL - 2)
     })
-  }, [game])
+  }, [game, themeVersion])
 
   function restart() {
     queueRef.current = []
