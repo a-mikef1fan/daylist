@@ -25,6 +25,7 @@ import {
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
+import { UserMenu } from '@/components/user-menu'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -38,6 +39,7 @@ const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
+const TASK_ICONS_STORAGE_KEY = 'daylist:show-task-icons'
 const SIDEBAR_DEFAULT_WIDTH = 248
 const SIDEBAR_MIN_WIDTH = 200
 const SIDEBAR_MAX_WIDTH = 420
@@ -87,6 +89,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH)
   const [resizing, setResizing] = useState(false)
   const [sidebarReady, setSidebarReady] = useState(false)
+  const [showTaskIcons, setShowTaskIcons] = useState(true)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
 
@@ -96,11 +99,21 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       setCollapsed(window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true')
       const savedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY))
       if (Number.isFinite(savedWidth) && savedWidth > 0) setSidebarWidth(clampSidebarWidth(savedWidth))
+      setShowTaskIcons(window.localStorage.getItem(TASK_ICONS_STORAGE_KEY) !== 'false')
     } catch {
       // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
     }
     setSidebarReady(true)
   }, [])
+
+  function handleShowTaskIconsChange(value: boolean) {
+    setShowTaskIcons(value)
+    try {
+      window.localStorage.setItem(TASK_ICONS_STORAGE_KEY, String(value))
+    } catch {
+      // Ignore storage failures; the preference still applies for this visit.
+    }
+  }
 
   function toggleSidebar() {
     const next = !collapsed
@@ -291,7 +304,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <button className="avatar-button" type="button" onClick={handleSignOut} aria-label={`Sign out ${firstName}`} title="Sign out">{firstName.slice(0, 1).toUpperCase()}</button>
+          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
         </header>
 
         <div className="dashboard-content">
@@ -334,7 +347,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
-                    <div className="task-copy"><span className="task-title"><span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
                   </li>
                 ))}
