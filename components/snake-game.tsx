@@ -107,7 +107,18 @@ export function SnakeGame() {
     boardRef.current?.focus()
   }
 
+  // Keys are handled on the board, so hand focus back to it after any button click.
+  function focusBoard() {
+    boardRef.current?.focus()
+  }
+
+  function start() {
+    setStatus('running')
+    focusBoard()
+  }
+
   function turn(direction: Direction) {
+    focusBoard()
     if (status === 'over') return
     const last = queueRef.current[queueRef.current.length - 1] ?? gameRef.current.direction
     if (direction !== last && !isOpposite(last, direction) && queueRef.current.length < 2) {
@@ -119,6 +130,7 @@ export function SnakeGame() {
   function togglePause() {
     if (status === 'running') setStatus('paused')
     else if (status === 'paused') setStatus('running')
+    focusBoard()
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -161,7 +173,7 @@ export function SnakeGame() {
             {status === 'over' ? (
               <button className="snake-action" type="button" onClick={restart}><RotateCcw aria-hidden="true" /> Play again</button>
             ) : (
-              <button className="snake-action" type="button" onClick={() => setStatus('running')}><Play aria-hidden="true" /> {status === 'paused' ? 'Resume' : 'Start'}</button>
+              <button className="snake-action" type="button" onClick={start}><Play aria-hidden="true" /> {status === 'paused' ? 'Resume' : 'Start'}</button>
             )}
           </div>
         )}
