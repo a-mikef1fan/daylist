@@ -79,7 +79,7 @@ export async function updateTaskCompletion(id: string, completed: boolean) {
 
 export async function deleteTask(id: string) {
   const userId = await getUserId()
-  if (typeof id !== 'string' || id.length < 80) throw new Error('Invalid task')
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80) throw new Error('Invalid task')
   await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
   revalidatePath('/')
 }
