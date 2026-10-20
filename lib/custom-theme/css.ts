@@ -13,7 +13,7 @@ export const THEME_SAVED_STORAGE_KEY = 'daylist:custom-theme-saved'
 // Precompiled output read by the inline script in <head>, so the theme paints before React hydrates.
 export const THEME_COMPILED_STORAGE_KEY = 'daylist:custom-theme-compiled'
 
-const mix = (a: string, percent: number, b: string) => `color-mix(in oklch, ${a} ${percent}%, ${b})`
+const mix = (a: string, percent: number, b: string) => `color-mix(in oklab, ${a} ${percent}%, ${b})`
 
 function colorVariables(colors: ThemeColors): Record<string, string> {
   const parsed = Object.fromEntries(COLOR_KEYS.map((key) => [key, parseColor(colors[key]) as Oklch])) as Record<keyof ThemeColors, Oklch>

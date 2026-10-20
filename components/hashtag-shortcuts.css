@@ -18,13 +18,13 @@
 .hashtag-list code { min-width: 76px; color: var(--foreground); font-size: 12px; font-weight: 600; }
 .hashtag-list span { flex: 1; color: var(--muted-foreground); }
 .hashtag-remove { display: grid; width: 22px; height: 22px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--muted-foreground); cursor: pointer; }
-.hashtag-remove:hover { background: oklch(0.93 0.018 100); color: var(--destructive); }
+.hashtag-remove:hover { background: var(--hover); color: var(--destructive); }
 .hashtag-remove svg { width: 13px; height: 13px; }
 .hashtag-empty { margin: 0; color: var(--muted-foreground); font-size: 11px; }
 .hashtag-add { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .hashtag-hash { color: var(--muted-foreground); font-size: 12px; }
-.hashtag-add input { min-width: 0; flex: 1; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: oklch(0.99 0.004 100); padding: 0 8px; font-size: 12px; }
+.hashtag-add input { min-width: 0; flex: 1; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 8px; font-size: 12px; }
 .hashtag-add select { height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 4px; color: var(--ink-soft); font-size: 11px; }
-.hashtag-add-button { display: inline-flex; height: 32px; align-items: center; gap: 4px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 10px; color: white; cursor: pointer; font-size: 11px; font-weight: 650; }
+.hashtag-add-button { display: inline-flex; height: 32px; align-items: center; gap: 4px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 10px; color: var(--on-sage-deep); cursor: pointer; font-size: 11px; font-weight: 650; }
 .hashtag-add-button svg { width: 13px; height: 13px; }
 .hashtag-popup .hashtag-error { margin-top: 8px; }
