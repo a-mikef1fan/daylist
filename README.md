@@ -6,6 +6,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
+- Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short bell sound) or delete them
 - Optionally assign a task to a member of your Slack workspace (display only: the assignee does not get access to the task)
 - Filter by All tasks, Today, Upcoming, Urgent, Assigned, and Completed; search by text
@@ -60,6 +61,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `assigneeSlackId`, `assigneeName`, `assigneeImage`, `createdAt`, `updatedAt`)
 
+A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 The three `assignee*` columns are nullable. If your `tasks` table predates task assignees, add them with:
@@ -91,7 +94,7 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, updateTaskAssignee, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), updateTaskAssignee, deleteTask
   actions/slack.ts            Server action: listSlackMembers (assignee picker)
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
@@ -105,5 +108,6 @@ lib/
   slack.ts                    Slack users.list lookup with in-memory cache
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
