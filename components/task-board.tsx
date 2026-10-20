@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, CircleCheck, CircleDot, Circle, Plus } from 'lucide-react'
 import { createTask, updateTaskStatus } from '@/app/actions/tasks'
 import { playCompletionBell } from '@/lib/completion-bell'
-import type { Task, TaskStatus } from '@/lib/db/schema'
+import type { TaskStatus } from '@/lib/db/schema'
+import type { TaskView as Task } from '@/lib/recurrence'
 import { TASK_STATUSES, TASK_STATUS_LABELS, getTaskProgress, getTaskStatus } from '@/lib/task-status'
 
 const statusIcons = { todo: Circle, in_progress: CircleDot, done: CircleCheck } as const
@@ -74,8 +75,11 @@ export function TaskBoard({ tasks, onTasksChange }: { tasks: Task[]; onTasksChan
     onTasksChange((current) => current.map((item) => (item.id === task.id ? { ...item, status, completed: status === 'done' } : item)))
     startTransition(async () => {
       try {
-        const updated = await updateTaskStatus(task.id, status)
-        onTasksChange((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+        const { task: updated, next } = await updateTaskStatus(task.id, status, dateKey(new Date()))
+        onTasksChange((current) => {
+          const synced = current.map((item) => (item.id === updated.id ? updated : item))
+          return next && !synced.some((item) => item.id === next.id) ? [next, ...synced] : synced
+        })
         router.refresh()
       } catch {
         onTasksChange((current) => current.map((item) => (item.id === task.id ? { ...item, ...previous } : item)))

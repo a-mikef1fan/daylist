@@ -6,6 +6,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
+- Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short bell sound) or delete them
 - Task board: a Kanban-style tracker with To do, In progress and Done columns, a progress bar with counts and percent complete, move buttons on every card, and drag and drop on desktop
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
@@ -61,6 +62,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 `tasks.status` is one of `todo`, `in_progress`, `done` and defaults to `todo`. It is kept in sync with `completed` (`done` if and only if `completed` is true). If you already have a `tasks` table from before the task board existed, run `lib/db/migrations/0001_add_task_status.sql` once. It is safe to re-run.
 
+A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 ### Run
@@ -86,7 +89,7 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, updateTaskStatus, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), updateTaskStatus, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
@@ -99,6 +102,7 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   db/migrations/              Hand-run SQL for schema changes
+  recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   task-status.ts              Task status labels and progress helpers
   utils.ts                    Helpers
 ```

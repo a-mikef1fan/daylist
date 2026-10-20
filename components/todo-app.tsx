@@ -18,6 +18,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Repeat,
   Search,
   Sparkles,
   Trash2,
@@ -25,14 +26,16 @@ import {
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { DailyQuote } from '@/components/daily-quote'
 import { SnakeGame } from '@/components/snake-game'
 import { TaskBoard } from '@/components/task-board'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
+import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { Task, TaskPriority } from '@/lib/db/schema'
+import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
@@ -81,7 +84,7 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; userName: string }) {
+export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; userName: string }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
@@ -90,6 +93,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
+  const [repeat, setRepeat] = useState<TaskRepeat>('none')
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
   const [collapsed, setCollapsed] = useState(false)
@@ -211,11 +215,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setMessage('')
     startTransition(async () => {
       try {
-        const task = await createTask({ title: title.trim(), dueDate: dueDate || null, priority })
+        // A repeating task needs a start date, so default it to today.
+        const task = await createTask({ title: title.trim(), dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority, repeat })
         setTasks((current) => [task, ...current])
         setTitle('')
         setDueDate('')
         setPriority('normal')
+        setRepeat('none')
         router.refresh()
       } catch {
         setMessage('Could not save that task. Please try again.')
@@ -223,23 +229,26 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     })
   }
 
-  function handleToggle(task: Task) {
+  function handleToggle(task: TaskView) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
     if (!task.completed) playCompletionBell()
-    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed, status: !item.completed ? 'done' : 'todo' } : item))
     startTransition(async () => {
       try {
-        const updated = await updateTaskCompletion(task.id, !task.completed)
-        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        const { task: updated, next } = await updateTaskCompletion(task.id, !task.completed, dateKey(new Date()))
+        setTasks((current) => {
+          const synced = current.map((item) => item.id === updated.id ? updated : item)
+          return next && !synced.some((item) => item.id === next.id) ? [next, ...synced] : synced
+        })
         router.refresh()
       } catch {
-        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed, status: task.status } : item))
         setMessage('Could not update that task. Please try again.')
       }
     })
   }
 
-  function handleDelete(task: Task) {
+  function handleDelete(task: TaskView) {
     setTasks((current) => current.filter((item) => item.id !== task.id))
     startTransition(async () => {
       try {
@@ -326,6 +335,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
             <p>{counts.all === 0 ? 'You’ve made space for what matters.' : `You have ${counts.all} ${counts.all === 1 ? 'thing' : 'things'} on your list. You’ve got this.`}</p>
           </div>
+          <DailyQuote />
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
             <div className="quick-add-heading"><span className="quick-add-icon"><Plus aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
@@ -337,6 +347,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                   <ArrowDownWideNarrow aria-hidden="true" />
                   <select value={priority} onChange={(event) => setPriority(event.target.value as TaskPriority)} aria-label="Priority">
                     <option value="normal">Normal priority</option><option value="high">High priority</option><option value="low">Low priority</option>
+                  </select>
+                </label>
+                <label className="select-control" aria-label="Repeat">
+                  <Repeat aria-hidden="true" />
+                  <select value={repeat} onChange={(event) => setRepeat(event.target.value as TaskRepeat)} aria-label="Repeat">
+                    {TASK_REPEATS.map((option) => <option key={option} value={option}>{option === 'none' ? 'Never repeats' : `Repeats ${repeatLabels[option].toLowerCase()}`}</option>)}
                   </select>
                 </label>
                 <label className="date-control" aria-label="Due date"><CalendarDays aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
@@ -359,7 +375,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
                   </li>
                 ))}

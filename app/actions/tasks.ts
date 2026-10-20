@@ -3,6 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, type TaskPriority, type TaskStatus } from '@/lib/db/schema'
+import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { isTaskStatus } from '@/lib/task-status'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -16,17 +17,19 @@ async function getUserId() {
 
 export async function getTasks() {
   const userId = await getUserId()
-  return db
+  const rows = await db
     .select()
     .from(tasks)
     .where(eq(tasks.userId, userId))
     .orderBy(asc(tasks.completed), desc(tasks.createdAt))
+  return rows.map(toTaskView)
 }
 
 export async function createTask(input: {
   title: string
   dueDate: string | null
   priority: TaskPriority
+  repeat?: TaskRepeat
 }) {
   const userId = await getUserId()
   if (!input || typeof input !== 'object') throw new Error('Invalid task')
@@ -36,7 +39,7 @@ export async function createTask(input: {
     throw new Error('Invalid task priority')
   }
   if (input.dueDate !== null) {
-    if (typeof input.dueDate !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.dueDate)) {
+    if (typeof input.dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
       throw new Error('Invalid due date')
     }
     const parsedDate = new Date(`${input.dueDate}T00:00:00.000Z`)
@@ -45,8 +48,10 @@ export async function createTask(input: {
     }
   }
 
-  if (input.dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
-    throw new Error('Invalid due date')
+  const repeat = input.repeat ?? 'none'
+  if (!isTaskRepeat(repeat)) throw new Error('Invalid repeat option')
+  if (repeat !== 'none' && input.dueDate === null) {
+    throw new Error('A repeating task needs a due date')
   }
 
   const [task] = await db
@@ -57,40 +62,93 @@ export async function createTask(input: {
       title,
       dueDate: input.dueDate,
       priority: input.priority,
+      description: encodeRepeat(repeat, null),
     })
     .returning()
   revalidatePath('/')
-  return task
+  return toTaskView(task)
 }
 
-export async function updateTaskCompletion(id: string, completed: boolean) {
+function isDateKey(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
+// Applies a new status/completed pair to a task (always kept in sync: `done` if and only
+// if `completed`) and, when a recurring task becomes completed, adds its next occurrence.
+// `today` is the caller's local 'YYYY-MM-DD' date, used so a late completion of a
+// recurring task schedules its next occurrence in the future, not the past.
+async function applyTaskState(userId: string, id: string, status: TaskStatus, today?: string) {
+  const completed = status === 'done'
+  return db.transaction(async (tx) => {
+    const [task] = await tx
+      .update(tasks)
+      .set({ completed, status, updatedAt: new Date() })
+      .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+      .returning()
+    if (!task) throw new Error('Task not found')
+
+    // Completing a recurring task leaves it in the Completed list and adds the
+    // next occurrence as a new open task. Skip it if that occurrence already
+    // exists (for example after un-completing and completing again).
+    let next: typeof task | null = null
+    const { repeat } = parseRepeat(task.description)
+    const nextDue =
+      completed && task.dueDate
+        ? nextOccurrence(task.dueDate, repeat, today ?? new Date().toISOString().slice(0, 10))
+        : null
+    if (nextDue && task.description) {
+      const [existing] = await tx
+        .select({ id: tasks.id })
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.userId, userId),
+            eq(tasks.title, task.title),
+            eq(tasks.description, task.description),
+            eq(tasks.dueDate, nextDue),
+            eq(tasks.completed, false),
+          ),
+        )
+        .limit(1)
+      if (!existing) {
+        ;[next] = await tx
+          .insert(tasks)
+          .values({
+            id: crypto.randomUUID(),
+            userId,
+            title: task.title,
+            description: task.description,
+            dueDate: nextDue,
+            priority: task.priority,
+            status: 'todo',
+          })
+          .returning()
+      }
+    }
+    return { task: toTaskView(task), next: next && toTaskView(next) }
+  })
+}
+
+export async function updateTaskCompletion(id: string, completed: boolean, today?: string) {
   const userId = await getUserId()
-  if (typeof id !== 'string' || id.length > 80 || typeof completed !== 'boolean') {
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80 || typeof completed !== 'boolean') {
     throw new Error('Invalid task update')
   }
-  const [task] = await db
-    .update(tasks)
-    .set({ completed, status: completed ? 'done' : 'todo', updatedAt: new Date() })
-    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
-    .returning()
-  if (!task) throw new Error('Task not found')
+  if (today !== undefined && !isDateKey(today)) throw new Error('Invalid date')
+  const result = await applyTaskState(userId, id, completed ? 'done' : 'todo', today)
   revalidatePath('/')
-  return task
+  return result
 }
 
-export async function updateTaskStatus(id: string, status: TaskStatus) {
+export async function updateTaskStatus(id: string, status: TaskStatus, today?: string) {
   const userId = await getUserId()
   if (typeof id !== 'string' || id.length < 1 || id.length > 80 || !isTaskStatus(status)) {
     throw new Error('Invalid task update')
   }
-  const [task] = await db
-    .update(tasks)
-    .set({ status, completed: status === 'done', updatedAt: new Date() })
-    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
-    .returning()
-  if (!task) throw new Error('Task not found')
+  if (today !== undefined && !isDateKey(today)) throw new Error('Invalid date')
+  const result = await applyTaskState(userId, id, status, today)
   revalidatePath('/')
-  return task
+  return result
 }
 
 export async function deleteTask(id: string) {
