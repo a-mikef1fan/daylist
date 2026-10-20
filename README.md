@@ -11,6 +11,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Just for fun, behind the same sign-in: Snake, Theseus & the Minotaur, and an arcade F1 Grand Prix with the full 2026 grid (22 drivers, 11 teams), AI rivals, laps, lap times, and a finishing order
 
 ## Tech stack
 
@@ -95,6 +96,9 @@ components/
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  snake-game.tsx              Snake
+  theseus-game.tsx            Theseus & the Minotaur
+  f1-game.tsx                 F1 Grand Prix: driver select, race loop, HUD, results (styles in f1-game.css)
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
@@ -102,6 +106,9 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  f1-grid.ts                  The 2026 F1 grid: teams, car names, colors, drivers (name, number, code, nationality)
+  f1.ts                       F1 race engine: circuit, car physics, AI, laps and classification
+  f1-render.ts                F1 canvas drawing (track layer and cars)
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
