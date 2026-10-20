@@ -345,7 +345,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
-/* Gamification: progress card, daily habit, toasts */
+/* Gamification: progress card, toasts */
 .progress-card { display: flex; align-items: center; gap: 18px; margin-top: 26px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); padding: 16px 20px; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
 .progress-level { display: grid; flex: none; width: 54px; height: 54px; place-items: center; align-content: center; border-radius: 16px; background: var(--sage-deep); color: white; line-height: 1; }
 .progress-level span { font-size: 9px; font-weight: 750; letter-spacing: .14em; opacity: .75; }
@@ -368,16 +368,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .progress-streak strong { font-family: var(--font-display); font-size: 22px; font-weight: 680; line-height: 1.1; }
 .progress-streak span { color: var(--muted-foreground); font-size: 10px; }
 .progress-streak em { color: var(--ink-soft); font-size: 10px; font-style: normal; font-weight: 650; }
-.habit-card { display: flex; align-items: center; gap: 12px; margin-top: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 12px 16px; }
-.habit-card.is-done { background: var(--sage); border-color: oklch(0.85 0.045 153); }
-.habit-card .complete-button { display: grid; place-items: center; }
-.habit-ring { display: block; width: 20px; height: 20px; border: 1.5px solid var(--muted-foreground); border-radius: 50%; }
-.habit-card.is-done .complete-button { color: var(--sage-deep); }
-.habit-copy { display: grid; gap: 3px; min-width: 0; flex: 1; }
-.habit-title { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
-.habit-title svg { width: 14px; height: 14px; color: var(--coral); }
-.habit-xp { color: var(--muted-foreground); font-size: 11px; font-weight: 650; }
-.habit-card.is-done .habit-xp { color: var(--sage-deep); }
 .toast-stack { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none; }
 .toast { display: flex; align-items: center; gap: 11px; border: 1px solid var(--border); border-radius: 13px; background: var(--card); padding: 11px 16px; box-shadow: 0 14px 34px oklch(0.28 0.04 157 / 14%); animation: toast-in .28s cubic-bezier(.2, .9, .3, 1.2); }
 .toast > svg { flex: none; width: 18px; height: 18px; color: var(--sage-deep); }

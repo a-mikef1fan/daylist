@@ -24,8 +24,8 @@ import {
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask } from '@/app/actions/tasks'
-import { setDailyHabitDone, setTaskCompleted } from '@/app/actions/progress'
-import { CelebrationToasts, DailyHabitCard, ProgressCard, type CelebrationToast } from '@/components/gamification'
+import { setTaskCompleted } from '@/app/actions/progress'
+import { CelebrationToasts, ProgressCard, type CelebrationToast } from '@/components/gamification'
 import { effectiveStreak, emptyProgress, levelFromXp, unlockedAchievementIds, achievements, type Progress } from '@/lib/gamification'
 import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
@@ -135,17 +135,6 @@ export function TodoApp({ initialTasks, userName, initialProgress = emptyProgres
       if (achievement) added.push({ kind: 'badge', title: `Badge: ${achievement.label}`, detail: achievement.description })
     }
     if (added.length > 0) setToasts((current) => [...current, ...added.map((toast) => ({ ...toast, id: ++toastId.current }))].slice(-4))
-  }
-
-  function handleHabitToggle(done: boolean) {
-    if (done) playCompletionBell()
-    startTransition(async () => {
-      try {
-        applyProgress(await setDailyHabitDone(done, dateKey(new Date())))
-      } catch {
-        setMessage('Could not update your daily habit. Please try again.')
-      }
-    })
   }
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
@@ -374,7 +363,6 @@ export function TodoApp({ initialTasks, userName, initialProgress = emptyProgres
           </div>
 
           <ProgressCard progress={progress} today={today} />
-          <DailyHabitCard progress={progress} today={today} pending={isPending} onToggle={handleHabitToggle} />
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
             <div className="quick-add-heading"><span className="quick-add-icon"><Plus aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>

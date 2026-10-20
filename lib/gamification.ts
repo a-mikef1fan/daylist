@@ -5,7 +5,6 @@
 //   - Completing a task earns BASE_XP (10).
 //   - +5 if the task is high priority.
 //   - +5 if it has a due date and is completed on or before that date.
-//   - The daily habit earns HABIT_XP (10).
 //   Un-completing a task deletes its XP grant, so toggling never farms XP.
 //
 // Levels
@@ -23,9 +22,6 @@
 export const BASE_XP = 10
 export const HIGH_PRIORITY_BONUS = 5
 export const ON_TIME_BONUS = 5
-export const HABIT_XP = 10
-
-export const DAILY_HABIT = { key: 'affirmations', title: 'Positive affirmations to self' } as const
 
 export type DateKey = string // 'YYYY-MM-DD'
 
@@ -112,8 +108,6 @@ export function effectiveStreak(stats: Pick<StreakSummary, 'currentStreak' | 'la
 export type Progress = StreakSummary & {
   totalXp: number
   tasksCompleted: number
-  /** Local dates (newest first, max 3) on which the daily habit was done. */
-  habitDoneDates: DateKey[]
 }
 
 export const emptyProgress: Progress = {
@@ -122,7 +116,6 @@ export const emptyProgress: Progress = {
   currentStreak: 0,
   bestStreak: 0,
   lastActiveDate: null,
-  habitDoneDates: [],
 }
 
 export type Achievement = { id: string; label: string; description: string; unlocked: (p: Progress) => boolean }
@@ -135,8 +128,4 @@ export const achievements: Achievement[] = [
 
 export function unlockedAchievementIds(progress: Progress): string[] {
   return achievements.filter((a) => a.unlocked(progress)).map((a) => a.id)
-}
-
-export function isHabitDoneToday(progress: Progress, today: DateKey): boolean {
-  return progress.habitDoneDates.includes(today)
 }

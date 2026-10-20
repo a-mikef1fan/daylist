@@ -1,16 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Award, Check, Flame, Sparkles, Star, Trophy, Zap } from 'lucide-react'
-import {
-  DAILY_HABIT,
-  HABIT_XP,
-  achievements,
-  effectiveStreak,
-  isHabitDoneToday,
-  levelProgress,
-  type Progress,
-} from '@/lib/gamification'
+import { Award, Flame, Sparkles, Star, Trophy, Zap } from 'lucide-react'
+import { achievements, effectiveStreak, levelProgress, type Progress } from '@/lib/gamification'
 
 export type CelebrationToast = {
   id: number
@@ -55,21 +47,6 @@ export function ProgressCard({ progress, today }: { progress: Progress; today: s
         <span>day streak</span>
         <em>Best {progress.bestStreak}</em>
       </div>
-    </section>
-  )
-}
-
-export function DailyHabitCard({ progress, today, pending, onToggle }: { progress: Progress; today: string | null; pending: boolean; onToggle: (done: boolean) => void }) {
-  // Needs the browser's local date to know whether today's habit is done, so render after mount.
-  if (!today) return null
-  const done = isHabitDoneToday(progress, today)
-  return (
-    <section className={`habit-card${done ? ' is-done' : ''}`} aria-label="Daily habit">
-      <button className="complete-button" type="button" disabled={pending} onClick={() => onToggle(!done)} aria-pressed={done} aria-label={done ? `Mark ${DAILY_HABIT.title} not done today` : `Mark ${DAILY_HABIT.title} done today`}>
-        {done ? <Check aria-hidden="true" /> : <span className="habit-ring" aria-hidden="true" />}
-      </button>
-      <div className="habit-copy"><span className="eyebrow">DAILY HABIT</span><span className="habit-title"><Sparkles aria-hidden="true" /> {DAILY_HABIT.title}</span></div>
-      <span className="habit-xp">+{HABIT_XP} XP</span>
     </section>
   )
 }

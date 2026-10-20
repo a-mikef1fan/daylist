@@ -70,9 +70,9 @@ export const tasks = pgTable('tasks', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
-// One row per XP grant (a completed task or a completed daily habit). Stats are derived
+// One row per XP grant (a completed task). Stats are derived
 // from these rows, so un-completing deletes the row and takes exactly that XP away.
-// `id` is `task:<taskId>` or `habit:<habitKey>:<YYYY-MM-DD>:<userId>`, which makes grants idempotent.
+// `id` is `task:<taskId>`, which makes grants idempotent.
 // `awardedOn` is the user's local calendar date when the XP was earned (see lib/gamification.ts).
 export const xpAwards = pgTable(
   'xp_awards',

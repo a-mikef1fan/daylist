@@ -9,13 +9,13 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
-- Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges, and tick off a built-in daily habit ("Positive affirmations to self")
+- Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges
 
 ## Gamification rules
 
 All rules live in `lib/gamification.ts` (pure functions, covered by `pnpm test`).
 
-- XP per completed task: 10 base, +5 for high priority, +5 if completed on or before its due date. The daily habit is worth 10 XP once per day.
+- XP per completed task: 10 base, +5 for high priority, +5 if completed on or before its due date.
 - Un-completing a task deletes the XP it granted, so toggling cannot farm XP. Deleting a completed task keeps its XP.
 - Level `n` needs `25 * n * (n - 1)` total XP (level 2 = 50, level 3 = 150, level 4 = 300, ...).
 - Streak: consecutive local calendar days with at least one XP grant. The browser sends its local date (`YYYY-MM-DD`) with each completion; the server only accepts dates within one day of its UTC date. A streak stays alive through the day after the last active day, then resets.
@@ -98,12 +98,12 @@ app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
-  actions/progress.ts         Server actions: setTaskCompleted (task + XP), setDailyHabitDone
+  actions/progress.ts         Server actions: setTaskCompleted (task + XP)
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
-  gamification.tsx            Progress card, daily habit card, celebration toasts
+  gamification.tsx            Progress card, celebration toasts
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)

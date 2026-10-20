@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, xpAwards } from '@/lib/db/schema'
 import { lockStats, recomputeStats } from '@/lib/gamification-server'
-import { DAILY_HABIT, HABIT_XP, isPlausibleLocalDate, isValidDateKey, taskXp, type Progress } from '@/lib/gamification'
+import { isPlausibleLocalDate, isValidDateKey, taskXp, type Progress } from '@/lib/gamification'
 import { and, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -60,27 +60,4 @@ export async function setTaskCompleted(id: string, completed: boolean, localDate
   })
   revalidatePath('/')
   return result
-}
-
-/** Marks today's built-in daily habit done (or undone). One XP grant per user per local day. */
-export async function setDailyHabitDone(done: boolean, localDate: string) {
-  const userId = await getUserId()
-  if (typeof done !== 'boolean') throw new Error('Invalid habit update')
-  assertLocalDate(localDate)
-
-  const progress = await db.transaction(async (tx) => {
-    await lockStats(tx, userId)
-    const awardId = `habit:${DAILY_HABIT.key}:${localDate}`
-    if (done) {
-      await tx
-        .insert(xpAwards)
-        .values({ id: `${awardId}:${userId}`, userId, kind: 'habit', xp: HABIT_XP, awardedOn: localDate })
-        .onConflictDoNothing()
-    } else {
-      await tx.delete(xpAwards).where(and(eq(xpAwards.id, `${awardId}:${userId}`), eq(xpAwards.userId, userId)))
-    }
-    return recomputeStats(tx, userId)
-  })
-  revalidatePath('/')
-  return progress
 }
