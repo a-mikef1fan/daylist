@@ -7,6 +7,8 @@
 //   3. Reached that state earlier (the time of the most recent improvement among those levels).
 //   4. Display name, then id, so the order is always total.
 
+import { LEADERBOARD_SIZE, displayName } from '@/lib/score-ranking'
+
 // One solved level for one user, as stored.
 export type SolvedLevel = { level: number; bestMoves: number; solvedAt: number /* epoch ms of last improvement */ }
 
@@ -30,17 +32,7 @@ export type LeaderboardEntry = {
 
 export type LeaderboardView = { entries: LeaderboardEntry[]; me: LeaderboardEntry | null; total: number }
 
-export const LEADERBOARD_SIZE = 20
-
-// Names come from the auth user. A name that is really an email address, or an empty one, falls back to the email's
-// local part so a full address is never shown.
-export function displayName(name: string, email: string): string {
-  const trimmed = name.trim()
-  const candidate = trimmed.includes('@') ? trimmed.split('@')[0].trim() : trimmed
-  if (candidate) return candidate.slice(0, 40)
-  const local = email.split('@')[0].trim()
-  return (local || 'Player').slice(0, 40)
-}
+export { LEADERBOARD_SIZE, displayName }
 
 // Reduce a user's solved levels (any order, level indexes from 0) to their ranking summary.
 export function summarizeProgress(user: { userId: string; name: string; email: string }, solved: SolvedLevel[]): ProgressSummary {
