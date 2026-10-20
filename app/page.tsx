@@ -7,6 +7,7 @@ import { AuthScreen } from '@/components/auth-screen'
 import { TodoApp } from '@/components/todo-app'
 import { isPreviewTestLoginEnabled } from '@/lib/preview-login'
 import { isAdminEmail } from '@/lib/admin'
+import { toTaskView } from '@/lib/recurrence'
 
 export default async function HomePage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -18,5 +19,5 @@ export default async function HomePage() {
     .where(eq(tasks.userId, session.user.id))
     .orderBy(asc(tasks.completed), desc(tasks.createdAt))
 
-  return <TodoApp initialTasks={userTasks} userName={session.user.name} isAdmin={isAdminEmail(session.user.email)} />
+  return <TodoApp initialTasks={userTasks.map(toTaskView)} userName={session.user.name} isAdmin={isAdminEmail(session.user.email)} />
 }

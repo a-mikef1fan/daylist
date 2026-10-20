@@ -6,6 +6,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
+- Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
@@ -62,6 +63,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 - Usage table: `usage_events` (`id`, `name`, `path`, `userId`, `metadata`, `createdAt`). Apply `migrations/0001_create_usage_events.sql` (idempotent) with `psql "$DATABASE_URL" -f migrations/0001_create_usage_events.sql`. Until it is applied, the app works normally (tracking failures are logged and ignored) and the dashboard shows an "unavailable" notice.
 
+A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 ### Usage dashboard
@@ -91,7 +94,7 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
   api/track/route.ts          Validates and records client usage events
   admin/usage/page.tsx        Admin-only usage dashboard
@@ -107,6 +110,7 @@ lib/
   usage.ts                    trackEvent helper and event names
   usage-stats.ts              Dashboard aggregate queries
   admin.ts                    ADMIN_EMAILS check
+  recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 migrations/                   Hand-applied SQL for tables added after the initial schema
 ```
