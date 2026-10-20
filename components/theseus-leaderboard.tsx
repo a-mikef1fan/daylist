@@ -18,7 +18,7 @@ function Row({ entry }: { entry: LeaderboardEntry }) {
       <span className="theseus-board-name">
         <strong>{entry.name}</strong>
         {entry.isMe && <em>You</em>}
-        <small>{entry.solved} {entry.solved === 1 ? 'level' : 'levels'} solved</small>
+        <small>{entry.farthest === 0 ? 'Level 1 not solved yet' : entry.farthest === 1 ? 'Level 1 cleared' : `Levels 1 to ${entry.farthest} cleared`}</small>
       </span>
       <span className="theseus-board-num">{entry.farthest}</span>
       <span className="theseus-board-num">{entry.steps}</span>
@@ -57,7 +57,7 @@ export function TheseusLeaderboard({ refreshKey, unsavedLevels }: Props) {
 
   return (
     <div className="theseus-leaders" aria-busy={loading}>
-      <p className="theseus-help">Ranked by the farthest level solved, then by fewest total steps. A step is one turn, a move or a wait.</p>
+      <p className="theseus-help">Ranked by how far you get with every level cleared in order (a solved level after a gap does not count yet), then by fewest total steps. A step is one turn, a move or a wait.</p>
       {!view && loading && <div className="theseus-leaders-note" role="status">Loading the leaderboard…</div>}
       {failed && (
         <div className="theseus-leaders-note is-error" role="alert">

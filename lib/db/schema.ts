@@ -1,9 +1,7 @@
 import {
   boolean,
   date,
-  integer,
   pgTable,
-  primaryKey,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
@@ -70,24 +68,6 @@ export const tasks = pgTable('tasks', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
-// One row per user per Theseus & the Minotaur level: their best verified solution. `moves` is the winning turn
-// list (see lib/theseus-moves.ts) and `bestMoves` its length, computed by the server when it replays the solution.
-export const theseusProgress = pgTable(
-  'theseus_progress',
-  {
-    userId: text('userId')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    level: integer('level').notNull(),
-    bestMoves: integer('bestMoves').notNull(),
-    moves: text('moves').notNull(),
-    createdAt: timestamp('createdAt').notNull().defaultNow(),
-    // Only changes when a better solution replaces the old one, so it is when the user last improved.
-    updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  },
-  (table) => [primaryKey({ columns: [table.userId, table.level] })],
-)
-
 export type Task = typeof tasks.$inferSelect
 export type TaskPriority = 'low' | 'normal' | 'high'
 export type NewTaskInput = {
@@ -97,5 +77,5 @@ export type NewTaskInput = {
 }
 
 export const authSchema = { user, session, account, verification }
-export const appSchema = { tasks, theseusProgress }
+export const appSchema = { tasks }
 export const schema = { ...authSchema, ...appSchema }

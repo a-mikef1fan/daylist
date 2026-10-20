@@ -10,7 +10,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
-- Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by farthest level solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
+- Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 
 ## Tech stack
@@ -60,9 +60,10 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
-- App table: `theseus_progress` (Theseus & the Minotaur leaderboard: `userId`, `level`, `bestMoves`, `moves`, `createdAt`, `updatedAt`; primary key `userId` + `level`). Run `psql "$DATABASE_URL" -f lib/db/migrations/0001_theseus_progress.sql` once (idempotent, additive). Until it exists the leaderboard routes return 503 and the game keeps working from local progress.
 
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
+
+Theseus & the Minotaur progress needs no table of its own (a demo shortcut): each player's progress is one reserved row in `tasks` with `id` and `userId` set to `theseus:<user id>` and a JSON payload in `description`. Because every task query filters on the signed-in user's real id, these rows never appear in task lists and cannot be changed by the task actions. See `lib/theseus-store.ts`; moving to a dedicated table later means copying each payload's levels into rows and deleting the `theseus:%` task rows.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -103,8 +104,7 @@ components/
 lib/
   theseus-moves.ts            Move-list encoding and the replay check that verifies a submitted win
   theseus-ranking.ts          Leaderboard ranking rule and display names
-  theseus-store.ts            Database reads and writes for the leaderboard
-  db/migrations/              SQL to run by hand (no migration runner)
+  theseus-store.ts            Where Theseus progress lives (reserved `tasks` rows) and the leaderboard query
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
