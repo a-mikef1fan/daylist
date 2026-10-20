@@ -32,7 +32,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
 
   return (
     <>
-      <button className="theme-button" type="button" onClick={() => setDialog('theme')} aria-haspopup="dialog" title="Describe a theme and restyle the whole app">
+      <button className="theme-button" type="button" onClick={() => setDialog('theme')} aria-haspopup="dialog" title="Change the look of the whole app">
         <Sparkles aria-hidden="true" /><span>Theme</span>
       </button>
       <Menu.Root>
@@ -63,7 +63,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
       </Dialog.Root>
 
       <Dialog.Root open={dialog === 'theme'} onOpenChange={(open) => !open && setDialog(null)}>
-        <DialogShell title="Describe a theme" description="Tell us the mood and the whole app restyles itself: colours, fonts, corners and icons." variant="side">
+        <DialogShell title="Theme" description="Pick a preset, fine-tune it, or describe a look in words. The whole app restyles live." variant="side">
           <ThemeStudio onDone={() => setDialog(null)} />
         </DialogShell>
       </Dialog.Root>

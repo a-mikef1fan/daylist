@@ -8,6 +8,7 @@ type FontDef = { family: string; category: FontCategory; weights: string; builti
 export const FONTS = {
   inter: { family: 'Inter', category: 'sans', weights: '400;500;600;700', builtin: 'var(--font-inter)' },
   fraunces: { family: 'Fraunces', category: 'serif', weights: '400;600;700', builtin: 'var(--font-fraunces)' },
+  roboto: { family: 'Roboto', category: 'sans', weights: '400;500;700' },
   dmSans: { family: 'DM Sans', category: 'sans', weights: '400;500;700' },
   nunito: { family: 'Nunito', category: 'sans', weights: '400;600;700' },
   quicksand: { family: 'Quicksand', category: 'sans', weights: '400;500;700' },

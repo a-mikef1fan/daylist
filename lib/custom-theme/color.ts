@@ -107,3 +107,12 @@ export function ensureContrast(fg: Oklch, backgrounds: Oklch[], min = 4.5): Oklc
   const white = { l: 1, c: 0, h: 0 }
   return worstContrast(black, backgrounds) >= worstContrast(white, backgrounds) ? black : white
 }
+
+// #rrggbb for <input type="color">, from a canonical colour string. Falls back to black for unparseable input.
+export function toHex(value: string): string {
+  const parsed = parseColor(value)
+  if (!parsed) return '#000000'
+  return `#${oklchToLinearSrgb(toGamut(parsed))
+    .map((v) => Math.round(clamp(toGamma(clamp(v, 0, 1)), 0, 1) * 255).toString(16).padStart(2, '0'))
+    .join('')}`
+}
