@@ -11,6 +11,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Optionally assign a task to a member of your Slack workspace (display only: the assignee does not get access to the task)
 - Filter by All tasks, Today, Upcoming, Urgent, Assigned, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 
 ## Tech stack
 
@@ -94,13 +95,16 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
+  themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), updateTaskAssignee, deleteTask
   actions/slack.ts            Server action: listSlackMembers (assignee picker)
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
-  todo-app.tsx                Task list UI (filters, search, create, complete, assign, delete)
   assignee-picker.tsx         Slack member picker and avatar
+  theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
+  theme-picker.tsx            Color theme swatch picker, shown in User preferences
+  todo-app.tsx                Task list UI (filters, search, create, complete, assign, delete)
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
@@ -108,6 +112,7 @@ lib/
   slack.ts                    Slack users.list lookup with in-memory cache
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
