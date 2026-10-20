@@ -9,9 +9,9 @@
 .theseus-level { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--ink-soft); cursor: pointer; font-size: 12px; font-weight: 650; }
 .theseus-level:hover { background: var(--muted); }
 .theseus-level.is-solved { background: var(--sage); color: var(--sage-deep); }
-.theseus-level.is-active { border-color: var(--sage-deep); background: var(--sage-deep); color: white; }
+.theseus-level.is-active { border-color: var(--brand); background: var(--brand); color: var(--brand-foreground); }
 .theseus-level svg { width: 15px; height: 15px; }
-.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
+.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px color-mix(in srgb, var(--shadow-ink) 3%, transparent); }
 .theseus-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
 .theseus-svg { display: block; width: 100%; height: auto; max-height: 68vh; margin: 0 auto; }
 .theseus-svg[data-outcome='lost'] { filter: saturate(.8); }
@@ -19,7 +19,7 @@
 .theseus-status { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; border-radius: 10px; background: var(--secondary); padding: 6px 12px; color: var(--foreground); font-size: 13px; font-weight: 600; }
 .theseus-status.is-won { background: var(--sage); color: var(--sage-deep); }
 .theseus-status.is-lost { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }
-.theseus-action, .theseus-secondary { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 12px; color: white; cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.theseus-action, .theseus-secondary { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: var(--brand); padding: 0 12px; color: var(--brand-foreground); cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
 .theseus-action svg, .theseus-secondary svg { width: 15px; height: 15px; }
 .theseus-secondary { background: var(--secondary); color: var(--secondary-foreground); }
 .theseus-secondary:disabled { cursor: not-allowed; opacity: .52; }

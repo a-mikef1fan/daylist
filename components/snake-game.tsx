@@ -11,6 +11,8 @@ import {
   type Direction,
   type SnakeState,
 } from '@/lib/snake'
+import { useColorMode } from '@/components/color-mode-provider'
+import { useTheme } from '@/components/theme-provider'
 
 type Status = 'ready' | 'running' | 'paused' | 'over'
 
@@ -35,6 +37,8 @@ export function SnakeGame() {
   const [game, setGame] = useState<SnakeState>(() => createSnake())
   const [status, setStatus] = useState<Status>('ready')
   const [best, setBest] = useState(0)
+  const { resolvedMode } = useColorMode()
+  const { theme } = useTheme()
   const gameRef = useRef(game)
   const queueRef = useRef<Direction[]>([])
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -82,6 +86,7 @@ export function SnakeGame() {
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
     if (!canvas || !context) return
+    // Colors come from the theme tokens, so this also redraws when the light/dark mode or color theme changes.
     const styles = window.getComputedStyle(canvas)
     const color = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback
     context.fillStyle = color('--secondary', '#f1f1ea')
@@ -96,7 +101,7 @@ export function SnakeGame() {
       context.fillStyle = index === 0 ? color('--sage-deep', '#2f5d46') : color('--primary', '#3d6b52')
       context.fillRect(part.x * CELL + 1, part.y * CELL + 1, CELL - 2, CELL - 2)
     })
-  }, [game])
+  }, [game, resolvedMode, theme])
 
   function restart() {
     queueRef.current = []

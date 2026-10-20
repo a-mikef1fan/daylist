@@ -32,6 +32,7 @@ import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
+import { ColorModeToggle } from '@/components/color-mode-toggle'
 import { playCompletionBell } from '@/lib/completion-bell'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
@@ -325,6 +326,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
+          <ColorModeToggle />
           <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
         </header>
 

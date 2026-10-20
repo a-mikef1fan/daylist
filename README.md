@@ -11,6 +11,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Light, dark, or system appearance: cycle it with the sun/moon/monitor button in the top bar; the choice is remembered per browser (`localStorage`) and works with every color theme
 
 ## Tech stack
 
@@ -94,6 +95,8 @@ components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
+  color-mode-provider.tsx     Applies and persists light, dark, or system appearance (`dark` class on `<html>`)
+  color-mode-toggle.tsx       Top bar button that cycles light, dark, and system
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   ui/                         Shared UI primitives
 lib/
@@ -102,6 +105,7 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  color-mode.ts               Appearance modes, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```

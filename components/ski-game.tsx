@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUp, Download, Pause, Play, RotateCcw } from 'lucide-react'
+import { useColorMode } from '@/components/color-mode-provider'
+import { useTheme } from '@/components/theme-provider'
 
 type Status = 'ready' | 'running' | 'paused' | 'over' | 'won'
 type Steer = -1 | 0 | 1
@@ -619,6 +621,8 @@ export function SkiGame() {
 
   const mode = MODES[modeKey]
   const best = bests[modeKey]
+  const { resolvedMode } = useColorMode()
+  const { theme } = useTheme()
 
   const changeStatus = useCallback((next: Status) => {
     statusRef.current = next
@@ -666,6 +670,12 @@ export function SkiGame() {
     observer.observe(canvas)
     return () => observer.disconnect()
   }, [render])
+
+  // The palette is cached from the theme tokens, so re-read it when the light/dark mode or color theme changes.
+  useEffect(() => {
+    paletteRef.current = null
+    render()
+  }, [resolvedMode, theme, render])
 
   // The animation loop only exists while running, and is cancelled on pause, game over, or unmount.
   useEffect(() => {
