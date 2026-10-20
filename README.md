@@ -104,7 +104,8 @@ components/
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
   custom-theme-provider.tsx   Applies, previews and persists a generated theme
-  theme-studio.tsx            The Describe a theme panel
+  theme-studio.tsx            The Theme panel (Presets, Customize, Describe)
+  theme-background.tsx        Canvas effects (matrix rain, stars, snow, ...) behind the app
   themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   ui/                         Shared UI primitives
@@ -118,7 +119,7 @@ lib/
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
-  custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
+  custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, background patterns/effects, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter
   utils.ts                    Helpers
 ```
@@ -130,4 +131,5 @@ The **Theme** button in the top bar opens a panel with a text box (up to 300 cha
 - `POST /api/theme/generate` requires a signed-in session, limits input to 300 characters and 10 requests per user per 10 minutes (per server instance), and calls Claude with `ANTHROPIC_API_KEY`.
 - A theme is plain data: validated colours (hex or `oklch()`), font ids from an allow-list of Google Fonts, icon names from an allow-list of lucide icons per app slot, a corner radius and an icon stroke width. `lib/custom-theme/schema.ts` sanitises it (unknown icons and fonts fall back to defaults, numbers are clamped) and repairs text colours below 4.5:1 contrast. Only canonical colour strings and allow-listed font stacks are written into CSS variables, so a generated theme cannot inject CSS or script.
 - It overrides the same CSS variables the colour themes use (`app/globals.css`, including the derived tokens near the top). The active theme and saved list live in `localStorage` (`daylist:custom-theme*`) and an inline script in `app/layout.tsx` applies it before first paint. It is per browser, not per account.
+- A theme can also set a page background: a pattern (pinstripes, stripes, grid, dots, checkerboard, crosshatch, zigzag, waves, speckle, gradient) or an animated effect (matrix rain, starfield, floating emoji, snow, confetti, rain, CRT scanlines, shifting gradient, retro grid), chosen from fixed lists with clamped numeric settings. Patterns and CSS effects are gradients on the root element, canvas effects are drawn behind the app at low opacity, pause when the tab is hidden and render a still frame for `prefers-reduced-motion`. Generating arbitrary images or GIFs is not supported.
 - To theme another icon, add a slot to `ICON_SLOTS` in `lib/custom-theme/icons.ts` and render it with `<ThemedIcon slot="..." />`.

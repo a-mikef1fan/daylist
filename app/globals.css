@@ -389,6 +389,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .check-field input { width: 16px; height: 16px; accent-color: var(--sage-deep); }
 .form-success { margin: 0; border-radius: 9px; background: var(--sage); padding: 12px 14px; color: var(--sage-deep); font-size: 13px; }
 
+/* Animated theme background (components/theme-background.tsx) */
+.theme-effect-canvas { position: fixed; inset: 0; z-index: -1; width: 100vw; height: 100vh; pointer-events: none; }
+
 /* Describe-a-theme dialog */
 .theme-button { display: inline-flex; flex: none; align-items: center; gap: 7px; height: 36px; border: 1px solid var(--avatar-border); border-radius: 999px; background: var(--sage); padding: 0 14px 0 12px; color: var(--sage-deep); cursor: pointer; font-size: 12px; font-weight: 650; transition: background .18s; }
 .theme-button:hover { background: var(--avatar-hover); }
@@ -447,6 +450,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .theme-customizer .form-field select, .theme-customizer .form-field > input:not([type='range']) { height: 40px; border: 1px solid var(--border); border-radius: 9px; background: var(--field); padding: 0 10px; color: var(--foreground); font-size: 12px; }
 .theme-customizer .form-field label { display: flex; justify-content: space-between; }
 .theme-customizer .form-field input[type='range'] { width: 100%; accent-color: var(--sage-deep); }
+.theme-background-controls { display: flex; flex-direction: column; gap: 12px; }
+.theme-emoji-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.theme-emoji-row input { width: 74px; height: 40px; border: 1px solid var(--border); border-radius: 9px; background: var(--field); color: var(--foreground); font-size: 16px; text-align: center; }
 .theme-customizer output { color: var(--muted-foreground); font-weight: 500; }
 .dialog-cancel:disabled { cursor: not-allowed; opacity: .5; }
 .dialog-cancel svg { width: 13px; height: 13px; vertical-align: -2px; }

@@ -32,6 +32,8 @@ export const FONTS = {
   caveat: { family: 'Caveat', category: 'handwriting', weights: '400;600;700' },
   patrickHand: { family: 'Patrick Hand', category: 'handwriting', weights: '400' },
   indieFlower: { family: 'Indie Flower', category: 'handwriting', weights: '400' },
+  comicNeue: { family: 'Comic Neue', category: 'handwriting', weights: '400;700' },
+  bangers: { family: 'Bangers', category: 'display', weights: '400' },
   pacifico: { family: 'Pacifico', category: 'handwriting', weights: '400' },
   specialElite: { family: 'Special Elite', category: 'display', weights: '400' },
   jetbrainsMono: { family: 'JetBrains Mono', category: 'mono', weights: '400;500;700' },

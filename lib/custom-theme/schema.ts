@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { ensureContrast, formatOklch, parseColor, type Oklch } from './color'
+import { blend, ensureContrast, formatOklch, parseColor, type Oklch } from './color'
+import { ANGLES, BACKGROUND_KINDS, GLYPH_SETS, RANGES, sanitizeBackground, type Background } from './background'
 import { FONT_IDS, isFontId, type FontId } from './fonts'
 import { ICON_NAMES, ICON_SLOTS, ICON_SLOT_KEYS, isIconName, type IconName, type IconSlot } from './icons'
 
@@ -42,6 +43,7 @@ export type Theme = {
   headingTransform: HeadingTransform
   iconStrokeWidth: number
   icons: Partial<Record<IconSlot, IconName>>
+  background: Background
 }
 
 export const RADIUS_RANGE = { min: 0, max: 1.75, fallback: 0.75 }
@@ -92,6 +94,21 @@ export const ModelThemeSchema = z.object({
   bodyFont: z.enum(FONT_IDS).describe('Font for body text; keep it legible'),
   headingTransform: z.enum(HEADING_TRANSFORMS).describe('Case of headings'),
   iconStrokeWidth: z.number().describe('Icon line weight from 1 (delicate) to 3 (bold), 2 is normal'),
+  background: z
+    .object({
+      kind: z.enum(BACKGROUND_KINDS).describe('Page background. none for a plain page; a pattern; or an animated effect'),
+      color: z.string().describe('Main pattern or effect colour'),
+      color2: z.string().describe('Second colour (alternate stripe, gradient end, matrix head glow)'),
+      size: z.number().describe('Pattern spacing or tile size in px, 4-120'),
+      thickness: z.number().describe('Line or dot size in px, 1-40, smaller than size'),
+      angle: z.number().describe(`Pattern direction in degrees: ${ANGLES.join(', ')} (90 = vertical stripes, 0 = horizontal)`),
+      opacity: z.number().describe('Strength 0.03-0.5; keep subtle so text stays readable'),
+      speed: z.number().describe('Animation speed 0.2-3'),
+      density: z.number().describe('How many particles or columns, 0.2-2'),
+      glyphs: z.enum(GLYPH_SETS).describe('Characters for the matrix effect'),
+      emoji: z.string().describe('One emoji (or one of ● ■ ▲ ◆ ★ ♥) for the emoji effect'),
+    })
+    .describe('Page background pattern or animated effect'),
   icons: z.object(
     Object.fromEntries(
       ICON_SLOT_KEYS.map((slot) => [slot, z.enum(ICON_NAMES).describe(`Icon for: ${ICON_SLOTS[slot].hint}`)]),
@@ -134,8 +151,14 @@ function parseColors(raw: unknown, defaults: ThemeColors, warnings: string[]): {
   return { colors, invalid }
 }
 
-function enforceReadability(colors: ParsedColors, warnings: string[]): ThemeColors {
-  const surfaces = [colors.background, colors.card]
+// Text also has to read over the pattern or effect behind it, so check against the page colour tinted
+// by the pattern at (roughly) its strength.
+function enforceReadability(colors: ParsedColors, background: Background, warnings: string[]): ThemeColors {
+  const tinted =
+    background.kind === 'none'
+      ? []
+      : [background.color, background.color2].map((tint) => blend(colors.background, parseColor(tint) as Oklch, background.opacity * 0.6))
+  const surfaces = [colors.background, colors.card, ...tinted]
   const adjust = (key: ColorKey, against: Oklch[]) => {
     const fixed = ensureContrast(colors[key], against, TARGET_CONTRAST)
     if (formatOklch(fixed) !== formatOklch(colors[key])) warnings.push(`Adjusted ${key} for readability`)
@@ -168,16 +191,19 @@ export function sanitizeTheme(raw: unknown): { theme: Theme; warnings: string[] 
     else if (name !== undefined) warnings.push(`Used the default icon for ${slot}`)
   }
 
+  const background = sanitizeBackground(source.background, { color: palette.colors.primary, color2: palette.colors.highlight })
+
   const theme: Theme = {
     name: cleanText(source.name, 40, 'Custom theme'),
     description: cleanText(source.description, 140, ''),
-    colors: enforceReadability(palette.colors, warnings),
+    colors: enforceReadability(palette.colors, background, warnings),
     radius: clampNumber(source.radius, RADIUS_RANGE),
     headingFont: isFontId(source.headingFont) ? source.headingFont : 'fraunces',
     bodyFont: isFontId(source.bodyFont) ? source.bodyFont : 'inter',
     headingTransform: HEADING_TRANSFORMS.find((value) => value === source.headingTransform) ?? 'none',
     iconStrokeWidth: clampNumber(source.iconStrokeWidth, STROKE_RANGE),
     icons,
+    background,
   }
   return { theme, warnings }
 }

@@ -1,4 +1,5 @@
 import { ensureContrast, formatOklch, parseColor, type Oklch } from './color'
+import { backgroundCss } from './background-css'
 import { fontStack, fontsHref } from './fonts'
 import { COLOR_KEYS, type Theme, type ThemeColors } from './schema'
 
@@ -104,7 +105,7 @@ export function compileThemeCss(theme: Theme): string {
     ([scale, selectors]) =>
       `${selectors.map((selector) => `${ROOT} ${selector}`).join(',')}{border-radius:calc(var(--radius)*${scale})}`,
   )
-  return [block(ROOT, variables), ...radii].join('\n')
+  return [block(ROOT, variables), ...radii, backgroundCss(theme.background, ROOT)].filter(Boolean).join('\n')
 }
 
 export type CompiledTheme = { css: string; fontsHref: string | null }
@@ -115,4 +116,4 @@ export function compileTheme(theme: Theme): CompiledTheme {
 
 // Runs in <head> before first paint. It trusts nothing blindly: the stored CSS must look like what
 // compileThemeCss produces, and the provider recompiles from the validated theme right after hydration.
-export const CUSTOM_THEME_INIT_SCRIPT = `(function(){try{var c=JSON.parse(localStorage.getItem(${JSON.stringify(THEME_COMPILED_STORAGE_KEY)})||'null');if(!c||typeof c.css!=='string'||!/^[\\w\\s.,:;%()#'"\\[\\]=>*+\\/{}-]*$/.test(c.css)||/url\\(|@import|expression|javascript/i.test(c.css))return;var d=document,s=d.createElement('style');s.id=${JSON.stringify(THEME_STYLE_ID)};s.textContent=c.css;d.head.appendChild(s);d.documentElement.setAttribute(${JSON.stringify(THEME_ATTRIBUTE)},'on');if(typeof c.fontsHref==='string'&&c.fontsHref.indexOf('https://fonts.googleapis.com/css2?')===0){var l=d.createElement('link');l.id=${JSON.stringify(THEME_FONTS_ID)};l.rel='stylesheet';l.href=c.fontsHref;d.head.appendChild(l)}}catch(e){}})()`
+export const CUSTOM_THEME_INIT_SCRIPT = `(function(){try{var c=JSON.parse(localStorage.getItem(${JSON.stringify(THEME_COMPILED_STORAGE_KEY)})||'null');if(!c||typeof c.css!=='string'||!/^[\\w\\s.,:;%()#'"\\[\\]=>*+\\/{}@!-]*$/.test(c.css)||/url\\(|@import|expression|javascript/i.test(c.css))return;var d=document,s=d.createElement('style');s.id=${JSON.stringify(THEME_STYLE_ID)};s.textContent=c.css;d.head.appendChild(s);d.documentElement.setAttribute(${JSON.stringify(THEME_ATTRIBUTE)},'on');if(typeof c.fontsHref==='string'&&c.fontsHref.indexOf('https://fonts.googleapis.com/css2?')===0){var l=d.createElement('link');l.id=${JSON.stringify(THEME_FONTS_ID)};l.rel='stylesheet';l.href=c.fontsHref;d.head.appendChild(l)}}catch(e){}})()`
