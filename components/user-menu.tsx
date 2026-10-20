@@ -5,6 +5,7 @@ import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
 import { KeyRound, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { BELL_OPTIONS, isBellId, type BellId } from '@/lib/completion-bell'
 import { useRouter } from 'next/navigation'
 
 // Matches the minimum enforced on the sign-up form in auth-screen.tsx.
@@ -14,9 +15,11 @@ type UserMenuProps = {
   userName: string
   showTaskIcons: boolean
   onShowTaskIconsChange: (value: boolean) => void
+  bellId: BellId
+  onBellChange: (value: BellId) => void
 }
 
-export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
+export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, bellId, onBellChange }: UserMenuProps) {
   const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
@@ -59,7 +62,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
 
       <Dialog.Root open={dialog === 'preferences'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogShell title="User preferences" description="Personalize how daylist looks for you.">
-          <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} onDone={() => setDialog(null)} />
+          <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} bellId={bellId} onBellChange={onBellChange} onDone={() => setDialog(null)} />
         </DialogShell>
       </Dialog.Root>
     </>
@@ -157,7 +160,7 @@ function ChangePasswordForm({ onDone }: { onDone: () => void }) {
   )
 }
 
-function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDone }: { userName: string; showTaskIcons: boolean; onShowTaskIconsChange: (value: boolean) => void; onDone: () => void }) {
+function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, bellId, onBellChange, onDone }: { userName: string; showTaskIcons: boolean; onShowTaskIconsChange: (value: boolean) => void; bellId: BellId; onBellChange: (value: BellId) => void; onDone: () => void }) {
   const router = useRouter()
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
@@ -194,6 +197,12 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDon
       <label className="form-field">
         <span>Display name</span>
         <input name="name" autoComplete="name" defaultValue={userName} maxLength={80} required />
+      </label>
+      <label className="form-field">
+        <span>Completion sound</span>
+        <select value={bellId} onChange={(event) => { if (isBellId(event.target.value)) onBellChange(event.target.value) }}>
+          {BELL_OPTIONS.map(({ id, label, description }) => <option key={id} value={id}>{label} - {description}</option>)}
+        </select>
       </label>
       <label className="check-field"><input type="checkbox" checked={showTaskIcons} onChange={(event) => onShowTaskIconsChange(event.target.checked)} /><span>Show emoji icons next to tasks</span></label>
       {error && <p className="form-error" role="alert">{error}</p>}

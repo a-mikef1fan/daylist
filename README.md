@@ -7,7 +7,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
-- Mark tasks complete (with a short bell sound) or delete them
+- Mark tasks complete (with a short bell sound you can choose in User preferences: Classic Bell, Chime, Soft Ping, Glass, or Marimba) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 

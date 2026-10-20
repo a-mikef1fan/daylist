@@ -32,7 +32,7 @@ import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
-import { playCompletionBell } from '@/lib/completion-bell'
+import { DEFAULT_BELL_ID, isBellId, playBell, type BellId } from '@/lib/completion-bell'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
@@ -51,6 +51,7 @@ const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
 const TASK_ICONS_STORAGE_KEY = 'daylist:show-task-icons'
+const BELL_STORAGE_KEY = 'daylist:completion-bell'
 const SIDEBAR_DEFAULT_WIDTH = 248
 const SIDEBAR_MIN_WIDTH = 200
 const SIDEBAR_MAX_WIDTH = 420
@@ -102,6 +103,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [resizing, setResizing] = useState(false)
   const [sidebarReady, setSidebarReady] = useState(false)
   const [showTaskIcons, setShowTaskIcons] = useState(true)
+  const [bellId, setBellId] = useState<BellId>(DEFAULT_BELL_ID)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
   const burstFireworks = useFireworks()
@@ -113,6 +115,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
       const savedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY))
       if (Number.isFinite(savedWidth) && savedWidth > 0) setSidebarWidth(clampSidebarWidth(savedWidth))
       setShowTaskIcons(window.localStorage.getItem(TASK_ICONS_STORAGE_KEY) !== 'false')
+      const savedBell = window.localStorage.getItem(BELL_STORAGE_KEY)
+      if (isBellId(savedBell)) setBellId(savedBell)
     } catch {
       // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
     }
@@ -125,6 +129,17 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
       window.localStorage.setItem(TASK_ICONS_STORAGE_KEY, String(value))
     } catch {
       // Ignore storage failures; the preference still applies for this visit.
+    }
+  }
+
+  function handleBellChange(value: BellId) {
+    setBellId(value)
+    // Preview the new sound; this runs inside the change handler, so autoplay policy allows it.
+    playBell(value)
+    try {
+      window.localStorage.setItem(BELL_STORAGE_KEY, value)
+    } catch {
+      // Ignore storage failures; the sound still applies for this visit.
     }
   }
 
@@ -233,7 +248,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
 
   function handleToggle(task: TaskView) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
-    if (!task.completed) playCompletionBell()
+    if (!task.completed) playBell(bellId)
     if (!task.completed) burstFireworks()
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
@@ -325,7 +340,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
+          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} bellId={bellId} onBellChange={handleBellChange} />
         </header>
 
         <div className="dashboard-content">
