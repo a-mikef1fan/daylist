@@ -12,7 +12,10 @@ import {
   RotateCcw,
   Undo2,
 } from 'lucide-react'
+import { TheseusLeaderboard } from '@/components/theseus-leaderboard'
 import { THESEUS_LEVELS } from '@/lib/theseus-levels'
+import { ApiError, fetchOwnBest, submitSolution } from '@/lib/theseus-client'
+import { encodeMoves, isMoveString } from '@/lib/theseus-moves'
 import { parseMaze, solveMaze, takeTurn, type Maze, type Move, type Outcome, type Point, type Positions } from '@/lib/theseus'
 import './theseus-game.css'
 
@@ -21,12 +24,16 @@ const CELL = 40
 const PAD = 14
 const LEVEL_COUNT = THESEUS_LEVELS.length
 
-type Progress = { level: number; best: Record<string, number> }
+// `best` is what the board shows. `moves` holds the winning turn list for levels won on this device (shortest kept), so a
+// win that could not be saved to the server can be submitted again later; the server replays it, so nothing here is trusted.
+type Progress = { level: number; best: Record<string, number>; moves: Record<string, string> }
+type Tab = 'play' | 'leaderboard'
 
 type Game = {
   level: number
   positions: Positions
   history: Positions[] // earlier positions, so undo can step back one turn at a time
+  moves: Move[] // the turns taken so far, parallel to history
   outcome: Outcome
 }
 
@@ -44,7 +51,7 @@ const dPad: { move: Move; label: string; icon: typeof ArrowUp }[] = [
 ]
 
 function startGame(level: number, maze: Maze): Game {
-  return { level, positions: { theseus: maze.theseus, minotaur: maze.minotaur }, history: [], outcome: 'playing' }
+  return { level, positions: { theseus: maze.theseus, minotaur: maze.minotaur }, history: [], moves: [], outcome: 'playing' }
 }
 
 function exitSide(maze: Maze) {
@@ -68,12 +75,33 @@ function readProgress(): Progress {
           }
         }
       }
-      return { level: Number.isInteger(level) && level >= 0 && level < LEVEL_COUNT ? level : 0, best }
+      const moves: Record<string, string> = {}
+      if (parsed.moves && typeof parsed.moves === 'object') {
+        for (const [key, value] of Object.entries(parsed.moves)) {
+          const index = Number(key)
+          if (Number.isInteger(index) && index >= 0 && index < LEVEL_COUNT && isMoveString(value)) moves[key] = value
+        }
+      }
+      return { level: Number.isInteger(level) && level >= 0 && level < LEVEL_COUNT ? level : 0, best, moves }
     }
   } catch {
     // Storage can be unavailable or corrupt; progress just won't persist.
   }
-  return { level: 0, best: {} }
+  return { level: 0, best: {}, moves: {} }
+}
+
+// Fold the server's best step counts into local progress, keeping the lower count for each level.
+function mergeBest(progress: Progress, server: Record<string, number>): Progress {
+  const best = { ...progress.best }
+  for (const [key, steps] of Object.entries(server)) {
+    if (best[key] === undefined || steps < best[key]) best[key] = steps
+  }
+  return { ...progress, best }
+}
+
+// Levels with a locally kept winning turn list that the server does not have (or has a worse score for).
+function unsentLevels(progress: Progress, server: Record<string, number>): string[] {
+  return Object.keys(progress.moves).filter((key) => server[key] === undefined || server[key] > progress.moves[key].length)
 }
 
 function writeProgress(progress: Progress) {
@@ -179,7 +207,14 @@ function MazeBoard({ maze, positions, outcome, label }: { maze: Maze; positions:
 }
 
 export function TheseusGame() {
-  const [progress, setProgress] = useState<Progress>({ level: 0, best: {} })
+  const [progress, setProgress] = useState<Progress>({ level: 0, best: {}, moves: {} })
+  const [tab, setTab] = useState<Tab>('play')
+  // The server's best steps per level, or null until it has answered (or when it cannot be reached).
+  const [serverBest, setServerBest] = useState<Record<string, number> | null>(null)
+  const [boardVersion, setBoardVersion] = useState(0)
+  const progressRef = useRef(progress)
+  progressRef.current = progress
+  const mounted = useRef(true)
   const [game, setGame] = useState<Game>(() => startGame(0, parseMaze(THESEUS_LEVELS[0])))
   const [notice, setNotice] = useState('')
   const boardRef = useRef<HTMLDivElement>(null)
@@ -187,13 +222,68 @@ export function TheseusGame() {
   const maze = useMemo(() => parseMaze(THESEUS_LEVELS[game.level]), [game.level])
   const par = useMemo(() => solveMaze(maze).minMoves, [maze])
 
-  // Restore saved progress (and the level last played) once on the client.
+  // Load the server's progress and send up any locally kept wins it is missing. The server verifies every solution by
+  // replaying it, so local step counts are never uploaded on their own. If the API fails the game just stays local.
+  const syncWithServer = useCallback(async () => {
+    try {
+      let best = await fetchOwnBest()
+      for (const key of unsentLevels(progressRef.current, best)) {
+        try {
+          best = await submitSolution(Number(key), progressRef.current.moves[key])
+        } catch (error) {
+          if (!(error instanceof ApiError) || error.status !== 422) throw error
+          // A solution the rules reject (a stale or edited save) is dropped rather than retried forever.
+          setProgress((current) => {
+            const moves = { ...current.moves }
+            delete moves[key]
+            const next = { ...current, moves }
+            writeProgress(next)
+            return next
+          })
+        }
+      }
+      if (!mounted.current) return
+      setServerBest(best)
+      setProgress((current) => {
+        const next = mergeBest(current, best)
+        writeProgress(next)
+        return next
+      })
+    } catch {
+      if (mounted.current) setServerBest(null)
+    }
+    if (mounted.current) setBoardVersion((version) => version + 1)
+  }, [])
+
+  // Restore saved progress (and the level last played) once on the client, then sync with the server.
   useEffect(() => {
+    mounted.current = true
     const saved = readProgress()
+    progressRef.current = saved
     setProgress(saved)
     if (saved.level !== 0) setGame(startGame(saved.level, parseMaze(THESEUS_LEVELS[saved.level])))
     boardRef.current?.focus()
-  }, [])
+    void syncWithServer()
+    return () => {
+      mounted.current = false
+    }
+  }, [syncWithServer])
+
+  // The board is hidden on the leaderboard tab, so hand it keyboard focus only once it is back on screen.
+  useEffect(() => {
+    if (tab === 'play') boardRef.current?.focus()
+  }, [tab])
+
+  // Opening the board retries any win that could not be saved earlier.
+  const showTab = useCallback(
+    (next: Tab) => {
+      setTab(next)
+      if (next === 'leaderboard' && (serverBest === null || unsentLevels(progressRef.current, serverBest).length > 0)) {
+        void syncWithServer()
+      }
+    },
+    [serverBest, syncWithServer],
+  )
 
   const selectLevel = useCallback((level: number) => {
     setGame(startGame(level, parseMaze(THESEUS_LEVELS[level])))
@@ -216,15 +306,38 @@ export function TheseusGame() {
       }
       setNotice('')
       const moves = game.history.length + 1
-      setGame({ ...game, positions: result.positions, history: [...game.history, game.positions], outcome: result.outcome })
+      const turns = [...game.moves, move]
+      setGame({ ...game, positions: result.positions, history: [...game.history, game.positions], moves: turns, outcome: result.outcome })
       if (result.outcome === 'won') {
+        const key = String(game.level)
+        const solution = encodeMoves(turns)
         setProgress((current) => {
-          const key = String(game.level)
-          if (current.best[key] !== undefined && current.best[key] <= moves) return current
-          const next = { ...current, best: { ...current.best, [key]: moves } }
+          const better = current.best[key] === undefined || moves < current.best[key]
+          const keep = current.moves[key] === undefined || solution.length < current.moves[key].length
+          if (!better && !keep) return current
+          const next = {
+            ...current,
+            best: better ? { ...current.best, [key]: moves } : current.best,
+            moves: keep ? { ...current.moves, [key]: solution } : current.moves,
+          }
           writeProgress(next)
           return next
         })
+        // Send the win to the leaderboard; the server replays it and keeps the best. On failure the local copy is retried later.
+        submitSolution(game.level, solution)
+          .then((best) => {
+            if (!mounted.current) return
+            setServerBest(best)
+            setProgress((current) => {
+              const next = mergeBest(current, best)
+              writeProgress(next)
+              return next
+            })
+            setBoardVersion((version) => version + 1)
+          })
+          .catch(() => {
+            if (mounted.current) setServerBest(null)
+          })
       }
     },
     [game, maze],
@@ -233,7 +346,7 @@ export function TheseusGame() {
   const undo = useCallback(() => {
     if (game.history.length === 0) return
     setNotice('')
-    setGame({ ...game, positions: game.history[game.history.length - 1], history: game.history.slice(0, -1), outcome: 'playing' })
+    setGame({ ...game, positions: game.history[game.history.length - 1], history: game.history.slice(0, -1), moves: game.moves.slice(0, -1), outcome: 'playing' })
   }, [game])
 
   const reset = useCallback(() => {
@@ -297,6 +410,17 @@ export function TheseusGame() {
           <span className="theseus-best">{best !== undefined ? `Best ${best}` : 'Not yet solved'}{par !== null ? ` · Shortest ${par}` : ''}</span>
         </div>
       </div>
+      <div className="theseus-tabs" role="group" aria-label="Game view">
+        <button type="button" className="theseus-tab" aria-pressed={tab === 'play'} onClick={() => showTab('play')}>Play</button>
+        <button type="button" className="theseus-tab" aria-pressed={tab === 'leaderboard'} onClick={() => showTab('leaderboard')}>Leaderboard</button>
+      </div>
+      {tab === 'leaderboard' && (
+        <TheseusLeaderboard
+          refreshKey={boardVersion}
+          unsavedLevels={serverBest ? Object.keys(progress.best).filter((key) => serverBest[key] === undefined && progress.moves[key] === undefined).length : 0}
+        />
+      )}
+      <div hidden={tab !== 'play'}>
       <p className="theseus-help" id="theseus-help">
         Lead Theseus to the exit. After every move the Minotaur takes two steps toward you, sideways first, then up or down. Use the arrow keys or W A S D to move, Space to wait, Z to undo and R to restart.
       </p>
@@ -353,6 +477,7 @@ export function TheseusGame() {
             <RotateCcw aria-hidden="true" /> Reset
           </button>
         </div>
+      </div>
       </div>
     </section>
   )
