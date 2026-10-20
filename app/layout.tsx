@@ -1,7 +1,9 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { CustomThemeProvider } from '@/components/custom-theme-provider'
 import { ThemeProvider } from '@/components/theme-provider'
+import { CUSTOM_THEME_INIT_SCRIPT } from '@/lib/custom-theme/css'
 import { THEME_INIT_SCRIPT } from '@/lib/themes'
 import './globals.css'
 
@@ -35,9 +37,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: CUSTOM_THEME_INIT_SCRIPT }} />
       </head>
       <body className="antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CustomThemeProvider>{children}</CustomThemeProvider>
+        </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -12,6 +12,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Per-user data: every task query is scoped to the signed-in user
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
 
 ## Tech stack
 
@@ -38,6 +39,8 @@ Create `.env.local` (git-ignored) in the project root:
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | PostgreSQL connection string, used by `lib/db/index.ts` |
 | `BETTER_AUTH_URL` | No | Public base URL for auth. On Vercel preview deployments (`VERCEL_ENV=preview`) the branch URL (`VERCEL_BRANCH_URL`, else `VERCEL_URL`) takes precedence. Otherwise falls back to `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, `V0_RUNTIME_URL`, then `http://localhost:3000` |
+| `ANTHROPIC_API_KEY` | No | Enables **Describe a theme** (the Theme button in the top bar). Used only on the server by `POST /api/theme/generate`; without it that route returns 503 and the panel shows a friendly message |
+| `ANTHROPIC_THEME_MODEL` | No | Overrides the Claude model used for theme generation (default `claude-opus-5-5`; a smaller model is cheaper and faster) |
 
 #### Preview test user (optional)
 
@@ -93,12 +96,16 @@ app/
   themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
+  api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
   api/theseus/leaderboard/route.ts  GET the top players plus the signed-in user's own row
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
+  custom-theme-provider.tsx   Applies, previews and persists a generated theme
+  theme-studio.tsx            The Describe a theme panel
+  themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   ui/                         Shared UI primitives
 lib/
@@ -111,5 +118,16 @@ lib/
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
+  custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
+  rate-limit.ts               In-memory sliding-window limiter
   utils.ts                    Helpers
 ```
+
+## Describe a theme
+
+The **Theme** button in the top bar opens a panel with a text box (up to 300 characters), example prompts, and a live preview of the result with **Keep theme** / **Revert**. **Reset to default** returns to the built-in look; kept themes are listed for one-click switching (up to 8). Picking a colour theme in User preferences replaces a generated theme.
+
+- `POST /api/theme/generate` requires a signed-in session, limits input to 300 characters and 10 requests per user per 10 minutes (per server instance), and calls Claude with `ANTHROPIC_API_KEY`.
+- A theme is plain data: validated colours (hex or `oklch()`), font ids from an allow-list of Google Fonts, icon names from an allow-list of lucide icons per app slot, a corner radius and an icon stroke width. `lib/custom-theme/schema.ts` sanitises it (unknown icons and fonts fall back to defaults, numbers are clamped) and repairs text colours below 4.5:1 contrast. Only canonical colour strings and allow-listed font stacks are written into CSS variables, so a generated theme cannot inject CSS or script.
+- It overrides the same CSS variables the colour themes use (`app/globals.css`, including the derived tokens near the top). The active theme and saved list live in `localStorage` (`daylist:custom-theme*`) and an inline script in `app/layout.tsx` applies it before first paint. It is per browser, not per account.
+- To theme another icon, add a slot to `ICON_SLOTS` in `lib/custom-theme/icons.ts` and render it with `<ThemedIcon slot="..." />`.
