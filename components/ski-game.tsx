@@ -1,11 +1,19 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUp, Download, Pause, Play, RotateCcw } from 'lucide-react'
 
-type Status = 'ready' | 'running' | 'paused' | 'over'
+type Status = 'ready' | 'running' | 'paused' | 'over' | 'won'
 type Steer = -1 | 0 | 1
 type ModeKey = 'trees' | 'groomed' | 'park'
+
+// Course lengths in distance points (METERS_PER_POINT px each). Tuned against each course's
+// speed ramp so a clean run takes roughly 70 to 80 seconds: Trees ~70s, Groomed ~78s, Park ~71s.
+const TREES_FINISH_POINTS = 1150
+const GROOMED_FINISH_POINTS = 1000
+const PARK_FINISH_POINTS = 1100
+
+const DOWNLOAD_URL = 'https://apps.apple.com/us/app/ski-tree/id1672785739'
 
 type ModeConfig = {
   label: string
@@ -19,6 +27,7 @@ type ModeConfig = {
   spawnBase: number // slope distance between rows, shrinks as speed grows
   spawnMin: number
   jumps: boolean
+  finishPoints: number // distance score (in points) at which the finish line is reached
 }
 
 const MODES: Record<ModeKey, ModeConfig> = {
@@ -26,19 +35,19 @@ const MODES: Record<ModeKey, ModeConfig> = {
     label: 'Trees',
     blurb: 'The classic slalom. Dodge trees and rocks.',
     help: 'Race down the slope and dodge the trees and rocks. Ski between the flags for bonus points.',
-    startSpeed: 170, maxSpeed: 430, accel: 5, gateHalf: 44, gateChance: 0.2, spawnBase: 215, spawnMin: 105, jumps: false,
+    startSpeed: 170, maxSpeed: 430, accel: 5, gateHalf: 44, gateChance: 0.2, spawnBase: 215, spawnMin: 105, jumps: false, finishPoints: TREES_FINISH_POINTS,
   },
   groomed: {
     label: 'Groomed run',
     blurb: 'Smooth, wide corduroy. Carve through the gates.',
     help: 'A smooth, wide-open groomed run with only the odd obstacle at the edges. Carve through the gates in a row to build a streak bonus.',
-    startSpeed: 140, maxSpeed: 330, accel: 3, gateHalf: 56, gateChance: 0.7, spawnBase: 190, spawnMin: 140, jumps: false,
+    startSpeed: 140, maxSpeed: 330, accel: 3, gateHalf: 56, gateChance: 0.7, spawnBase: 190, spawnMin: 140, jumps: false, finishPoints: GROOMED_FINISH_POINTS,
   },
   park: {
     label: 'Terrain park',
     blurb: 'Hit kickers, grind rails and boxes.',
     help: 'Hit kickers and jump for air, and ease off the steering before you land. Jump onto rails and boxes to grind them, because hitting one from the ground is a wipeout. Bumps slow you down.',
-    startSpeed: 185, maxSpeed: 380, accel: 4, gateHalf: 44, gateChance: 0, spawnBase: 270, spawnMin: 190, jumps: true,
+    startSpeed: 185, maxSpeed: 380, accel: 4, gateHalf: 44, gateChance: 0, spawnBase: 270, spawnMin: 190, jumps: true, finishPoints: PARK_FINISH_POINTS,
   },
 }
 const MODE_ORDER: ModeKey[] = ['trees', 'groomed', 'park']
@@ -73,6 +82,7 @@ type SkiState = {
   specks: Speck[]
   popup: { text: string; ttl: number } | null
   crashed: boolean
+  finished: boolean
 }
 
 const BEST_KEY_PREFIX = 'daylist:ski-best-'
@@ -126,11 +136,21 @@ function createSki(modeKey: ModeKey): SkiState {
     specks,
     popup: null,
     crashed: false,
+    finished: false,
   }
 }
 
 function scoreOf(state: SkiState) {
   return Math.floor(state.distance / METERS_PER_POINT) + state.bonus
+}
+
+function finishDistance(state: SkiState) {
+  return state.mode.finishPoints * METERS_PER_POINT
+}
+
+// Slope position of the finish line. It scrolls down the screen and the run ends when it reaches the skier.
+function finishLineY(state: SkiState) {
+  return SKIER_Y - (finishDistance(state) - state.distance)
 }
 
 function say(state: SkiState, text: string) {
@@ -310,8 +330,8 @@ function stepPark(state: SkiState, dt: number) {
   return false
 }
 
-// Advances the simulation by dt seconds. Returns true when the skier crashed this step.
-function stepSki(state: SkiState, steer: Steer, dt: number) {
+// Advances the simulation by dt seconds. Returns 'crashed' on a wipeout, 'finished' on crossing the line.
+function stepSki(state: SkiState, steer: Steer, dt: number): 'crashed' | 'finished' | null {
   const { mode } = state
   state.speed = Math.min(mode.maxSpeed, state.speed + mode.accel * dt)
   const advance = state.speed * dt
@@ -329,7 +349,8 @@ function stepSki(state: SkiState, steer: Steer, dt: number) {
   }
 
   state.nextSpawn -= advance
-  if (state.nextSpawn <= 0) {
+  // Keep the run-out to the finish line clear of new obstacles.
+  if (state.nextSpawn <= 0 && finishLineY(state) < SPAWN_Y - 60) {
     spawnRow(state)
     state.nextSpawn = Math.max(mode.spawnMin, mode.spawnBase - state.speed * 0.25) + Math.random() * 60
   }
@@ -371,9 +392,13 @@ function stepSki(state: SkiState, steer: Steer, dt: number) {
 
   if (state.obstacles.some((obstacle) => hitsObstacle(state, obstacle)) || (mode.jumps && stepPark(state, dt))) {
     state.crashed = true
-    return true
+    return 'crashed'
   }
-  return false
+  if (state.distance >= finishDistance(state)) {
+    state.finished = true
+    return 'finished'
+  }
+  return null
 }
 
 type Palette = {
@@ -425,6 +450,19 @@ function drawSki(context: CanvasRenderingContext2D, state: SkiState, palette: Pa
   context.moveTo(state.x + 3 - carve * 8, HEIGHT)
   context.lineTo(state.x + 3, SKIER_Y)
   context.stroke()
+
+  const finishY = finishLineY(state)
+  if (finishY > -24) {
+    const cell = 12
+    context.fillStyle = palette.ink
+    for (let row = 0; row < 2; row++) {
+      for (let x = 0; x * cell < WIDTH; x++) {
+        if ((x + row) % 2 === 0) context.fillRect(x * cell, finishY - (row + 1) * cell, cell, cell)
+      }
+    }
+    context.fillStyle = palette.flagA
+    context.fillRect(0, finishY - 2 * cell - 3, WIDTH, 3)
+  }
 
   for (const feature of state.features) {
     const top = feature.y - feature.len
@@ -643,14 +681,14 @@ export function SkiGame() {
       const state = stateRef.current
       const keys = keysRef.current
       const steer = Math.max(-1, Math.min(1, (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + touchRef.current)) as Steer
-      const crashed = stepSki(state, steer, dt)
+      const outcome = stepSki(state, steer, dt)
       const next = scoreOf(state)
       if (next !== scoreRef.current) {
         scoreRef.current = next
         setScore(next)
       }
       render()
-      if (crashed) {
+      if (outcome) {
         const key = modeRef.current
         if (next > bestsRef.current[key]) {
           bestsRef.current = { ...bestsRef.current, [key]: next }
@@ -661,7 +699,8 @@ export function SkiGame() {
             // Ignore storage failures.
           }
         }
-        changeStatus('over')
+        // A win records the score just like a wipeout does.
+        changeStatus(outcome === 'finished' ? 'won' : 'over')
         return
       }
       frame = window.requestAnimationFrame(tick)
@@ -707,7 +746,7 @@ export function SkiGame() {
   }
 
   function begin() {
-    if (statusRef.current === 'over') restart()
+    if (statusRef.current === 'over' || statusRef.current === 'won') restart()
     else if (statusRef.current !== 'running') {
       changeStatus('running')
       boardRef.current?.focus()
@@ -734,18 +773,18 @@ export function SkiGame() {
     if (leftKeys.has(key) || rightKeys.has(key)) {
       if (!onBoard) return
       event.preventDefault()
-      if (statusRef.current === 'over') return
+      if (statusRef.current === 'over' || statusRef.current === 'won') return
       keysRef.current[leftKeys.has(key) ? 'left' : 'right'] = true
       if (statusRef.current !== 'running') begin()
     } else if (parkJump && onBoard) {
       event.preventDefault()
-      if (event.repeat || statusRef.current === 'over') return
+      if (event.repeat || statusRef.current === 'over' || statusRef.current === 'won') return
       if (statusRef.current === 'running') jump()
       else begin()
     } else if (key === 'p' || key === 'P') {
       if (!onBoard) return
       event.preventDefault()
-      if (statusRef.current === 'over') restart()
+      if (statusRef.current === 'over' || statusRef.current === 'won') restart()
       else if (statusRef.current === 'ready') begin()
       else togglePause()
     } else if ((key === ' ' || key === 'Enter') && onBoard) {
@@ -771,7 +810,7 @@ export function SkiGame() {
         event.currentTarget.setPointerCapture?.(event.pointerId)
         touchRef.current = value
         if (statusRef.current === 'ready' || statusRef.current === 'paused') begin()
-        else if (statusRef.current === 'over') restart()
+        else if (statusRef.current === 'over' || statusRef.current === 'won') restart()
       },
       onPointerUp: release,
       onPointerCancel: release,
@@ -780,7 +819,7 @@ export function SkiGame() {
     }
   }
 
-  const statusText = status === 'over' ? `Wipeout. Final score ${score}.` : `Score ${score}`
+  const statusText = status === 'over' ? `Wipeout. Final score ${score}.` : status === 'won' ? `You made it down the mountain. Final score ${score}.` : `Score ${score}`
 
   return (
     <section className="snake-panel" aria-labelledby="ski-title">
@@ -809,8 +848,13 @@ export function SkiGame() {
         <canvas ref={canvasRef} className="ski-canvas" width={WIDTH} height={HEIGHT} role="img" aria-label={`${mode.label} slope. Score ${score}.`} />
         {status !== 'running' && (
           <div className="snake-overlay">
-            <strong>{status === 'over' ? 'Wipeout' : status === 'paused' ? 'Paused' : 'Ready?'}</strong>
-            <span>{status === 'over' ? `You scored ${score}.` : status === 'paused' ? 'Press Space or P to keep going.' : 'Press Space or an arrow key to start.'}</span>
+            <strong>{status === 'won' ? 'You made it down the mountain!' : status === 'over' ? 'Wipeout' : status === 'paused' ? 'Paused' : 'Ready?'}</strong>
+            <span>{status === 'won' ? `Score ${score} · ${mode.label} best ${best}` : status === 'over' ? `You scored ${score}.` : status === 'paused' ? 'Press Space or P to keep going.' : 'Press Space or an arrow key to start.'}</span>
+            {status === 'won' && (
+              <a className="snake-action ski-download" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
+                <Download aria-hidden="true" /> Download Ski Tree on iOS
+              </a>
+            )}
             {status !== 'paused' && (
               <div className="ski-modes" role="group" aria-label="Course">
                 {MODE_ORDER.map((key) => (
@@ -819,8 +863,8 @@ export function SkiGame() {
               </div>
             )}
             {status !== 'paused' && <span className="ski-mode-blurb">{mode.blurb}</span>}
-            {status === 'over' ? (
-              <button className="snake-action" type="button" onClick={restart}><RotateCcw aria-hidden="true" /> Play again</button>
+            {status === 'over' || status === 'won' ? (
+              <button className={status === 'won' ? 'snake-action ski-again' : 'snake-action'} type="button" onClick={restart}><RotateCcw aria-hidden="true" /> Play again</button>
             ) : (
               <button className="snake-action" type="button" onClick={begin}><Play aria-hidden="true" /> {status === 'paused' ? 'Resume' : 'Start'}</button>
             )}
