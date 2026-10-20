@@ -7,9 +7,10 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
-- Mark tasks complete (with a short bell sound) or delete them
+- Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 
 ## Tech stack
 
@@ -86,10 +87,13 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
+  themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
+  theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
+  theme-picker.tsx            Color theme swatch picker, shown in User preferences
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   ui/                         Shared UI primitives
 lib/
@@ -97,6 +101,7 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
