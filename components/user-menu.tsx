@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
-import { Check, ChevronRight, KeyRound, LogOut, Palette, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { Check, ChevronRight, KeyRound, LogOut, Palette, SlidersHorizontal, Sparkles, UserRoundCog, X } from 'lucide-react'
+import { useCustomTheme } from '@/components/custom-theme-provider'
 import { ThemePicker } from '@/components/theme-picker'
+import { ThemeStudio } from '@/components/theme-studio'
 import { useTheme } from '@/components/theme-provider'
 import { authClient } from '@/lib/auth-client'
 import {
@@ -32,9 +34,10 @@ type UserMenuProps = {
 }
 
 export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange }: UserMenuProps) {
-  const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
+  const [dialog, setDialog] = useState<'password' | 'preferences' | 'theme' | null>(null)
   const [themeMode, setThemeMode] = useState<ThemeMode>(DEFAULT_THEME_MODE)
   const { theme: themePalette, setTheme: setThemePalette } = useTheme()
+  const { shown: customTheme } = useCustomTheme()
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   // Restore the saved mode after mount so server and client markup match on hydration.
@@ -68,6 +71,9 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
 
   return (
     <>
+      <button className="theme-button" type="button" onClick={() => setDialog('theme')} aria-haspopup="dialog" title="Change the look of the whole app">
+        <Sparkles aria-hidden="true" /><span>Theme</span>
+      </button>
       <Menu.Root>
         <Menu.Trigger className="avatar-button" aria-label={`Account menu for ${firstName}`} title="Account">
           {firstName.slice(0, 1).toUpperCase()}
@@ -82,12 +88,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
               <Menu.Item className="user-menu-item" onClick={() => setDialog('password')}><KeyRound aria-hidden="true" />Change password</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('preferences')}><SlidersHorizontal aria-hidden="true" />User preferences</Menu.Item>
               <Menu.SubmenuRoot>
-                <Menu.SubmenuTrigger className="user-menu-item"><Palette aria-hidden="true" />Theme<ChevronRight className="user-menu-chevron" aria-hidden="true" /></Menu.SubmenuTrigger>
+                <Menu.SubmenuTrigger className="user-menu-item"><Palette aria-hidden="true" />Appearance<ChevronRight className="user-menu-chevron" aria-hidden="true" /></Menu.SubmenuTrigger>
                 <Menu.Portal>
                   <Menu.Positioner className="user-menu-positioner" side="right" align="start" sideOffset={6} alignOffset={-6}>
                     <Menu.Popup className="user-menu">
                       <Menu.Group>
-                        <Menu.GroupLabel className="user-menu-label user-menu-group-label">Appearance</Menu.GroupLabel>
+                        <Menu.GroupLabel className="user-menu-label user-menu-group-label">Mode</Menu.GroupLabel>
                         <Menu.RadioGroup value={themeMode} onValueChange={(value) => isThemeMode(value) && updateMode(value)}>
                           {THEME_MODES.map((mode) => (
                             <Menu.RadioItem key={mode.value} className="user-menu-item" value={mode.value}>
@@ -100,7 +106,8 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
                       <Menu.Separator className="user-menu-separator" />
                       <Menu.Group>
                         <Menu.GroupLabel className="user-menu-label user-menu-group-label">Color palette</Menu.GroupLabel>
-                        <Menu.RadioGroup value={themePalette} onValueChange={(value) => isThemeId(value) && setThemePalette(value)}>
+                        {/* A generated theme (top bar Theme button) supplies its own full palette, so no built-in palette is selected while it is on; picking one switches it off. */}
+                        <Menu.RadioGroup value={customTheme ? '' : themePalette} onValueChange={(value) => isThemeId(value) && setThemePalette(value)}>
                           {THEMES.map((palette) => (
                             <Menu.RadioItem key={palette.id} className="user-menu-item" value={palette.id}>
                               <span className="theme-menu-swatch" data-theme={palette.id} aria-hidden="true" />
@@ -109,6 +116,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
                             </Menu.RadioItem>
                           ))}
                         </Menu.RadioGroup>
+                        {customTheme && <p className="user-menu-hint">The custom theme &ldquo;{customTheme.name}&rdquo; is on and sets its own colors. Pick a palette to switch it off; Mode applies to the palettes.</p>}
                       </Menu.Group>
                     </Menu.Popup>
                   </Menu.Positioner>
@@ -128,6 +136,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
         </DialogShell>
       </Dialog.Root>
 
+      <Dialog.Root open={dialog === 'theme'} onOpenChange={(open) => !open && setDialog(null)}>
+        <DialogShell title="Theme" description="Pick a preset, fine-tune it, or describe a look in words. The whole app restyles live." variant="side">
+          <ThemeStudio onDone={() => setDialog(null)} />
+        </DialogShell>
+      </Dialog.Root>
+
       <Dialog.Root open={dialog === 'preferences'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogShell title="User preferences" description="Personalize how daylist looks for you.">
           <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={onCompletionSoundChange} onDone={() => setDialog(null)} />
@@ -137,11 +151,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
   )
 }
 
-function DialogShell({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+// The `side` variant docks the dialog to the right with a clear backdrop so a theme preview stays visible.
+function DialogShell({ title, description, children, variant }: { title: string; description: string; children: React.ReactNode; variant?: 'side' }) {
   return (
     <Dialog.Portal>
-      <Dialog.Backdrop className="dialog-backdrop" />
-      <Dialog.Popup className="dialog-popup">
+      <Dialog.Backdrop className={`dialog-backdrop${variant === 'side' ? ' is-clear' : ''}`} />
+      <Dialog.Popup className={`dialog-popup${variant === 'side' ? ' theme-studio' : ''}`}>
         <Dialog.Close className="dialog-close" aria-label="Close"><X aria-hidden="true" /></Dialog.Close>
         <Dialog.Title className="dialog-title">{title}</Dialog.Title>
         <Dialog.Description className="dialog-description">{description}</Dialog.Description>
