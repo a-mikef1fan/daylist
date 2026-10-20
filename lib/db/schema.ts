@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  index,
   pgTable,
   text,
   timestamp,
@@ -56,6 +57,22 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 })
 
+export const goals = pgTable(
+  'goals',
+  {
+    id: text('id').primaryKey(),
+    userId: text('userId')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    description: text('description'),
+    targetDate: date('targetDate'),
+    createdAt: timestamp('createdAt').notNull().defaultNow(),
+    updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  },
+  (table) => [index('goals_user_id_idx').on(table.userId)],
+)
+
 export const tasks = pgTable('tasks', {
   id: text('id').primaryKey(),
   userId: text('userId').notNull(),
@@ -66,9 +83,15 @@ export const tasks = pgTable('tasks', {
   completed: boolean('completed').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  // Optional goal this task contributes to. Deleting the goal keeps the task and clears the link.
+  // (The tasks_goal_id_idx index lives in the SQL migration only.)
+  goalId: text('goalId').references(() => goals.id, { onDelete: 'set null' }),
 })
 
 export type Task = typeof tasks.$inferSelect
+export type Goal = typeof goals.$inferSelect
+export type GoalProgress = { completed: number; total: number }
+export type GoalWithProgress = Goal & GoalProgress
 export type TaskPriority = 'low' | 'normal' | 'high'
 export type NewTaskInput = {
   title: string
@@ -77,5 +100,5 @@ export type NewTaskInput = {
 }
 
 export const authSchema = { user, session, account, verification }
-export const appSchema = { tasks }
+export const appSchema = { goals, tasks }
 export const schema = { ...authSchema, ...appSchema }
