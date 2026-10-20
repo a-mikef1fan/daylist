@@ -7,6 +7,7 @@ import { AuthScreen } from '@/components/auth-screen'
 import { TodoApp } from '@/components/todo-app'
 import { isPreviewTestLoginEnabled } from '@/lib/preview-login'
 import { getUserProgress } from '@/lib/gamification-server'
+import { toTaskView } from '@/lib/recurrence'
 
 export default async function HomePage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -20,5 +21,5 @@ export default async function HomePage() {
 
   const progress = await getUserProgress(session.user.id)
 
-  return <TodoApp initialTasks={userTasks} userName={session.user.name} initialProgress={progress} />
+  return <TodoApp initialTasks={userTasks.map(toTaskView)} userName={session.user.name} initialProgress={progress} />
 }
