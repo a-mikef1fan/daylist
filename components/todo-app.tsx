@@ -22,11 +22,13 @@ import {
   Search,
   Sparkles,
   Trash2,
+  MountainSnow,
   Waypoints,
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { DailyQuote } from '@/components/daily-quote'
+import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { TaskBoard } from '@/components/task-board'
 import { TheseusGame } from '@/components/theseus-game'
@@ -40,10 +42,11 @@ import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-type GameKey = 'snake' | 'theseus'
+type GameKey = 'snake' | 'ski' | 'theseus'
 
 const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
   { id: 'snake', label: 'Snake', icon: Worm },
+  { id: 'ski', label: 'Downhill Skiing', icon: MountainSnow },
   { id: 'theseus', label: 'Theseus & the Minotaur', icon: Waypoints },
 ]
 
@@ -332,7 +335,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'theseus' ? <TheseusGame /> : boardOpen ? <TaskBoard tasks={tasks} onTasksChange={setTasks} /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : boardOpen ? <TaskBoard tasks={tasks} onTasksChange={setTasks} /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
