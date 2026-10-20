@@ -7,6 +7,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Mark tasks complete (with a short bell sound) or delete them
+- Task board: a Kanban-style tracker with To do, In progress and Done columns, a progress bar with counts and percent complete, move buttons on every card, and drag and drop on desktop
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 
@@ -56,7 +57,9 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `status`, `createdAt`, `updatedAt`)
+
+`tasks.status` is one of `todo`, `in_progress`, `done` and defaults to `todo`. It is kept in sync with `completed` (`done` if and only if `completed` is true). If you already have a `tasks` table from before the task board existed, run `lib/db/migrations/0001_add_task_status.sql` once. It is safe to re-run.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -83,16 +86,19 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, updateTaskStatus, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  task-board.tsx              Task tracker board (columns, progress summary, move between statuses)
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  db/migrations/              Hand-run SQL for schema changes
+  task-status.ts              Task status labels and progress helpers
   utils.ts                    Helpers
 ```

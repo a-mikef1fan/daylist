@@ -2,7 +2,8 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { tasks, type TaskPriority, type TaskStatus } from '@/lib/db/schema'
+import { isTaskStatus } from '@/lib/task-status'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -69,7 +70,22 @@ export async function updateTaskCompletion(id: string, completed: boolean) {
   }
   const [task] = await db
     .update(tasks)
-    .set({ completed, updatedAt: new Date() })
+    .set({ completed, status: completed ? 'done' : 'todo', updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning()
+  if (!task) throw new Error('Task not found')
+  revalidatePath('/')
+  return task
+}
+
+export async function updateTaskStatus(id: string, status: TaskStatus) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80 || !isTaskStatus(status)) {
+    throw new Error('Invalid task update')
+  }
+  const [task] = await db
+    .update(tasks)
+    .set({ status, completed: status === 'done', updatedAt: new Date() })
     .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
     .returning()
   if (!task) throw new Error('Task not found')

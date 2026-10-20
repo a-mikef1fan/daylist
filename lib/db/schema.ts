@@ -64,12 +64,16 @@ export const tasks = pgTable('tasks', {
   dueDate: date('dueDate'),
   priority: text('priority').notNull().default('normal'),
   completed: boolean('completed').notNull().default(false),
+  // Kanban column. `completed` stays the source of truth for "done": the two are kept in sync
+  // by the server actions, and lib/task-status.ts derives the effective status when reading.
+  status: text('status').$type<TaskStatus>().notNull().default('todo'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
 export type Task = typeof tasks.$inferSelect
 export type TaskPriority = 'low' | 'normal' | 'high'
+export type TaskStatus = 'todo' | 'in_progress' | 'done'
 export type NewTaskInput = {
   title: string
   dueDate: string
