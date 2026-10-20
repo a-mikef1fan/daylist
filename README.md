@@ -7,10 +7,11 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
-- Mark tasks complete (with a short bell sound) or delete them
+- Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 - Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges
+- Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 
 ## Gamification rules
@@ -75,6 +76,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
+Theseus & the Minotaur progress needs no table of its own (a demo shortcut): each player's progress is one reserved row in `tasks` with `id` and `userId` set to `theseus:<user id>` and a JSON payload in `description`. Because every task query filters on the signed-in user's real id, these rows never appear in task lists and cannot be changed by the task actions. See `lib/theseus-store.ts`; moving to a dedicated table later means copying each payload's levels into rows and deleting the `theseus:%` task rows.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 ### Run
@@ -104,6 +107,8 @@ app/
   themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks and applies XP), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
+  api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
+  api/theseus/leaderboard/route.ts  GET the top players plus the signed-in user's own row
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
@@ -112,6 +117,9 @@ components/
   gamification.tsx            Progress card, celebration toasts
   ui/                         Shared UI primitives
 lib/
+  theseus-moves.ts            Move-list encoding and the replay check that verifies a submitted win
+  theseus-ranking.ts          Leaderboard ranking rule and display names
+  theseus-store.ts            Where Theseus progress lives (reserved `tasks` rows) and the leaderboard query
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
