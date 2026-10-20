@@ -25,7 +25,7 @@ import {
   Waypoints,
   Worm,
 } from 'lucide-react'
-import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { createTask, deleteTask, getTasks, updateTaskCompletion } from '@/app/actions/tasks'
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
@@ -264,6 +264,15 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     })
   }
 
+  // Reload the list after a Google Tasks sync has added or changed tasks.
+  async function refreshTasks() {
+    try {
+      setTasks(await getTasks())
+    } catch {
+      setMessage('Synced, but the list could not refresh. Reload the page to see changes.')
+    }
+  }
+
   async function handleSignOut() {
     await authClient.signOut()
     window.location.assign('/')
@@ -325,7 +334,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
+          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} onTasksChanged={refreshTasks} />
         </header>
 
         <div className="dashboard-content">

@@ -3,6 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { pushTaskCompletion } from '@/lib/google-tasks-server'
 import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -125,6 +126,8 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
     }
     return { task: toTaskView(task), next: next && toTaskView(next) }
   })
+  // Mirror the change onto the linked Google task (best effort, no-op if not linked).
+  await pushTaskCompletion(userId, result.task, await headers())
   revalidatePath('/')
   return result
 }
