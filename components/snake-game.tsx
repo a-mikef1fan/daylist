@@ -84,7 +84,7 @@ export function SnakeGame() {
     if (!canvas || !context) return
     const styles = window.getComputedStyle(canvas)
     const color = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback
-    context.fillStyle = color('--secondary', '#f1f1ea')
+    context.fillStyle = color('--secondary', '#efeff7')
     context.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
     if (game.food) {
       context.fillStyle = color('--coral', '#d9774f')
@@ -93,7 +93,7 @@ export function SnakeGame() {
       context.fill()
     }
     game.snake.forEach((part, index) => {
-      context.fillStyle = index === 0 ? color('--sage-deep', '#2f5d46') : color('--primary', '#3d6b52')
+      context.fillStyle = index === 0 ? color('--sage-deep', '#3c3a8f') : color('--primary', '#4f46c8')
       context.fillRect(part.x * CELL + 1, part.y * CELL + 1, CELL - 2, CELL - 2)
     })
   }, [game])
