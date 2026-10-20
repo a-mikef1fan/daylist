@@ -9,18 +9,18 @@
 .goal-form-error, .goals-message { margin: 10px 0 0; color: var(--destructive); font-size: 11px; }
 .goals-message { margin: 0 0 12px; }
 .goal-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.goal-card { border: 1px solid oklch(0.91 0.014 100); border-radius: 14px; background: var(--card); padding: 16px 18px 15px; transition: border .18s, box-shadow .18s; }
-.goal-card:hover { border-color: oklch(0.83 0.035 153); box-shadow: 0 5px 15px oklch(0.28 0.04 157 / 4%); }
-.goal-card.is-reached { border-color: oklch(0.83 0.06 153); }
+.goal-card { border: 1px solid oklch(0.91 0.014 var(--surface-hue)); border-radius: 14px; background: var(--card); padding: 16px 18px 15px; transition: border .18s, box-shadow .18s; }
+.goal-card:hover { border-color: oklch(0.83 0.035 var(--hue)); box-shadow: 0 5px 15px oklch(0.28 0.04 var(--hue) / 4%); }
+.goal-card.is-reached { border-color: oklch(0.83 0.06 var(--hue)); }
 .goal-card-head { display: flex; align-items: flex-start; gap: 10px; }
 .goal-card-title { min-width: 0; flex: 1; margin: 0; overflow-wrap: anywhere; color: var(--foreground); font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
 .goal-card-actions { display: flex; flex: none; gap: 2px; }
 .goal-icon-button { display: grid; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer; transition: color .15s, background .15s; }
-.goal-icon-button:hover { background: oklch(0.94 0.018 100); color: var(--foreground); }
+.goal-icon-button:hover { background: oklch(0.94 0.018 var(--surface-hue)); color: var(--foreground); }
 .goal-icon-button.is-danger:hover { background: oklch(0.96 0.025 30); color: var(--destructive); }
 .goal-icon-button svg { width: 15px; height: 15px; }
 .goal-description { margin: 5px 0 0; overflow-wrap: anywhere; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
-.goal-progress { height: 8px; margin-top: 14px; overflow: hidden; border-radius: 999px; background: oklch(0.93 0.018 100); }
+.goal-progress { height: 8px; margin-top: 14px; overflow: hidden; border-radius: 999px; background: oklch(0.93 0.018 var(--surface-hue)); }
 .goal-progress > span { display: block; height: 100%; border-radius: inherit; background: var(--sage-deep); transition: width .3s ease; }
 .goal-card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 10px; color: var(--muted-foreground); font-size: 11px; }
 .goal-card-foot .goal-count { color: var(--ink-soft); font-weight: 600; }
@@ -28,15 +28,15 @@
 .goal-target svg { width: 11px; height: 11px; }
 .goal-target.is-overdue { color: oklch(0.56 0.17 31); }
 .goal-view-tasks { margin-left: auto; border: 0; border-radius: 6px; background: transparent; padding: 3px 6px; color: var(--sage-deep); cursor: pointer; font-size: 11px; font-weight: 650; }
-.goal-view-tasks:hover { background: oklch(0.94 0.03 153); }
+.goal-view-tasks:hover { background: oklch(0.94 0.03 var(--hue)); }
 .goal-edit-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 .goal-cancel-button { min-height: 36px; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 0 13px; color: var(--ink-soft); cursor: pointer; font-size: 11px; font-weight: 600; }
-.goal-cancel-button:hover { background: oklch(0.96 0.01 100); }
+.goal-cancel-button:hover { background: oklch(0.96 0.01 var(--surface-hue)); }
 .goal-edit-actions .add-task-button { margin-left: 0; }
 
 /* Goal chip on a task row (a native select styled as a badge) */
 .task-copy .task-meta { flex-wrap: wrap; row-gap: 4px; }
-.goal-chip { display: inline-flex; max-width: 100%; align-items: center; gap: 4px; margin-left: 4px; border-radius: 999px; background: oklch(0.94 0.03 153); padding: 1px 4px 1px 7px; color: var(--sage-deep); transition: opacity .15s; }
+.goal-chip { display: inline-flex; max-width: 100%; align-items: center; gap: 4px; margin-left: 4px; border-radius: 999px; background: oklch(0.94 0.03 var(--hue)); padding: 1px 4px 1px 7px; color: var(--sage-deep); transition: opacity .15s; }
 .goal-chip svg { width: 11px; height: 11px; flex: none; }
 .goal-chip select { min-width: 0; max-width: 150px; border: 0; background: transparent; padding: 1px 0; color: inherit; cursor: pointer; field-sizing: content; font-size: 10px; font-weight: 600; text-overflow: ellipsis; outline: none; }
 .goal-chip:focus-within { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 1px; }
@@ -45,11 +45,11 @@
 .task-row:hover .goal-chip:not(.has-goal), .goal-chip:not(.has-goal):focus-within { opacity: 1; }
 
 /* "Showing tasks for goal" chip above the task list */
-.goal-filter-chip { display: inline-flex; max-width: 100%; align-items: center; gap: 7px; margin-bottom: 12px; border-radius: 999px; background: oklch(0.94 0.03 153); padding: 5px 6px 5px 11px; color: var(--sage-deep); font-size: 11px; }
+.goal-filter-chip { display: inline-flex; max-width: 100%; align-items: center; gap: 7px; margin-bottom: 12px; border-radius: 999px; background: oklch(0.94 0.03 var(--hue)); padding: 5px 6px 5px 11px; color: var(--sage-deep); font-size: 11px; }
 .goal-filter-chip svg { width: 13px; height: 13px; flex: none; }
 .goal-filter-chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .goal-filter-chip button { display: grid; width: 20px; height: 20px; flex: none; place-items: center; border: 0; border-radius: 50%; background: transparent; padding: 0; color: inherit; cursor: pointer; }
-.goal-filter-chip button:hover { background: oklch(0.88 0.05 153); }
+.goal-filter-chip button:hover { background: oklch(0.88 0.05 var(--hue)); }
 
 @media (max-width: 680px) {
   .goal-card { padding: 14px 14px 13px; }
