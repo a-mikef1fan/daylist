@@ -28,7 +28,7 @@ import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
-import { playCompletionBell } from '@/lib/completion-bell'
+import { DEFAULT_COMPLETION_SOUND, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -44,6 +44,7 @@ const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
 const SIDEBAR_WIDTH_STORAGE_KEY = 'daylist:sidebar-width'
 const TASK_ICONS_STORAGE_KEY = 'daylist:show-task-icons'
+const COMPLETION_SOUND_STORAGE_KEY = 'daylist:completion-sound'
 const SIDEBAR_DEFAULT_WIDTH = 248
 const SIDEBAR_MIN_WIDTH = 200
 const SIDEBAR_MAX_WIDTH = 420
@@ -94,6 +95,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [resizing, setResizing] = useState(false)
   const [sidebarReady, setSidebarReady] = useState(false)
   const [showTaskIcons, setShowTaskIcons] = useState(true)
+  const [completionSound, setCompletionSound] = useState<CompletionSoundId>(DEFAULT_COMPLETION_SOUND)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
 
@@ -104,6 +106,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       const savedWidth = Number(window.localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY))
       if (Number.isFinite(savedWidth) && savedWidth > 0) setSidebarWidth(clampSidebarWidth(savedWidth))
       setShowTaskIcons(window.localStorage.getItem(TASK_ICONS_STORAGE_KEY) !== 'false')
+      const savedSound = window.localStorage.getItem(COMPLETION_SOUND_STORAGE_KEY)
+      if (isCompletionSoundId(savedSound)) setCompletionSound(savedSound)
     } catch {
       // Storage can be unavailable (private mode, blocked cookies); fall back to expanded.
     }
@@ -114,6 +118,15 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setShowTaskIcons(value)
     try {
       window.localStorage.setItem(TASK_ICONS_STORAGE_KEY, String(value))
+    } catch {
+      // Ignore storage failures; the preference still applies for this visit.
+    }
+  }
+
+  function handleCompletionSoundChange(value: CompletionSoundId) {
+    setCompletionSound(value)
+    try {
+      window.localStorage.setItem(COMPLETION_SOUND_STORAGE_KEY, value)
     } catch {
       // Ignore storage failures; the preference still applies for this visit.
     }
@@ -222,7 +235,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
 
   function handleToggle(task: Task) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
-    if (!task.completed) playCompletionBell()
+    if (!task.completed) playCompletionBell(completionSound)
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
@@ -310,7 +323,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
+          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={handleCompletionSoundChange} />
         </header>
 
         <div className="dashboard-content">
