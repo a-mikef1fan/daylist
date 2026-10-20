@@ -1,0 +1,29 @@
+/* Play / Leaderboard switch and ranked list for the score-based games (Snake, Downhill Skiing). The look matches the
+   Theseus leaderboard (theseus-game.css) and uses the same theme tokens. */
+.game-tabs { display: inline-flex; gap: 4px; margin-top: 14px; border-radius: 10px; background: var(--secondary); padding: 3px; }
+.game-tab { min-height: 32px; border: 0; border-radius: 8px; background: transparent; padding: 0 14px; color: var(--muted-foreground); cursor: pointer; font-size: 12px; font-weight: 650; }
+.game-tab[aria-pressed='true'] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px color-mix(in oklch, var(--foreground) 10%, transparent); }
+.game-tab:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 1px; }
+.game-board-help { margin: 14px 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.65; }
+.game-leaders-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 10px; background: var(--secondary); padding: 14px 12px; color: var(--muted-foreground); font-size: 13px; line-height: 1.5; }
+.game-leaders-note.is-error { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }
+.game-leaders-note + div { margin-top: 12px; }
+.game-leaders-retry { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: var(--secondary); padding: 0 12px; color: var(--secondary-foreground); cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.game-leaders-note.is-error .game-leaders-retry { background: var(--card); }
+.game-leaders .is-stale { opacity: .6; }
+.game-board-head, .game-board-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 64px; align-items: center; gap: 8px; padding: 0 12px; }
+.game-board-head { padding-bottom: 6px; color: var(--muted-foreground); font-size: 10px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+.game-board-head span:last-child, .game-board-num { text-align: right; }
+.game-board-list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: 14px; background: var(--card); overflow: hidden; }
+.game-board-mine { margin-top: 8px; }
+.game-board-row { min-height: 46px; border-top: 1px solid var(--border); font-size: 13px; }
+.game-board-row:first-child { border-top: 0; }
+.game-board-row.is-me { background: var(--sage); color: var(--sage-deep); }
+.game-board-rank { color: var(--muted-foreground); font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.game-board-row.is-me .game-board-rank { color: inherit; }
+.game-board-name { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.game-board-name strong { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.game-board-name em { flex: none; border-radius: 6px; background: var(--sage-deep); padding: 1px 6px; color: var(--on-sage-deep); font-size: 10px; font-style: normal; font-weight: 650; }
+.game-board-num { font-weight: 650; font-variant-numeric: tabular-nums; }
+.game-leaders-total { margin: 10px 0 0; color: var(--muted-foreground); font-size: 11px; line-height: 1.6; }
+.ski-board-courses { margin: 0 0 12px; }

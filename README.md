@@ -69,6 +69,8 @@ A task's repeat rule (daily, weekdays, weekly) is stored in the `description` co
 
 Theseus & the Minotaur progress needs no table of its own (a demo shortcut): each player's progress is one reserved row in `tasks` with `id` and `userId` set to `theseus:<user id>` and a JSON payload in `description`. Because every task query filters on the signed-in user's real id, these rows never appear in task lists and cannot be changed by the task actions. See `lib/theseus-store.ts`; moving to a dedicated table later means copying each payload's levels into rows and deleting the `theseus:%` task rows.
 
+Snake and Downhill Skiing high scores are stored the same way, one reserved row per player and game (`snake:<user id>`, `skiing:<user id>`), through the shared helper in `lib/reserved-rows.ts`. A player's best per board is kept (`lib/score-store.ts`): Snake has one board, Downhill Skiing one per course (Trees, Groomed run, Terrain park). Ranking is the highest score, then whoever reached it first, then display name and id (`lib/score-ranking.ts`). Unlike Theseus, these games run in the browser on random boards, so the server cannot replay a run: `POST /api/snake/score` and `POST /api/skiing/score` trust the reported score but reject numbers the game could not have produced (maximum score, and a play time that fits the score; see `lib/snake-rules.ts` and `lib/ski-rules.ts`). Moving to a dedicated table later means copying each payload's boards into rows and deleting the `snake:%` and `skiing:%` task rows.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 ### Run
@@ -100,6 +102,10 @@ app/
   api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
   api/theseus/leaderboard/route.ts  GET the top players plus the signed-in user's own row
+  api/snake/score/route.ts          POST a finished run's score (plausibility-checked); the server keeps the best
+  api/snake/leaderboard/route.ts    GET the top players plus the signed-in user's own row
+  api/skiing/score/route.ts         POST a finished run for a course (plausibility-checked); the server keeps the best per course
+  api/skiing/leaderboard/route.ts   GET the top players for a course (?course=trees|groomed|park) plus the signed-in user's own row
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
@@ -111,8 +117,16 @@ components/
   snake-game.tsx              Snake
   theseus-game.tsx            Theseus & the Minotaur
   f1-game.tsx                 F1 Grand Prix: driver select, race loop, HUD, results (styles in f1-game.css)
+  game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
+  reserved-rows.ts            Reserved `tasks` rows: one JSON row per player and game, read/modify/write under a row lock, no schema change
+  score-store.ts              Best score per player per board on top of reserved rows, and the leaderboard query
+  score-ranking.ts            Ranking rule for score-based games, display names, shared validation types
+  score-api.ts, score-games.ts  The shared score and leaderboard route handlers, and the per-game configuration
+  snake-rules.ts, ski-rules.ts  Which Snake and Downhill Skiing results are plausible
+  score-client.ts, use-score-sync.ts  Browser side: submit a score, retry later when it could not be sent
+  game-api.ts, game-client.ts  Request helpers shared by the game routes and their browser clients
   theseus-moves.ts            Move-list encoding and the replay check that verifies a submitted win
   theseus-ranking.ts          Leaderboard ranking rule and display names
   theseus-store.ts            Where Theseus progress lives (reserved `tasks` rows) and the leaderboard query
