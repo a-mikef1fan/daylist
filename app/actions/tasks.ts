@@ -35,7 +35,7 @@ export async function createTask(input: {
     throw new Error('Invalid task priority')
   }
   if (input.dueDate !== null) {
-    if (typeof input.dueDate !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(input.dueDate)) {
+    if (typeof input.dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
       throw new Error('Invalid due date')
     }
     const parsedDate = new Date(`${input.dueDate}T00:00:00.000Z`)
