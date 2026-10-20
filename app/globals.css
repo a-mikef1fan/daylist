@@ -132,6 +132,19 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .snake-dpad-left { grid-area: left; }
 .snake-dpad-right { grid-area: right; }
 .snake-dpad-down { grid-area: down; }
+.ski-canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; touch-action: none; }
+.ski-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.ski-center { display: flex; align-items: center; gap: 10px; }
+.ski-steer { display: grid; width: 72px; height: 48px; place-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--card); color: var(--ink-soft); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.ski-steer:hover { background: var(--muted); }
+.ski-steer:active { background: var(--sage); }
+.ski-steer svg { width: 20px; height: 20px; }
+.ski-jump { width: 48px; }
+.ski-modes { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 4px; }
+.ski-mode { min-height: 30px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); padding: 0 12px; color: var(--ink-soft); cursor: pointer; font-size: 11px; font-weight: 650; }
+.ski-mode:hover { background: var(--muted); }
+.ski-mode[aria-pressed='true'] { border-color: var(--sage-deep); background: var(--sage); color: var(--sage-deep); }
+.ski-mode-blurb { padding: 0 16px; }
 @keyframes snake-fade { from { opacity: 0; } to { opacity: 1; } }
 .topbar { display: flex; min-height: 80px; align-items: center; justify-content: flex-end; gap: 16px; border-bottom: 1px solid oklch(0.91 0.014 100 / 65%); padding: 0 clamp(24px, 6vw, 88px); }
 .topbar-date { color: var(--muted-foreground); font-size: 12px; }

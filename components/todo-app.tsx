@@ -20,9 +20,11 @@ import {
   Search,
   Sparkles,
   Trash2,
+  MountainSnow,
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
@@ -32,10 +34,11 @@ import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-type GameKey = 'snake'
+type GameKey = 'snake' | 'ski'
 
 const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
   { id: 'snake', label: 'Snake', icon: Worm },
+  { id: 'ski', label: 'Downhill Skiing', icon: MountainSnow },
 ]
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
@@ -311,7 +314,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
