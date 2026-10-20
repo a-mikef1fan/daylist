@@ -17,6 +17,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Repeat,
   Search,
   Sparkles,
   Trash2,
@@ -27,6 +28,7 @@ import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
+import { TASK_REPEATS, repeatLabels, type TaskRepeat } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -84,6 +86,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
+  const [repeat, setRepeat] = useState<TaskRepeat>('none')
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
   const [collapsed, setCollapsed] = useState(false)
@@ -205,11 +208,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setMessage('')
     startTransition(async () => {
       try {
-        const task = await createTask({ title: title.trim(), dueDate: dueDate || null, priority })
+        // A repeating task needs a start date, so default it to today.
+        const task = await createTask({ title: title.trim(), dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority, repeat })
         setTasks((current) => [task, ...current])
         setTitle('')
         setDueDate('')
         setPriority('normal')
+        setRepeat('none')
         router.refresh()
       } catch {
         setMessage('Could not save that task. Please try again.')
@@ -223,8 +228,11 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
-        const updated = await updateTaskCompletion(task.id, !task.completed)
-        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        const { task: updated, next } = await updateTaskCompletion(task.id, !task.completed, dateKey(new Date()))
+        setTasks((current) => {
+          const synced = current.map((item) => item.id === updated.id ? updated : item)
+          return next && !synced.some((item) => item.id === next.id) ? [next, ...synced] : synced
+        })
         router.refresh()
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
@@ -330,6 +338,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <option value="normal">Normal priority</option><option value="high">High priority</option><option value="low">Low priority</option>
                   </select>
                 </label>
+                <label className="select-control" aria-label="Repeat">
+                  <Repeat aria-hidden="true" />
+                  <select value={repeat} onChange={(event) => setRepeat(event.target.value as TaskRepeat)} aria-label="Repeat">
+                    {TASK_REPEATS.map((option) => <option key={option} value={option}>{option === 'none' ? 'Never repeats' : `Repeats ${repeatLabels[option].toLowerCase()}`}</option>)}
+                  </select>
+                </label>
                 <label className="date-control" aria-label="Due date"><CalendarDays aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
                 <button className="add-task-button" type="submit" disabled={isPending || !title.trim()}><Plus aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
               </div>
@@ -350,7 +364,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
                   </li>
                 ))}

@@ -6,6 +6,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
+- Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
@@ -56,7 +57,13 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `repeat`, `completed`, `createdAt`, `updatedAt`)
+
+`repeat` is `text NOT NULL DEFAULT 'none'` and holds `none`, `daily`, `weekdays`, or `weekly`. If your `tasks` table already exists, add the column:
+
+```sql
+ALTER TABLE tasks ADD COLUMN "repeat" text NOT NULL DEFAULT 'none';
+```
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -83,7 +90,7 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
@@ -94,5 +101,6 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  recurrence.ts               Repeat options and next-occurrence date math
   utils.ts                    Helpers
 ```
