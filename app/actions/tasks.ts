@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, type TaskPriority } from '@/lib/db/schema'
-import { isTaskRepeat, nextOccurrence, type TaskRepeat } from '@/lib/recurrence'
+import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -16,11 +16,12 @@ async function getUserId() {
 
 export async function getTasks() {
   const userId = await getUserId()
-  return db
+  const rows = await db
     .select()
     .from(tasks)
     .where(eq(tasks.userId, userId))
     .orderBy(asc(tasks.completed), desc(tasks.createdAt))
+  return rows.map(toTaskView)
 }
 
 export async function createTask(input: {
@@ -60,11 +61,11 @@ export async function createTask(input: {
       title,
       dueDate: input.dueDate,
       priority: input.priority,
-      repeat,
+      description: encodeRepeat(repeat, null),
     })
     .returning()
   revalidatePath('/')
-  return task
+  return toTaskView(task)
 }
 
 // `today` is the caller's local 'YYYY-MM-DD' date, used so a late completion of a
@@ -89,11 +90,12 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
     // next occurrence as a new open task. Skip it if that occurrence already
     // exists (for example after un-completing and completing again).
     let next: typeof task | null = null
+    const { repeat } = parseRepeat(task.description)
     const nextDue =
       completed && task.dueDate
-        ? nextOccurrence(task.dueDate, task.repeat, today ?? new Date().toISOString().slice(0, 10))
+        ? nextOccurrence(task.dueDate, repeat, today ?? new Date().toISOString().slice(0, 10))
         : null
-    if (nextDue) {
+    if (nextDue && task.description) {
       const [existing] = await tx
         .select({ id: tasks.id })
         .from(tasks)
@@ -101,7 +103,7 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
           and(
             eq(tasks.userId, userId),
             eq(tasks.title, task.title),
-            eq(tasks.repeat, task.repeat),
+            eq(tasks.description, task.description),
             eq(tasks.dueDate, nextDue),
             eq(tasks.completed, false),
           ),
@@ -117,12 +119,11 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
             description: task.description,
             dueDate: nextDue,
             priority: task.priority,
-            repeat: task.repeat,
           })
           .returning()
       }
     }
-    return { task, next }
+    return { task: toTaskView(task), next: next && toTaskView(next) }
   })
   revalidatePath('/')
   return result

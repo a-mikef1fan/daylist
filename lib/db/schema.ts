@@ -5,7 +5,6 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core'
-import type { TaskRepeat } from '@/lib/recurrence'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -64,7 +63,6 @@ export const tasks = pgTable('tasks', {
   description: text('description'),
   dueDate: date('dueDate'),
   priority: text('priority').notNull().default('normal'),
-  repeat: text('repeat').$type<TaskRepeat>().notNull().default('none'),
   completed: boolean('completed').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
@@ -76,7 +74,6 @@ export type NewTaskInput = {
   title: string
   dueDate: string
   priority: TaskPriority
-  repeat: TaskRepeat
 }
 
 export const authSchema = { user, session, account, verification }

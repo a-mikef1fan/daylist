@@ -28,9 +28,9 @@ import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
-import { TASK_REPEATS, repeatLabels, type TaskRepeat } from '@/lib/recurrence'
+import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { Task, TaskPriority } from '@/lib/db/schema'
+import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
@@ -78,7 +78,7 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; userName: string }) {
+export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; userName: string }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
@@ -222,7 +222,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     })
   }
 
-  function handleToggle(task: Task) {
+  function handleToggle(task: TaskView) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
     if (!task.completed) playCompletionBell()
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
@@ -241,7 +241,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     })
   }
 
-  function handleDelete(task: Task) {
+  function handleDelete(task: TaskView) {
     setTasks((current) => current.filter((item) => item.id !== task.id))
     startTransition(async () => {
       try {

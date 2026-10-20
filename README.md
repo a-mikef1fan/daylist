@@ -57,13 +57,9 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `repeat`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
 
-`repeat` is `text NOT NULL DEFAULT 'none'` and holds `none`, `daily`, `weekdays`, or `weekly`. If your `tasks` table already exists, add the column:
-
-```sql
-ALTER TABLE tasks ADD COLUMN "repeat" text NOT NULL DEFAULT 'none';
-```
+A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -101,6 +97,6 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
-  recurrence.ts               Repeat options and next-occurrence date math
+  recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
