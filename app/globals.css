@@ -91,6 +91,10 @@
   --intro-body: oklch(0.40 0.04 var(--hue));
   --intro-list: oklch(0.34 0.06 var(--hue));
   --intro-muted: oklch(0.42 0.07 var(--hue));
+  --chip-high-bg: oklch(0.94 0.04 39);
+  --chip-high-text: oklch(0.5 0.13 39);
+  --chip-low-bg: oklch(0.94 0.03 155);
+  --chip-low-text: oklch(0.45 0.08 155);
 }
 
 /* Dark mode: the same hues as the light palette (see themes.css) on deep tinted neutrals. The "dark" class is set on <html> before first paint. */
@@ -149,6 +153,10 @@
   --intro-body: oklch(0.8 0.03 var(--hue));
   --intro-list: oklch(0.85 0.04 var(--hue));
   --intro-muted: oklch(0.75 0.05 var(--hue));
+  --chip-high-bg: oklch(0.34 0.06 39);
+  --chip-high-text: oklch(0.82 0.11 45);
+  --chip-low-bg: oklch(0.32 0.05 155);
+  --chip-low-text: oklch(0.8 0.09 155);
 }
 
 * { box-sizing: border-box; }
@@ -342,6 +350,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .auth-form { display: flex; flex-direction: column; gap: 16px; margin-top: 30px; }
 .form-field { display: flex; flex-direction: column; gap: 7px; color: var(--ink-soft); font-size: 11px; font-weight: 620; }
 .form-field input { height: 45px; border: 1px solid var(--border); border-radius: 9px; background: var(--field); padding: 0 12px; color: var(--foreground); font-size: 12px; }
+.form-field select { height: 45px; border: 1px solid var(--border); border-radius: 9px; background: var(--field); padding: 0 12px; color: var(--foreground); cursor: pointer; font-size: 12px; }
 .form-field input::placeholder { color: var(--placeholder); }
 .auth-submit { display: flex; height: 46px; align-items: center; justify-content: center; gap: 9px; margin-top: 2px; border: 0; border-radius: 9px; background: var(--brand); color: var(--brand-foreground); cursor: pointer; font-size: 12px; font-weight: 650; transition: background .18s; }
 .auth-submit:hover:not(:disabled) { background: var(--brand-hover); }
