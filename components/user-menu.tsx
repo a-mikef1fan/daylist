@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
-import { KeyRound, ListChecks, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { KeyRound, ListChecks, LogOut, SlidersHorizontal, Sparkles, UserRoundCog, X } from 'lucide-react'
 import { GoogleTasksPanel } from '@/components/google-tasks-panel'
 import { ThemePicker } from '@/components/theme-picker'
+import { ThemeStudio } from '@/components/theme-studio'
 import { authClient } from '@/lib/auth-client'
 import { completionSoundOptions, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import { useRouter } from 'next/navigation'
@@ -23,7 +24,7 @@ type UserMenuProps = {
 }
 
 export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange, onTasksChanged }: UserMenuProps) {
-  const [dialog, setDialog] = useState<'password' | 'preferences' | 'google' | null>(null)
+  const [dialog, setDialog] = useState<'password' | 'preferences' | 'theme' | 'google' | null>(null)
   const [googleNotice, setGoogleNotice] = useState<'connected' | 'error' | null>(null)
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
@@ -50,6 +51,9 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
 
   return (
     <>
+      <button className="theme-button" type="button" onClick={() => setDialog('theme')} aria-haspopup="dialog" title="Change the look of the whole app">
+        <Sparkles aria-hidden="true" /><span>Theme</span>
+      </button>
       <Menu.Root>
         <Menu.Trigger className="avatar-button" aria-label={`Account menu for ${firstName}`} title="Account">
           {firstName.slice(0, 1).toUpperCase()}
@@ -78,6 +82,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
         </DialogShell>
       </Dialog.Root>
 
+      <Dialog.Root open={dialog === 'theme'} onOpenChange={(open) => !open && setDialog(null)}>
+        <DialogShell title="Theme" description="Pick a preset, fine-tune it, or describe a look in words. The whole app restyles live." variant="side">
+          <ThemeStudio onDone={() => setDialog(null)} />
+        </DialogShell>
+      </Dialog.Root>
+
       <Dialog.Root open={dialog === 'preferences'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogShell title="User preferences" description="Personalize how daylist looks for you.">
           <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={onCompletionSoundChange} onDone={() => setDialog(null)} />
@@ -93,11 +103,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
   )
 }
 
-function DialogShell({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+// The `side` variant docks the dialog to the right with a clear backdrop so a theme preview stays visible.
+function DialogShell({ title, description, children, variant }: { title: string; description: string; children: React.ReactNode; variant?: 'side' }) {
   return (
     <Dialog.Portal>
-      <Dialog.Backdrop className="dialog-backdrop" />
-      <Dialog.Popup className="dialog-popup">
+      <Dialog.Backdrop className={`dialog-backdrop${variant === 'side' ? ' is-clear' : ''}`} />
+      <Dialog.Popup className={`dialog-popup${variant === 'side' ? ' theme-studio' : ''}`}>
         <Dialog.Close className="dialog-close" aria-label="Close"><X aria-hidden="true" /></Dialog.Close>
         <Dialog.Title className="dialog-title">{title}</Dialog.Title>
         <Dialog.Description className="dialog-description">{description}</Dialog.Description>
