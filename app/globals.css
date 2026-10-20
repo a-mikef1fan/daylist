@@ -407,8 +407,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .theme-examples { display: flex; flex-wrap: wrap; gap: 6px; }
 .theme-example { border: 1px solid var(--border); border-radius: 999px; background: transparent; padding: 6px 11px; color: var(--ink-soft); cursor: pointer; font-size: 11px; text-align: left; }
 .theme-example:hover { background: var(--hover); color: var(--foreground); }
-.theme-notice { display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--warm-border); border-radius: 10px; background: var(--warm); padding: 11px 13px; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
-.theme-notice strong { color: var(--foreground); font-weight: 650; }
 .theme-error { min-height: 0; margin: 0; }
 .theme-error:empty { display: none; }
 .theme-preview { display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--muted); padding: 14px; font-size: 13px; }
