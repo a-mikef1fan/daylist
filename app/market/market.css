@@ -1,0 +1,61 @@
+/* Scoped to .market-root so it can live next to another app's styles. */
+.market-root {
+  --m-bg: #fafaf9;
+  --m-card: #ffffff;
+  --m-fg: #1c1917;
+  --m-muted: #57534e;
+  --m-line: #e7e5e4;
+  --m-accent: #1d4ed8;
+  --m-accent-bg: #eff6ff;
+  --m-yes: #15803d;
+  --m-partial: #b45309;
+  --m-no: #b91c1c;
+  --m-unknown: #57534e;
+  --m-head: #f5f5f4;
+  background: var(--m-bg);
+  color: var(--m-fg);
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+}
+@media (prefers-color-scheme: dark) {
+  .market-root {
+    --m-bg: #0c0a09;
+    --m-card: #171412;
+    --m-fg: #f5f5f4;
+    --m-muted: #a8a29e;
+    --m-line: #2e2926;
+    --m-accent: #93c5fd;
+    --m-accent-bg: #172036;
+    --m-yes: #4ade80;
+    --m-partial: #fbbf24;
+    --m-no: #f87171;
+    --m-unknown: #a8a29e;
+    --m-head: #1c1917;
+  }
+}
+.market-root a { color: inherit; }
+.m-link { color: var(--m-accent) !important; text-decoration: underline; text-underline-offset: 3px; }
+.m-link:hover { text-decoration-thickness: 2px; }
+.m-card { background: var(--m-card); border: 1px solid var(--m-line); border-radius: 0.75rem; padding: 1.25rem; }
+a.m-card:hover { border-color: var(--m-accent); }
+.m-muted { color: var(--m-muted); }
+.m-chip { display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid var(--m-line); border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.75rem; white-space: nowrap; }
+.m-chip[data-level="high"] { color: var(--m-yes); border-color: currentColor; }
+.m-chip[data-level="medium"] { color: var(--m-partial); border-color: currentColor; }
+.m-chip[data-level="low"] { color: var(--m-no); border-color: currentColor; }
+.m-btn { border: 1px solid var(--m-line); background: var(--m-card); border-radius: 0.5rem; padding: 0.35rem 0.8rem; font-size: 0.875rem; cursor: pointer; color: var(--m-fg); }
+.m-btn:hover { border-color: var(--m-accent); }
+.m-input { border: 1px solid var(--m-line); background: var(--m-card); color: var(--m-fg); border-radius: 0.5rem; padding: 0.35rem 0.6rem; font-size: 0.875rem; }
+.m-focus:focus-visible, .market-root a:focus-visible, .market-root button:focus-visible, .market-root select:focus-visible { outline: 2px solid var(--m-accent); outline-offset: 2px; }
+.m-tab[aria-current="page"], .m-nav a[aria-current="page"] { background: var(--m-accent-bg); color: var(--m-accent); }
+
+/* Matrix: both header row and first column stay visible while scrolling. */
+.m-matrix-wrap { overflow: auto; max-height: 75vh; border: 1px solid var(--m-line); border-radius: 0.75rem; background: var(--m-card); }
+.m-matrix { border-collapse: separate; border-spacing: 0; font-size: 0.875rem; width: max-content; min-width: 100%; }
+.m-matrix th, .m-matrix td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--m-line); border-right: 1px solid var(--m-line); background: var(--m-card); }
+.m-matrix thead th { position: sticky; top: 0; z-index: 3; background: var(--m-head); text-align: left; vertical-align: bottom; min-width: 7.5rem; max-width: 10rem; }
+.m-matrix tbody th[scope="row"] { position: sticky; left: 0; z-index: 2; background: var(--m-card); text-align: left; font-weight: 500; min-width: 12rem; max-width: 16rem; }
+.m-matrix thead th:first-child { left: 0; z-index: 4; min-width: 12rem; }
+.m-matrix tbody tr.m-cat th { position: sticky; left: 0; background: var(--m-head); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--m-muted); z-index: 2; }
+.m-matrix td { text-align: center; }
