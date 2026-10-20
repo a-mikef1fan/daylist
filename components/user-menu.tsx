@@ -17,6 +17,7 @@ import {
   type ThemeMode,
 } from '@/lib/color-mode'
 import { THEMES, isThemeId } from '@/lib/themes'
+import { completionSoundOptions, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import { useRouter } from 'next/navigation'
 
 // Matches the minimum enforced on the sign-up form in auth-screen.tsx.
@@ -26,9 +27,11 @@ type UserMenuProps = {
   userName: string
   showTaskIcons: boolean
   onShowTaskIconsChange: (value: boolean) => void
+  completionSound: CompletionSoundId
+  onCompletionSoundChange: (value: CompletionSoundId) => void
 }
 
-export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
+export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange }: UserMenuProps) {
   const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
   const [themeMode, setThemeMode] = useState<ThemeMode>(DEFAULT_THEME_MODE)
   const { theme: themePalette, setTheme: setThemePalette } = useTheme()
@@ -127,7 +130,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
 
       <Dialog.Root open={dialog === 'preferences'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogShell title="User preferences" description="Personalize how daylist looks for you.">
-          <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} onDone={() => setDialog(null)} />
+          <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={onCompletionSoundChange} onDone={() => setDialog(null)} />
         </DialogShell>
       </Dialog.Root>
     </>
@@ -225,7 +228,7 @@ function ChangePasswordForm({ onDone }: { onDone: () => void }) {
   )
 }
 
-function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDone }: { userName: string; showTaskIcons: boolean; onShowTaskIconsChange: (value: boolean) => void; onDone: () => void }) {
+function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange, onDone }: { userName: string; showTaskIcons: boolean; onShowTaskIconsChange: (value: boolean) => void; completionSound: CompletionSoundId; onCompletionSoundChange: (value: CompletionSoundId) => void; onDone: () => void }) {
   const router = useRouter()
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
@@ -257,6 +260,13 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDon
     onDone()
   }
 
+  function handleSoundChange(value: string) {
+    if (!isCompletionSoundId(value)) return
+    onCompletionSoundChange(value)
+    // Preview inside the change event so the browser counts it as a user gesture.
+    playCompletionBell(value)
+  }
+
   return (
     <form className="auth-form dialog-body" onSubmit={handleSubmit}>
       <label className="form-field">
@@ -265,6 +275,12 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDon
       </label>
       <ThemePicker />
       <label className="check-field"><input type="checkbox" checked={showTaskIcons} onChange={(event) => onShowTaskIconsChange(event.target.checked)} /><span>Show emoji icons next to tasks</span></label>
+      <label className="form-field">
+        <span>Task completion sound</span>
+        <select name="completionSound" value={completionSound} onChange={(event) => handleSoundChange(event.target.value)}>
+          {completionSoundOptions.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+        </select>
+      </label>
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="dialog-actions">
         <button className="dialog-cancel" type="button" onClick={onDone}>Close</button>
