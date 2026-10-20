@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
 import { KeyRound, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { ThemePicker } from '@/components/theme-picker'
 import { authClient } from '@/lib/auth-client'
 import { completionSoundOptions, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import { useRouter } from 'next/navigation'
@@ -205,6 +206,7 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, compl
         <span>Display name</span>
         <input name="name" autoComplete="name" defaultValue={userName} maxLength={80} required />
       </label>
+      <ThemePicker />
       <label className="check-field"><input type="checkbox" checked={showTaskIcons} onChange={(event) => onShowTaskIconsChange(event.target.checked)} /><span>Show emoji icons next to tasks</span></label>
       <label className="form-field">
         <span>Task completion sound</span>

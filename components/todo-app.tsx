@@ -21,26 +21,30 @@ import {
   Search,
   Sparkles,
   Trash2,
+  MountainSnow,
   Waypoints,
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { DailyQuote } from '@/components/daily-quote'
+import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { DEFAULT_COMPLETION_SOUND, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
+import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-type GameKey = 'snake' | 'theseus'
+type GameKey = 'snake' | 'ski' | 'theseus'
 
 const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
   { id: 'snake', label: 'Snake', icon: Worm },
+  { id: 'ski', label: 'Downhill Skiing', icon: MountainSnow },
   { id: 'theseus', label: 'Theseus & the Minotaur', icon: Waypoints },
 ]
 
@@ -102,6 +106,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [completionSound, setCompletionSound] = useState<CompletionSoundId>(DEFAULT_COMPLETION_SOUND)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
+  const burstFireworks = useFireworks()
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
@@ -242,6 +247,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   function handleToggle(task: TaskView) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
     if (!task.completed) playCompletionBell(completionSound)
+    if (!task.completed) burstFireworks()
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
@@ -336,7 +342,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
