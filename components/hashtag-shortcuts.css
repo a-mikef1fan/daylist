@@ -1,0 +1,30 @@
+.hashtag-hint { display: flex; min-height: 0; flex-wrap: wrap; align-items: center; gap: 8px; }
+.hashtag-hint:not(:empty) { margin-top: 8px; }
+.hashtag-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; background: var(--sage); padding: 3px 10px; color: var(--sage-deep); font-size: 11px; font-weight: 650; }
+.hashtag-chip svg { width: 12px; height: 12px; }
+.hashtag-chip-high { background: var(--coral-soft); color: var(--coral-text); }
+.hashtag-chip-low { background: color-mix(in oklch, var(--low) 22%, var(--card)); color: var(--low-text); }
+.hashtag-error { margin: 0; color: var(--destructive); font-size: 11px; }
+.hashtag-trigger { display: inline-flex; min-height: 35px; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 9px; color: var(--muted-foreground); cursor: pointer; font-size: 11px; }
+.hashtag-trigger:hover, .hashtag-trigger[data-popup-open] { color: var(--foreground); background: var(--hover); }
+.hashtag-trigger svg { width: 14px; height: 14px; flex: none; }
+.hashtag-positioner { z-index: 60; }
+.hashtag-popup { width: min(320px, calc(100vw - 32px)); max-height: min(480px, calc(100vh - 32px)); overflow-y: auto; border: 1px solid var(--border); border-radius: 13px; background: var(--popover); padding: 14px; box-shadow: 0 14px 36px color-mix(in oklch, var(--foreground) 12%, transparent); font-family: var(--font-sans); outline: none; }
+.hashtag-title { margin: 0 0 4px; font-size: 14px; font-weight: 680; letter-spacing: -.02em; }
+.hashtag-description { margin: 0 0 10px; color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
+.hashtag-subtitle { margin: 12px 0 6px; color: var(--muted-foreground); font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.hashtag-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.hashtag-list li { display: flex; min-height: 28px; align-items: center; gap: 8px; border-radius: 7px; padding: 0 6px; font-size: 12px; }
+.hashtag-list code { min-width: 76px; color: var(--foreground); font-size: 12px; font-weight: 600; }
+.hashtag-list span { flex: 1; color: var(--muted-foreground); }
+.hashtag-remove { display: grid; width: 22px; height: 22px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--muted-foreground); cursor: pointer; }
+.hashtag-remove:hover { background: oklch(0.93 0.018 100); color: var(--destructive); }
+.hashtag-remove svg { width: 13px; height: 13px; }
+.hashtag-empty { margin: 0; color: var(--muted-foreground); font-size: 11px; }
+.hashtag-add { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.hashtag-hash { color: var(--muted-foreground); font-size: 12px; }
+.hashtag-add input { min-width: 0; flex: 1; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: oklch(0.99 0.004 100); padding: 0 8px; font-size: 12px; }
+.hashtag-add select { height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 4px; color: var(--ink-soft); font-size: 11px; }
+.hashtag-add-button { display: inline-flex; height: 32px; align-items: center; gap: 4px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 10px; color: white; cursor: pointer; font-size: 11px; font-weight: 650; }
+.hashtag-add-button svg { width: 13px; height: 13px; }
+.hashtag-popup .hashtag-error { margin-top: 8px; }
