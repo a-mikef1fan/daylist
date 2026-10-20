@@ -23,6 +23,7 @@ import {
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { DailyQuote } from '@/components/daily-quote'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
@@ -317,6 +318,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
             <p>{counts.all === 0 ? 'You’ve made space for what matters.' : `You have ${counts.all} ${counts.all === 1 ? 'thing' : 'things'} on your list. You’ve got this.`}</p>
           </div>
+          <DailyQuote />
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
             <div className="quick-add-heading"><span className="quick-add-icon"><Plus aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
