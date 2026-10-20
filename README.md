@@ -13,6 +13,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
 
 ## Gamification rules
 
@@ -50,6 +51,8 @@ Create `.env.local` (git-ignored) in the project root:
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | PostgreSQL connection string, used by `lib/db/index.ts` |
 | `BETTER_AUTH_URL` | No | Public base URL for auth. On Vercel preview deployments (`VERCEL_ENV=preview`) the branch URL (`VERCEL_BRANCH_URL`, else `VERCEL_URL`) takes precedence. Otherwise falls back to `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, `V0_RUNTIME_URL`, then `http://localhost:3000` |
+| `ANTHROPIC_API_KEY` | No | Enables **Describe a theme** (the Theme button in the top bar). Used only on the server by `POST /api/theme/generate`; without it that route returns 503 and the panel shows a friendly message |
+| `ANTHROPIC_THEME_MODEL` | No | Overrides the Claude model used for theme generation (default `claude-opus-5-5`; a smaller model is cheaper and faster) |
 
 #### Preview test user (optional)
 
@@ -77,6 +80,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
 Theseus & the Minotaur progress needs no table of its own (a demo shortcut): each player's progress is one reserved row in `tasks` with `id` and `userId` set to `theseus:<user id>` and a JSON payload in `description`. Because every task query filters on the signed-in user's real id, these rows never appear in task lists and cannot be changed by the task actions. See `lib/theseus-store.ts`; moving to a dedicated table later means copying each payload's levels into rows and deleting the `theseus:%` task rows.
+
+Snake and Downhill Skiing high scores are stored the same way, one reserved row per player and game (`snake:<user id>`, `skiing:<user id>`), through the shared helper in `lib/reserved-rows.ts`. A player's best per board is kept (`lib/score-store.ts`): Snake has one board, Downhill Skiing one per course (Trees, Groomed run, Terrain park). Ranking is the highest score, then whoever reached it first, then display name and id (`lib/score-ranking.ts`). Unlike Theseus, these games run in the browser on random boards, so the server cannot replay a run: `POST /api/snake/score` and `POST /api/skiing/score` trust the reported score but reject numbers the game could not have produced (maximum score, and a play time that fits the score; see `lib/snake-rules.ts` and `lib/ski-rules.ts`). Moving to a dedicated table later means copying each payload's boards into rows and deleting the `snake:%` and `skiing:%` task rows.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -107,16 +112,32 @@ app/
   themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks and applies XP), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
+  api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
   api/theseus/leaderboard/route.ts  GET the top players plus the signed-in user's own row
+  api/snake/score/route.ts          POST a finished run's score (plausibility-checked); the server keeps the best
+  api/snake/leaderboard/route.ts    GET the top players plus the signed-in user's own row
+  api/skiing/score/route.ts         POST a finished run for a course (plausibility-checked); the server keeps the best per course
+  api/skiing/leaderboard/route.ts   GET the top players for a course (?course=trees|groomed|park) plus the signed-in user's own row
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
+  custom-theme-provider.tsx   Applies, previews and persists a generated theme
+  theme-studio.tsx            The Describe a theme panel
+  themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   gamification.tsx            Progress card, celebration toasts
+  game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
+  reserved-rows.ts            Reserved `tasks` rows: one JSON row per player and game, read/modify/write under a row lock, no schema change
+  score-store.ts              Best score per player per board on top of reserved rows, and the leaderboard query
+  score-ranking.ts            Ranking rule for score-based games, display names, shared validation types
+  score-api.ts, score-games.ts  The shared score and leaderboard route handlers, and the per-game configuration
+  snake-rules.ts, ski-rules.ts  Which Snake and Downhill Skiing results are plausible
+  score-client.ts, use-score-sync.ts  Browser side: submit a score, retry later when it could not be sent
+  game-api.ts, game-client.ts  Request helpers shared by the game routes and their browser clients
   theseus-moves.ts            Move-list encoding and the replay check that verifies a submitted win
   theseus-ranking.ts          Leaderboard ranking rule and display names
   theseus-store.ts            Where Theseus progress lives (reserved `tasks` rows) and the leaderboard query
@@ -128,5 +149,16 @@ lib/
   gamification.ts             Pure XP, level, streak and badge rules (unit tested)
   gamification-server.ts      Recomputes and loads per-user stats
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
+  custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
+  rate-limit.ts               In-memory sliding-window limiter
   utils.ts                    Helpers
 ```
+
+## Describe a theme
+
+The **Theme** button in the top bar opens a panel with a text box (up to 300 characters), example prompts, and a live preview of the result with **Keep theme** / **Revert**. **Reset to default** returns to the built-in look; kept themes are listed for one-click switching (up to 8). Picking a colour theme in User preferences replaces a generated theme.
+
+- `POST /api/theme/generate` requires a signed-in session, limits input to 300 characters and 10 requests per user per 10 minutes (per server instance), and calls Claude with `ANTHROPIC_API_KEY`.
+- A theme is plain data: validated colours (hex or `oklch()`), font ids from an allow-list of Google Fonts, icon names from an allow-list of lucide icons per app slot, a corner radius and an icon stroke width. `lib/custom-theme/schema.ts` sanitises it (unknown icons and fonts fall back to defaults, numbers are clamped) and repairs text colours below 4.5:1 contrast. Only canonical colour strings and allow-listed font stacks are written into CSS variables, so a generated theme cannot inject CSS or script.
+- It overrides the same CSS variables the colour themes use (`app/globals.css`, including the derived tokens near the top). The active theme and saved list live in `localStorage` (`daylist:custom-theme*`) and an inline script in `app/layout.tsx` applies it before first paint. It is per browser, not per account.
+- To theme another icon, add a slot to `ICON_SLOTS` in `lib/custom-theme/icons.ts` and render it with `<ThemedIcon slot="..." />`.
