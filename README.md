@@ -11,6 +11,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Task board: a Kanban-style tracker with To do, In progress and Done columns, a progress bar with counts and percent complete, move buttons on every card, and drag and drop on desktop
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 
 ## Tech stack
 
@@ -89,10 +90,13 @@ Open http://localhost:3000.
 app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
+  themes.css                  Hue definitions for each color theme
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), updateTaskStatus, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
+  theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
+  theme-picker.tsx            Color theme swatch picker, shown in User preferences
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
   task-board.tsx              Task tracker board (columns, progress summary, move between statuses)
   ui/                         Shared UI primitives
@@ -102,6 +106,7 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   db/migrations/              Hand-run SQL for schema changes
+  themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   task-status.ts              Task status labels and progress helpers
   utils.ts                    Helpers
