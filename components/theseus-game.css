@@ -1,0 +1,39 @@
+/* Theseus & the Minotaur. Mirrors the snake-* styles in globals.css and uses the same theme tokens. */
+.theseus-panel { max-width: 520px; margin: 0 auto; }
+.theseus-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.theseus-heading h2 { margin: 6px 0 0; font-size: 28px; font-weight: 680; letter-spacing: -.04em; }
+.theseus-scores { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: var(--muted-foreground); font-size: 11px; text-align: right; }
+.theseus-score { color: var(--foreground); font-size: 13px; font-weight: 650; }
+.theseus-help { margin: 12px 0 14px; color: var(--muted-foreground); font-size: 12px; line-height: 1.65; }
+.theseus-levels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.theseus-level { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--ink-soft); cursor: pointer; font-size: 12px; font-weight: 650; }
+.theseus-level:hover { background: var(--muted); }
+.theseus-level.is-solved { background: var(--sage); color: var(--sage-deep); }
+.theseus-level.is-active { border-color: var(--sage-deep); background: var(--sage-deep); color: white; }
+.theseus-level svg { width: 15px; height: 15px; }
+.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
+.theseus-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
+.theseus-svg { display: block; width: 100%; height: auto; max-height: 68vh; margin: 0 auto; }
+.theseus-svg[data-outcome='lost'] { filter: saturate(.8); }
+.theseus-piece { transition: transform .14s ease-out; }
+.theseus-status { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; border-radius: 10px; background: var(--secondary); padding: 6px 12px; color: var(--foreground); font-size: 13px; font-weight: 600; }
+.theseus-status.is-won { background: var(--sage); color: var(--sage-deep); }
+.theseus-status.is-lost { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }
+.theseus-action, .theseus-secondary { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 12px; color: white; cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.theseus-action svg, .theseus-secondary svg { width: 15px; height: 15px; }
+.theseus-secondary { background: var(--secondary); color: var(--secondary-foreground); }
+.theseus-secondary:disabled { cursor: not-allowed; opacity: .52; }
+.theseus-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.theseus-actions { display: flex; flex-direction: column; gap: 8px; }
+.theseus-dpad { display: grid; grid-template-areas: '. up .' 'left wait right' '. down .'; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 40px); gap: 4px; }
+.theseus-dpad button { display: grid; place-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--ink-soft); cursor: pointer; }
+.theseus-dpad button:hover { background: var(--muted); }
+.theseus-dpad button:active { background: var(--sage); }
+.theseus-dpad button:disabled { cursor: not-allowed; opacity: .52; }
+.theseus-dpad svg { width: 18px; height: 18px; }
+.theseus-dpad-up { grid-area: up; }
+.theseus-dpad-left { grid-area: left; }
+.theseus-dpad-right { grid-area: right; }
+.theseus-dpad-down { grid-area: down; }
+.theseus-dpad-wait { grid-area: wait; }
+@media (prefers-reduced-motion: reduce) { .theseus-piece { transition: none; } }
