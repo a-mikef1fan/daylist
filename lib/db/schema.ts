@@ -1,6 +1,8 @@
 import {
   boolean,
   date,
+  index,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -68,6 +70,38 @@ export const tasks = pgTable('tasks', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
+// One row per XP grant (a completed task or a completed daily habit). Stats are derived
+// from these rows, so un-completing deletes the row and takes exactly that XP away.
+// `id` is `task:<taskId>` or `habit:<habitKey>:<YYYY-MM-DD>:<userId>`, which makes grants idempotent.
+// `awardedOn` is the user's local calendar date when the XP was earned (see lib/gamification.ts).
+export const xpAwards = pgTable(
+  'xp_awards',
+  {
+    id: text('id').primaryKey(),
+    userId: text('userId')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    xp: integer('xp').notNull(),
+    awardedOn: date('awardedOn').notNull(),
+    createdAt: timestamp('createdAt').notNull().defaultNow(),
+  },
+  (table) => [index('xp_awards_user_idx').on(table.userId, table.awardedOn)],
+)
+
+// Cached per-user totals, recomputed from xp_awards on every change.
+export const userStats = pgTable('user_stats', {
+  userId: text('userId')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  totalXp: integer('totalXp').notNull().default(0),
+  tasksCompleted: integer('tasksCompleted').notNull().default(0),
+  currentStreak: integer('currentStreak').notNull().default(0),
+  bestStreak: integer('bestStreak').notNull().default(0),
+  lastActiveDate: date('lastActiveDate'),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})
+
 export type Task = typeof tasks.$inferSelect
 export type TaskPriority = 'low' | 'normal' | 'high'
 export type NewTaskInput = {
@@ -77,5 +111,5 @@ export type NewTaskInput = {
 }
 
 export const authSchema = { user, session, account, verification }
-export const appSchema = { tasks }
+export const appSchema = { tasks, xpAwards, userStats }
 export const schema = { ...authSchema, ...appSchema }

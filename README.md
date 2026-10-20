@@ -9,6 +9,18 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges, and tick off a built-in daily habit ("Positive affirmations to self")
+
+## Gamification rules
+
+All rules live in `lib/gamification.ts` (pure functions, covered by `pnpm test`).
+
+- XP per completed task: 10 base, +5 for high priority, +5 if completed on or before its due date. The daily habit is worth 10 XP once per day.
+- Un-completing a task deletes the XP it granted, so toggling cannot farm XP. Deleting a completed task keeps its XP.
+- Level `n` needs `25 * n * (n - 1)` total XP (level 2 = 50, level 3 = 150, level 4 = 300, ...).
+- Streak: consecutive local calendar days with at least one XP grant. The browser sends its local date (`YYYY-MM-DD`) with each completion; the server only accepts dates within one day of its UTC date. A streak stays alive through the day after the last active day, then resets.
+- Badges: First step (1 task), On a roll (10 tasks), Week warrior (best streak of 7).
+- Stats are derived from the `xp_awards` table and cached in `user_stats`, both keyed by Better Auth user id.
 
 ## Tech stack
 
@@ -57,6 +69,7 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- Gamification tables: `xp_awards` and `user_stats`. Apply `migrations/0001_gamification.sql` (idempotent; also backfills XP for tasks that were already completed): `psql "$DATABASE_URL" -f migrations/0001_gamification.sql`
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
@@ -76,6 +89,7 @@ Open http://localhost:3000.
 | `pnpm dev` | `next dev` | Start the development server |
 | `pnpm build` | `next build` | Create a production build |
 | `pnpm start` | `next start` | Serve the production build |
+| `pnpm test` | `node --test` | Run unit tests (`lib/**/*.test.ts`) |
 
 ## Project structure
 
@@ -84,15 +98,19 @@ app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/progress.ts         Server actions: setTaskCompleted (task + XP), setDailyHabitDone
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  gamification.tsx            Progress card, daily habit card, celebration toasts
   ui/                         Shared UI primitives
 lib/
   auth.ts                     Better Auth server config (Drizzle adapter, trusted origins)
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  gamification.ts             Pure XP, level, streak and badge rules (unit tested)
+  gamification-server.ts      Recomputes and loads per-user stats
   utils.ts                    Helpers
 ```
