@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUp, Download, Pause, Play, RotateCcw } from 'lucide-react'
+import { GameLeaderboard, GameTabs, type GameTab } from '@/components/game-leaderboard'
+import { SKI_RULES } from '@/lib/ski-rules'
+import { useScoreSync } from '@/lib/use-score-sync'
 
 type Status = 'ready' | 'running' | 'paused' | 'over' | 'won'
 type Steer = -1 | 0 | 1
@@ -9,9 +12,10 @@ type ModeKey = 'trees' | 'groomed' | 'park'
 
 // Course lengths in distance points (METERS_PER_POINT px each). Tuned against each course's
 // speed ramp so a clean run takes roughly 70 to 80 seconds: Trees ~70s, Groomed ~78s, Park ~71s.
-const TREES_FINISH_POINTS = 1150
-const GROOMED_FINISH_POINTS = 1000
-const PARK_FINISH_POINTS = 1100
+// The leaderboard's plausibility checks use the same lengths (lib/ski-rules.ts).
+const TREES_FINISH_POINTS = SKI_RULES.trees.finishPoints
+const GROOMED_FINISH_POINTS = SKI_RULES.groomed.finishPoints
+const PARK_FINISH_POINTS = SKI_RULES.park.finishPoints
 
 const DOWNLOAD_URL = 'https://apps.apple.com/us/app/ski-tree/id1672785739'
 
@@ -604,12 +608,18 @@ export function SkiGame() {
   const [status, setStatus] = useState<Status>('ready')
   const [modeKey, setModeKey] = useState<ModeKey>(DEFAULT_MODE)
   const [score, setScore] = useState(0)
+  const [tab, setTab] = useState<GameTab>('play')
+  // The course the leaderboard shows; it starts on the one being played and can be changed there.
+  const [boardCourse, setBoardCourse] = useState<ModeKey>(DEFAULT_MODE)
+  const scores = useScoreSync('skiing')
   const [bests, setBests] = useState<Record<ModeKey, number>>({ trees: 0, groomed: 0, park: 0 })
   const stateRef = useRef<SkiState>(createSki(DEFAULT_MODE))
   const statusRef = useRef<Status>('ready')
   const modeRef = useRef<ModeKey>(DEFAULT_MODE)
   const bestsRef = useRef<Record<ModeKey, number>>({ trees: 0, groomed: 0, park: 0 })
   const scoreRef = useRef(0)
+  // Seconds the current run has been in play (simulated time, so paused time does not count).
+  const playedRef = useRef(0)
   const scaleRef = useRef(1)
   const paletteRef = useRef<Palette | null>(null)
   const keysRef = useRef({ left: false, right: false })
@@ -681,6 +691,7 @@ export function SkiGame() {
       const state = stateRef.current
       const keys = keysRef.current
       const steer = Math.max(-1, Math.min(1, (keys.right ? 1 : 0) - (keys.left ? 1 : 0) + touchRef.current)) as Steer
+      playedRef.current += dt
       const outcome = stepSki(state, steer, dt)
       const next = scoreOf(state)
       if (next !== scoreRef.current) {
@@ -699,7 +710,16 @@ export function SkiGame() {
             // Ignore storage failures.
           }
         }
-        // A win records the score just like a wipeout does.
+        // The server keeps the player's best for the course; a score that cannot be sent now is kept on this device and
+        // sent later. A win records the score just like a wipeout does.
+        if (next > 0) {
+          scores.submit(key, {
+            course: key,
+            score: next,
+            distance: Math.min(MODES[key].finishPoints, Math.floor(state.distance / METERS_PER_POINT)),
+            durationMs: Math.round(playedRef.current * 1000),
+          })
+        }
         changeStatus(outcome === 'finished' ? 'won' : 'over')
         return
       }
@@ -707,7 +727,7 @@ export function SkiGame() {
     }
     frame = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frame)
-  }, [status, render, changeStatus])
+  }, [status, render, changeStatus, scores.submit])
 
   // Pause automatically if the tab is hidden so the skier never crashes while you are away.
   useEffect(() => {
@@ -726,6 +746,7 @@ export function SkiGame() {
   function restart() {
     clearInput()
     stateRef.current = createSki(modeRef.current)
+    playedRef.current = 0
     scoreRef.current = 0
     setScore(0)
     changeStatus('running')
@@ -737,13 +758,30 @@ export function SkiGame() {
     clearInput()
     modeRef.current = next
     setModeKey(next)
+    setBoardCourse(next)
     stateRef.current = createSki(next)
+    playedRef.current = 0
     scoreRef.current = 0
     setScore(0)
     changeStatus('ready')
     render()
     boardRef.current?.focus()
   }
+
+  // The board is hidden on the leaderboard tab, so pause a run in progress, and hand the board keyboard focus again only
+  // once it is back on screen.
+  function showTab(next: GameTab) {
+    setTab(next)
+    if (next === 'leaderboard') {
+      if (statusRef.current === 'running') changeStatus('paused')
+      setBoardCourse(modeRef.current)
+      void scores.flush()
+    }
+  }
+
+  useEffect(() => {
+    if (tab === 'play') boardRef.current?.focus()
+  }, [tab])
 
   function begin() {
     if (statusRef.current === 'over' || statusRef.current === 'won') restart()
@@ -833,6 +871,23 @@ export function SkiGame() {
           <span className="snake-best">{mode.label} best {best}</span>
         </div>
       </div>
+      <GameTabs tab={tab} onChange={showTab} />
+      {tab === 'leaderboard' && (
+        <GameLeaderboard
+          game="skiing"
+          board={boardCourse}
+          refreshKey={scores.version}
+          help="Ranked per course by the highest score in one run (distance plus bonus points), best first. If two players have the same score, whoever got there first ranks higher. Scores are reported by your browser, so they are checked for plausibility, not replayed."
+          controls={
+            <div className="ski-modes ski-board-courses" role="group" aria-label="Course">
+              {MODE_ORDER.map((key) => (
+                <button key={key} type="button" className="ski-mode" aria-pressed={boardCourse === key} onClick={() => setBoardCourse(key)}>{MODES[key].label}</button>
+              ))}
+            </div>
+          }
+        />
+      )}
+      <div hidden={tab !== 'play'}>
       <p className="snake-help" id="ski-help">
         {mode.help} Steer with the left and right arrow keys or A and D{mode.jumps ? ', jump with Up, W or Space' : ''}. Press Space to start and P to pause.
       </p>
@@ -895,6 +950,7 @@ export function SkiGame() {
           </button>
         </div>
         <button className="ski-steer" type="button" aria-label="Steer right" {...holdProps('right')}><ArrowRight aria-hidden="true" /></button>
+      </div>
       </div>
     </section>
   )

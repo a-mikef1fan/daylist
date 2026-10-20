@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw } from 'lucide-react'
+import { GameLeaderboard, GameTabs, type GameTab } from '@/components/game-leaderboard'
+import { useScoreSync } from '@/lib/use-score-sync'
+import { SNAKE_BOARD } from '@/lib/snake-rules'
 import {
   SNAKE_GRID,
   createSnake,
@@ -35,10 +38,14 @@ export function SnakeGame() {
   const [game, setGame] = useState<SnakeState>(() => createSnake())
   const [status, setStatus] = useState<Status>('ready')
   const [best, setBest] = useState(0)
+  const [tab, setTab] = useState<GameTab>('play')
+  const scores = useScoreSync('snake')
   const gameRef = useRef(game)
   const queueRef = useRef<Direction[]>([])
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
+  // How long the current run has been in play, in ms (the tick lengths waited, so paused time does not count).
+  const playedMsRef = useRef(0)
 
   useEffect(() => {
     try {
@@ -51,10 +58,13 @@ export function SnakeGame() {
   }, [])
 
   const commit = useCallback((next: SnakeState) => {
+    const wasOver = gameRef.current.over
     gameRef.current = next
     setGame(next)
-    if (next.over) {
+    if (next.over && !wasOver) {
       setStatus('over')
+      // The server keeps the player's best; a score that cannot be sent now is kept on this device and sent later.
+      if (next.score > 0) scores.submit(SNAKE_BOARD, { score: next.score, durationMs: Math.round(playedMsRef.current) })
       setBest((current) => {
         if (next.score <= current) return current
         try {
@@ -65,7 +75,7 @@ export function SnakeGame() {
         return next.score
       })
     }
-  }, [])
+  }, [scores.submit])
 
   // The timer only exists while running, and is cleared on pause, game over, or unmount.
   const speed = snakeInterval(game.score)
@@ -73,6 +83,7 @@ export function SnakeGame() {
     if (status !== 'running') return
     const id = window.setInterval(() => {
       const direction = queueRef.current.shift() ?? gameRef.current.direction
+      playedMsRef.current += snakeInterval(gameRef.current.score)
       commit(stepSnake(gameRef.current, direction))
     }, speed)
     return () => window.clearInterval(id)
@@ -98,8 +109,23 @@ export function SnakeGame() {
     })
   }, [game])
 
+  // The board is hidden on the leaderboard tab, so pause a run in progress, and hand the board keyboard focus again only
+  // once it is back on screen.
+  function showTab(next: GameTab) {
+    setTab(next)
+    if (next === 'leaderboard') {
+      if (status === 'running') setStatus('paused')
+      void scores.flush()
+    }
+  }
+
+  useEffect(() => {
+    if (tab === 'play') boardRef.current?.focus()
+  }, [tab])
+
   function restart() {
     queueRef.current = []
+    playedMsRef.current = 0
     const fresh = createSnake()
     gameRef.current = fresh
     setGame(fresh)
@@ -149,6 +175,15 @@ export function SnakeGame() {
           <span className="snake-best">Best {best}</span>
         </div>
       </div>
+      <GameTabs tab={tab} onChange={showTab} />
+      {tab === 'leaderboard' && (
+        <GameLeaderboard
+          game="snake"
+          refreshKey={scores.version}
+          help="Ranked by the most dots eaten in one run, best first. If two players have the same score, whoever got there first ranks higher. Scores are reported by your browser, so they are checked for plausibility, not replayed."
+        />
+      )}
+      <div hidden={tab !== 'play'}>
       <p className="snake-help" id="snake-help">
         Eat the dots without hitting the walls or yourself. Use the arrow keys or W A S D to steer, and Space or P to pause.
       </p>
@@ -176,6 +211,7 @@ export function SnakeGame() {
           {status === 'paused' ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
           {status === 'paused' ? 'Resume' : 'Pause'}
         </button>
+      </div>
       </div>
     </section>
   )

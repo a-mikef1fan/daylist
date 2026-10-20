@@ -74,10 +74,6 @@ function DescribeTab() {
 
   return (
     <form className="auth-form theme-studio-form theme-tab-body" onSubmit={handleGenerate}>
-      <div className="theme-notice" role="note">
-        <strong>Coming soon: describing a theme doesn&rsquo;t work yet.</strong>
-        <span>We&rsquo;re still setting it up. Presets and Customize work today.</span>
-      </div>
       <label className="form-field" htmlFor={fieldId}>
         <span>Describe your theme</span>
         <textarea
