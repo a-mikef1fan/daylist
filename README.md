@@ -6,6 +6,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
+- Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
@@ -59,6 +60,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
 
+A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
 
 ### Run
@@ -85,7 +88,7 @@ app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
   themes.css                  Hue definitions for each color theme
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
 components/
   auth-screen.tsx             Sign-in / sign-up UI
@@ -99,5 +102,6 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   utils.ts                    Helpers
 ```
