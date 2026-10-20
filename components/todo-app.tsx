@@ -4,23 +4,11 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
-  CalendarDays,
-  Check,
-  CheckCheck,
-  Circle,
-  CircleCheck,
-  Clock3,
-  Flame,
   Gamepad2,
-  ListTodo,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
-  Plus,
   Repeat,
-  Search,
-  Sparkles,
-  Trash2,
   MountainSnow,
   Waypoints,
   Worm,
@@ -29,6 +17,7 @@ import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/task
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
+import { ThemedIcon } from '@/components/themed-icon'
 import { TheseusGame } from '@/components/theseus-game'
 import { HashtagHint, HashtagShortcutsPanel, useCustomHashtags } from '@/components/hashtag-shortcuts'
 import { parseHashtags } from '@/lib/hashtags'
@@ -36,6 +25,7 @@ import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { ColorModeToggle } from '@/components/color-mode-toggle'
 import { DEFAULT_COMPLETION_SOUND, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
+import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
@@ -64,12 +54,12 @@ function clampSidebarWidth(value: number) {
   return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, Math.round(value)))
 }
 
-const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo; urgent?: boolean }[] = [
-  { id: 'all', label: 'All tasks', icon: ListTodo },
-  { id: 'today', label: 'Today', icon: CalendarDays },
-  { id: 'upcoming', label: 'Upcoming', icon: Clock3 },
-  { id: 'urgent', label: 'Urgent', icon: Flame, urgent: true },
-  { id: 'completed', label: 'Completed', icon: CheckCheck },
+const filterOptions: { id: FilterKey; label: string; slot: IconSlot; urgent?: boolean }[] = [
+  { id: 'all', label: 'All tasks', slot: 'filterAll' },
+  { id: 'today', label: 'Today', slot: 'filterToday' },
+  { id: 'upcoming', label: 'Upcoming', slot: 'filterUpcoming' },
+  { id: 'urgent', label: 'Urgent', slot: 'filterUrgent', urgent: true },
+  { id: 'completed', label: 'Completed', slot: 'filterDone' },
 ]
 
 function dateKey(date: Date) {
@@ -297,16 +287,16 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     <main className={`app-shell${collapsed ? ' is-collapsed' : ''}${sidebarReady ? ' is-ready' : ''}${resizing ? ' is-resizing' : ''}`} style={collapsed ? undefined : ({ '--rail-width': `${sidebarWidth}px` } as React.CSSProperties)}>
       <aside id="side-rail" className="side-rail" aria-label="Task navigation">
         <div className="rail-header">
-          <a href="/" className="brand-mark" aria-label="daylist home"><span className="brand-icon"><Check aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
+          <a href="/" className="brand-mark" aria-label="daylist home"><span className="brand-icon"><ThemedIcon slot="brand" aria-hidden="true" /></span><span className="rail-label">daylist</span></a>
           <button className="rail-toggle" type="button" onClick={toggleSidebar} aria-expanded={!collapsed} aria-controls="side-rail" aria-label="Toggle sidebar" title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
             {collapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
           </button>
         </div>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
-          {filterOptions.map(({ id, label, icon: Icon, urgent }) => (
+          {filterOptions.map(({ id, label, slot, urgent }) => (
             <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
-              <Icon aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
+              <ThemedIcon slot={slot} aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
         </nav>
@@ -318,7 +308,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
             </button>
           ))}
         </nav>
-        <div className="rail-tip"><Sparkles aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
+        <div className="rail-tip"><ThemedIcon slot="tip" aria-hidden="true" /><p>Keep it simple.<br /><strong>One step at a time.</strong></p></div>
         <button className="sign-out-button" type="button" onClick={handleSignOut} title={collapsed ? 'Sign out' : undefined}><LogOut aria-hidden="true" /><span className="rail-label">Sign out</span></button>
         {!collapsed && (
           <div
@@ -343,7 +333,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
 
       <section className="todo-main">
         <header className="topbar">
-          <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
+          <div className="mobile-brand"><span className="brand-icon"><ThemedIcon slot="brand" aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
           <ColorModeToggle />
           <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={handleCompletionSoundChange} />
@@ -359,7 +349,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
           <DailyQuote />
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
-            <div className="quick-add-heading"><span className="quick-add-icon"><Plus aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
+            <div className="quick-add-heading"><span className="quick-add-icon"><ThemedIcon slot="add" aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
             <form className="quick-add-form" onSubmit={handleAddTask}>
               <label className="sr-only" htmlFor="task-title">Task name</label>
               <input id="task-title" className="task-title-input" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="What would you like to get done?" maxLength={180} required />
@@ -377,9 +367,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                     {TASK_REPEATS.map((option) => <option key={option} value={option}>{option === 'none' ? 'Never repeats' : `Repeats ${repeatLabels[option].toLowerCase()}`}</option>)}
                   </select>
                 </label>
-                <label className="date-control" aria-label="Due date"><CalendarDays aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
+                <label className="date-control" aria-label="Due date"><ThemedIcon slot="dueDate" aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
                 <HashtagShortcutsPanel custom={customHashtags} onChange={setCustomHashtags} />
-                <button className="add-task-button" type="submit" disabled={isPending || !parsedTitle.title}><Plus aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
+                <button className="add-task-button" type="submit" disabled={isPending || !parsedTitle.title}><ThemedIcon slot="add" aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
               </div>
             </form>
           </section>
@@ -387,7 +377,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
           <section className="task-section" aria-labelledby="tasks-heading">
             <div className="task-section-heading">
               <div><span className="eyebrow">YOUR LIST</span><h2 id="tasks-heading">{filterOptions.find((option) => option.id === filter)?.label}<span className="heading-count">{visibleTasks.length}</span></h2></div>
-              <label className="search-field"><Search aria-hidden="true" /><span className="sr-only">Search tasks</span><input type="search" placeholder="Find a task" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+              <label className="search-field"><ThemedIcon slot="search" aria-hidden="true" /><span className="sr-only">Search tasks</span><input type="search" placeholder="Find a task" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
             </div>
 
             {message && <p className="task-message" role="alert">{message}</p>}
@@ -396,20 +386,20 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                 {visibleTasks.map((task) => (
                   <li className={`task-row${task.completed ? ' is-complete' : ''}`} key={task.id}>
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
-                      {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
+                      <ThemedIcon slot={task.completed ? 'taskDone' : 'taskOpen'} aria-hidden="true" />
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
-                    <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><ThemedIcon slot="dueDate" aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
+                    <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><ThemedIcon slot="remove" aria-hidden="true" /></button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
+              <div className="empty-state"><div className="empty-illustration"><ThemedIcon slot="brand" aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
             )}
-            {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><CheckCheck aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
+            {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><ThemedIcon slot="filterDone" aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
           </>)}
-          <footer className="dashboard-footer"><span><CircleCheck aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
+          <footer className="dashboard-footer"><span><ThemedIcon slot="taskDone" aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
         </div>
       </section>
     </main>

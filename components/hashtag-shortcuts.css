@@ -2,11 +2,11 @@
 .hashtag-hint:not(:empty) { margin-top: 8px; }
 .hashtag-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; background: var(--sage); padding: 3px 10px; color: var(--sage-deep); font-size: 11px; font-weight: 650; }
 .hashtag-chip svg { width: 12px; height: 12px; }
-.hashtag-chip-high { background: var(--chip-high-bg); color: var(--chip-high-text); }
-.hashtag-chip-low { background: var(--chip-low-bg); color: var(--chip-low-text); }
+.hashtag-chip-high { background: var(--coral-soft); color: var(--coral-text); }
+.hashtag-chip-low { background: color-mix(in oklch, var(--low) 22%, var(--card)); color: var(--low-text); }
 .hashtag-error { margin: 0; color: var(--destructive); font-size: 11px; }
 .hashtag-trigger { display: inline-flex; min-height: 35px; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 9px; color: var(--muted-foreground); cursor: pointer; font-size: 11px; }
-.hashtag-trigger:hover, .hashtag-trigger[data-popup-open] { color: var(--foreground); background: var(--muted); }
+.hashtag-trigger:hover, .hashtag-trigger[data-popup-open] { color: var(--foreground); background: var(--hover); }
 .hashtag-trigger svg { width: 14px; height: 14px; flex: none; }
 .hashtag-positioner { z-index: 60; }
 .hashtag-popup { width: min(320px, calc(100vw - 32px)); max-height: min(480px, calc(100vh - 32px)); overflow-y: auto; border: 1px solid var(--border); border-radius: 13px; background: var(--popover); padding: 14px; box-shadow: 0 14px 36px color-mix(in srgb, var(--shadow-ink) 12%, transparent); font-family: var(--font-sans); outline: none; }
@@ -23,8 +23,8 @@
 .hashtag-empty { margin: 0; color: var(--muted-foreground); font-size: 11px; }
 .hashtag-add { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .hashtag-hash { color: var(--muted-foreground); font-size: 12px; }
-.hashtag-add input { min-width: 0; flex: 1; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field-soft); padding: 0 8px; color: var(--foreground); font-size: 12px; }
+.hashtag-add input { min-width: 0; flex: 1; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 8px; color: var(--foreground); font-size: 12px; }
 .hashtag-add select { height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--field); padding: 0 4px; color: var(--ink-soft); font-size: 11px; }
-.hashtag-add-button { display: inline-flex; height: 32px; align-items: center; gap: 4px; border: 0; border-radius: 8px; background: var(--brand); padding: 0 10px; color: var(--brand-foreground); cursor: pointer; font-size: 11px; font-weight: 650; }
+.hashtag-add-button { display: inline-flex; height: 32px; align-items: center; gap: 4px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 10px; color: var(--on-sage-deep); cursor: pointer; font-size: 11px; font-weight: 650; }
 .hashtag-add-button svg { width: 13px; height: 13px; }
 .hashtag-popup .hashtag-error { margin-top: 8px; }

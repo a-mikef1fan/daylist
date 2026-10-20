@@ -9,17 +9,17 @@
 .theseus-level { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--border); border-radius: 9px; background: var(--card); color: var(--ink-soft); cursor: pointer; font-size: 12px; font-weight: 650; }
 .theseus-level:hover { background: var(--muted); }
 .theseus-level.is-solved { background: var(--sage); color: var(--sage-deep); }
-.theseus-level.is-active { border-color: var(--brand); background: var(--brand); color: var(--brand-foreground); }
+.theseus-level.is-active { border-color: var(--sage-deep); background: var(--sage-deep); color: var(--on-sage-deep); }
 .theseus-level svg { width: 15px; height: 15px; }
-.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px color-mix(in srgb, var(--shadow-ink) 3%, transparent); }
-.theseus-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
+.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
+.theseus-board:focus-visible { outline: 3px solid color-mix(in srgb, var(--ring) 48%, transparent); outline-offset: 3px; }
 .theseus-svg { display: block; width: 100%; height: auto; max-height: 68vh; margin: 0 auto; }
 .theseus-svg[data-outcome='lost'] { filter: saturate(.8); }
 .theseus-piece { transition: transform .14s ease-out; }
 .theseus-status { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; border-radius: 10px; background: var(--secondary); padding: 6px 12px; color: var(--foreground); font-size: 13px; font-weight: 600; }
 .theseus-status.is-won { background: var(--sage); color: var(--sage-deep); }
 .theseus-status.is-lost { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }
-.theseus-action, .theseus-secondary { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: var(--brand); padding: 0 12px; color: var(--brand-foreground); cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.theseus-action, .theseus-secondary { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 12px; color: var(--on-sage-deep); cursor: pointer; font-size: 12px; font-weight: 650; white-space: nowrap; }
 .theseus-action svg, .theseus-secondary svg { width: 15px; height: 15px; }
 .theseus-secondary { background: var(--secondary); color: var(--secondary-foreground); }
 .theseus-secondary:disabled { cursor: not-allowed; opacity: .52; }
@@ -37,3 +37,31 @@
 .theseus-dpad-down { grid-area: down; }
 .theseus-dpad-wait { grid-area: wait; }
 @media (prefers-reduced-motion: reduce) { .theseus-piece { transition: none; } }
+
+/* Leaderboard tab. */
+.theseus-tabs { display: inline-flex; gap: 4px; margin-top: 14px; border-radius: 10px; background: var(--secondary); padding: 3px; }
+.theseus-tab { min-height: 32px; border: 0; border-radius: 8px; background: transparent; padding: 0 14px; color: var(--muted-foreground); cursor: pointer; font-size: 12px; font-weight: 650; }
+.theseus-tab[aria-pressed='true'] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow-ink) 10%, transparent); }
+.theseus-tab:focus-visible { outline: 3px solid color-mix(in srgb, var(--ring) 48%, transparent); outline-offset: 1px; }
+.theseus-leaders .theseus-help { margin-top: 14px; }
+.theseus-leaders-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 10px; background: var(--secondary); padding: 14px 12px; color: var(--muted-foreground); font-size: 13px; line-height: 1.5; }
+.theseus-leaders-note.is-error { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }
+.theseus-leaders-note + div { margin-top: 12px; }
+.is-stale { opacity: .6; margin-top: 12px; }
+.theseus-board-head, .theseus-board-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 52px 56px; align-items: center; gap: 8px; padding: 0 12px; }
+.theseus-board-head { padding-bottom: 6px; color: var(--muted-foreground); font-size: 10px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+.theseus-board-head span:nth-child(n+3), .theseus-board-num { text-align: right; }
+.theseus-board-list { margin: 0; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: 14px; background: var(--card); overflow: hidden; }
+.theseus-board-mine { margin-top: 8px; }
+.theseus-board-row { min-height: 52px; border-top: 1px solid var(--border); font-size: 13px; }
+.theseus-board-row:first-child { border-top: 0; }
+.theseus-board-row.is-me { background: var(--sage); color: var(--sage-deep); }
+.theseus-board-rank { color: var(--muted-foreground); font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.theseus-board-row.is-me .theseus-board-rank { color: inherit; }
+.theseus-board-name { display: grid; grid-template-columns: minmax(0, max-content) 1fr; align-items: baseline; column-gap: 6px; min-width: 0; }
+.theseus-board-name strong { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.theseus-board-name em { justify-self: start; border-radius: 6px; background: var(--sage-deep); padding: 1px 6px; color: var(--on-sage-deep); font-size: 10px; font-style: normal; font-weight: 650; }
+.theseus-board-name small { grid-column: 1 / -1; color: var(--muted-foreground); font-size: 11px; }
+.theseus-board-row.is-me .theseus-board-name small { color: inherit; opacity: .8; }
+.theseus-board-num { font-weight: 650; font-variant-numeric: tabular-nums; }
+.theseus-leaders-total, .theseus-leaders-hint { margin: 10px 0 0; color: var(--muted-foreground); font-size: 11px; line-height: 1.6; }
