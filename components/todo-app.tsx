@@ -20,17 +20,20 @@ import {
   Search,
   Sparkles,
   Trash2,
+  UserRound,
   Worm,
 } from 'lucide-react'
-import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { createTask, deleteTask, updateTaskAssignee, updateTaskCompletion } from '@/app/actions/tasks'
+import { listSlackMembers } from '@/app/actions/slack'
+import { AssigneePicker, type MembersState } from '@/components/assignee-picker'
 import { SnakeGame } from '@/components/snake-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { Task, TaskPriority } from '@/lib/db/schema'
+import type { Assignee, Task, TaskPriority } from '@/lib/db/schema'
 
-type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
+type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'assigned' | 'completed'
 
 type GameKey = 'snake'
 
@@ -55,6 +58,7 @@ const filterOptions: { id: FilterKey; label: string; icon: typeof ListTodo; urge
   { id: 'today', label: 'Today', icon: CalendarDays },
   { id: 'upcoming', label: 'Upcoming', icon: Clock3 },
   { id: 'urgent', label: 'Urgent', icon: Flame, urgent: true },
+  { id: 'assigned', label: 'Assigned', icon: UserRound },
   { id: 'completed', label: 'Completed', icon: CheckCheck },
 ]
 
@@ -63,6 +67,16 @@ function dateKey(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+function taskAssignee(task: Task): Assignee | null {
+  return task.assigneeSlackId && task.assigneeName
+    ? { id: task.assigneeSlackId, name: task.assigneeName, image: task.assigneeImage }
+    : null
+}
+
+function assigneeColumns(assignee: Assignee | null) {
+  return { assigneeSlackId: assignee?.id ?? null, assigneeName: assignee?.name ?? null, assigneeImage: assignee?.image ?? null }
 }
 
 function formatDueDate(value: string | null) {
@@ -84,6 +98,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
+  const [assignee, setAssignee] = useState<Assignee | null>(null)
+  const [membersState, setMembersState] = useState<MembersState>({ status: 'idle', members: [] })
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
   const [collapsed, setCollapsed] = useState(false)
@@ -167,6 +183,18 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setAndSaveSidebarWidth(sidebarWidth + (event.key === 'ArrowRight' ? SIDEBAR_KEY_STEP : -SIDEBAR_KEY_STEP))
   }
 
+  // Slack members load the first time a picker opens, and again on the next open if Slack was unavailable.
+  async function loadMembers() {
+    if (membersState.status === 'loading' || membersState.status === 'ready') return
+    setMembersState({ status: 'loading', members: [] })
+    try {
+      const { members, connected } = await listSlackMembers()
+      setMembersState({ status: connected ? 'ready' : 'unavailable', members })
+    } catch {
+      setMembersState({ status: 'unavailable', members: [] })
+    }
+  }
+
   const counts = useMemo(() => {
     const today = dateKey(new Date())
     return {
@@ -174,6 +202,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       today: tasks.filter((task) => !task.completed && task.dueDate === today).length,
       upcoming: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate > today).length,
       urgent: tasks.filter((task) => !task.completed && task.priority === 'high').length,
+      assigned: tasks.filter((task) => !task.completed && task.assigneeSlackId).length,
       completed: tasks.filter((task) => task.completed).length,
     }
   }, [tasks])
@@ -186,6 +215,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         if (filter === 'today' && (task.completed || task.dueDate !== today)) return false
         if (filter === 'upcoming' && (task.completed || !task.dueDate || task.dueDate <= today)) return false
         if (filter === 'urgent' && (task.completed || task.priority !== 'high')) return false
+        if (filter === 'assigned' && (task.completed || !task.assigneeSlackId)) return false
         if (filter === 'completed' && !task.completed) return false
         if (filter === 'all' && task.completed) return false
         return !normalizedSearch || task.title.toLowerCase().includes(normalizedSearch)
@@ -205,11 +235,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
     setMessage('')
     startTransition(async () => {
       try {
-        const task = await createTask({ title: title.trim(), dueDate: dueDate || null, priority })
+        const task = await createTask({ title: title.trim(), dueDate: dueDate || null, priority, assignee })
         setTasks((current) => [task, ...current])
         setTitle('')
         setDueDate('')
         setPriority('normal')
+        setAssignee(null)
         router.refresh()
       } catch {
         setMessage('Could not save that task. Please try again.')
@@ -229,6 +260,21 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
         setMessage('Could not update that task. Please try again.')
+      }
+    })
+  }
+
+  function handleAssign(task: Task, next: Assignee | null) {
+    const previous = taskAssignee(task)
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, ...assigneeColumns(next) } : item))
+    startTransition(async () => {
+      try {
+        const updated = await updateTaskAssignee(task.id, next)
+        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        router.refresh()
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, ...assigneeColumns(previous) } : item))
+        setMessage('Could not update the assignee. Please try again.')
       }
     })
   }
@@ -330,6 +376,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <option value="normal">Normal priority</option><option value="high">High priority</option><option value="low">Low priority</option>
                   </select>
                 </label>
+                <AssigneePicker variant="form" label="Assignee" value={assignee} membersState={membersState} onOpen={loadMembers} onChange={setAssignee} />
                 <label className="date-control" aria-label="Due date"><CalendarDays aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
                 <button className="add-task-button" type="submit" disabled={isPending || !title.trim()}><Plus aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
               </div>
@@ -350,13 +397,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       {task.completed ? <CircleCheck aria-hidden="true" /> : <Circle aria-hidden="true" />}
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span></div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><CalendarDays aria-hidden="true" />{formatDueDate(task.dueDate)}</span><span className="meta-separator">·</span><AssigneePicker variant="row" label={`Assignee for ${task.title}`} value={taskAssignee(task)} membersState={membersState} onOpen={loadMembers} onChange={(next) => handleAssign(task, next)} /></div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><Trash2 aria-hidden="true" /></button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
+              <div className="empty-state"><div className="empty-illustration"><Check aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'assigned' ? 'Nothing assigned yet' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : filter === 'assigned' ? 'Tasks you assign to a teammate will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><CheckCheck aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
