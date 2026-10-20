@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
@@ -26,12 +26,14 @@ import {
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { CelebrationToast } from '@/components/celebration-toast'
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
+import { pickCelebration, type Celebration, type CelebrationHistory } from '@/lib/celebration'
 import { playCompletionBell } from '@/lib/completion-bell'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
@@ -102,6 +104,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [resizing, setResizing] = useState(false)
   const [sidebarReady, setSidebarReady] = useState(false)
   const [showTaskIcons, setShowTaskIcons] = useState(true)
+  const [celebration, setCelebration] = useState<Celebration | null>(null)
+  const celebrationHistoryRef = useRef<CelebrationHistory>({ joke: -1, panda: -1 })
+  const celebrationCountRef = useRef(0)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
   const burstFireworks = useFireworks()
@@ -231,10 +236,22 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     })
   }
 
+  const dismissCelebration = useCallback(() => setCelebration(null), [])
+
+  function celebrate(task: TaskView) {
+    const { joke, panda, history } = pickCelebration(celebrationHistoryRef.current)
+    celebrationHistoryRef.current = history
+    celebrationCountRef.current += 1
+    setCelebration({ id: celebrationCountRef.current, taskId: task.id, taskTitle: task.title, joke, panda })
+  }
+
   function handleToggle(task: TaskView) {
-    // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
-    if (!task.completed) playCompletionBell()
-    if (!task.completed) burstFireworks()
+    // Ring, burst fireworks and celebrate only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
+    if (!task.completed) {
+      playCompletionBell()
+      burstFireworks()
+      celebrate(task)
+    }
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
@@ -246,6 +263,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         router.refresh()
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
+        // The task was not actually completed, so take back the celebration.
+        setCelebration((current) => current?.taskId === task.id ? null : current)
         setMessage('Could not update that task. Please try again.')
       }
     })
@@ -389,6 +408,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
           <footer className="dashboard-footer"><span><CircleCheck aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
         </div>
       </section>
+      <CelebrationToast celebration={celebration} onDismiss={dismissCelebration} />
     </main>
   )
 }
