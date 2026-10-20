@@ -4,20 +4,19 @@ import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
 import { Check, ChevronRight, KeyRound, LogOut, Palette, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { ThemePicker } from '@/components/theme-picker'
+import { useTheme } from '@/components/theme-provider'
 import { authClient } from '@/lib/auth-client'
 import {
   DEFAULT_THEME_MODE,
-  DEFAULT_THEME_PALETTE,
   THEME_MODES,
-  THEME_PALETTES,
-  applyTheme,
+  applyMode,
   isThemeMode,
-  isThemePalette,
-  readStoredTheme,
-  saveTheme,
+  readStoredMode,
+  saveMode,
   type ThemeMode,
-  type ThemePalette,
-} from '@/lib/theme'
+} from '@/lib/color-mode'
+import { THEMES, isThemeId } from '@/lib/themes'
 import { useRouter } from 'next/navigation'
 
 // Matches the minimum enforced on the sign-up form in auth-screen.tsx.
@@ -32,31 +31,28 @@ type UserMenuProps = {
 export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
   const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
   const [themeMode, setThemeMode] = useState<ThemeMode>(DEFAULT_THEME_MODE)
-  const [themePalette, setThemePalette] = useState<ThemePalette>(DEFAULT_THEME_PALETTE)
+  const { theme: themePalette, setTheme: setThemePalette } = useTheme()
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
-  // Restore the saved theme after mount so server and client markup match on hydration.
-  // The page itself is already themed by the inline script in layout.tsx.
+  // Restore the saved mode after mount so server and client markup match on hydration.
+  // The page itself is already themed by the inline scripts in layout.tsx.
   useEffect(() => {
-    const stored = readStoredTheme()
-    setThemeMode(stored.mode)
-    setThemePalette(stored.palette)
+    setThemeMode(readStoredMode())
   }, [])
 
   // In System mode, follow the OS setting as it changes.
   useEffect(() => {
     if (themeMode !== 'system') return
     const query = window.matchMedia('(prefers-color-scheme: dark)')
-    const sync = () => applyTheme('system', themePalette)
+    const sync = () => applyMode('system')
     query.addEventListener('change', sync)
     return () => query.removeEventListener('change', sync)
-  }, [themeMode, themePalette])
+  }, [themeMode])
 
-  function updateTheme(mode: ThemeMode, palette: ThemePalette) {
+  function updateMode(mode: ThemeMode) {
     setThemeMode(mode)
-    setThemePalette(palette)
-    applyTheme(mode, palette)
-    saveTheme(mode, palette)
+    applyMode(mode)
+    saveMode(mode)
   }
 
   async function handleChangeUser() {
@@ -89,7 +85,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
                     <Menu.Popup className="user-menu">
                       <Menu.Group>
                         <Menu.GroupLabel className="user-menu-label user-menu-group-label">Appearance</Menu.GroupLabel>
-                        <Menu.RadioGroup value={themeMode} onValueChange={(value) => isThemeMode(value) && updateTheme(value, themePalette)}>
+                        <Menu.RadioGroup value={themeMode} onValueChange={(value) => isThemeMode(value) && updateMode(value)}>
                           {THEME_MODES.map((mode) => (
                             <Menu.RadioItem key={mode.value} className="user-menu-item" value={mode.value}>
                               {mode.label}
@@ -101,10 +97,10 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
                       <Menu.Separator className="user-menu-separator" />
                       <Menu.Group>
                         <Menu.GroupLabel className="user-menu-label user-menu-group-label">Color palette</Menu.GroupLabel>
-                        <Menu.RadioGroup value={themePalette} onValueChange={(value) => isThemePalette(value) && updateTheme(themeMode, value)}>
-                          {THEME_PALETTES.map((palette) => (
-                            <Menu.RadioItem key={palette.value} className="user-menu-item" value={palette.value}>
-                              <span className="theme-swatch" style={{ background: palette.swatch }} aria-hidden="true" />
+                        <Menu.RadioGroup value={themePalette} onValueChange={(value) => isThemeId(value) && setThemePalette(value)}>
+                          {THEMES.map((palette) => (
+                            <Menu.RadioItem key={palette.id} className="user-menu-item" value={palette.id}>
+                              <span className="theme-menu-swatch" data-theme={palette.id} aria-hidden="true" />
                               {palette.label}
                               <Menu.RadioItemIndicator className="user-menu-check"><Check aria-hidden="true" /></Menu.RadioItemIndicator>
                             </Menu.RadioItem>
@@ -267,6 +263,7 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, onDon
         <span>Display name</span>
         <input name="name" autoComplete="name" defaultValue={userName} maxLength={80} required />
       </label>
+      <ThemePicker />
       <label className="check-field"><input type="checkbox" checked={showTaskIcons} onChange={(event) => onShowTaskIconsChange(event.target.checked)} /><span>Show emoji icons next to tasks</span></label>
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="dialog-actions">

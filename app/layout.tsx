@@ -1,7 +1,9 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
-import { THEME_INIT_SCRIPT } from '@/lib/theme'
+import { ThemeProvider } from '@/components/theme-provider'
+import { THEME_INIT_SCRIPT } from '@/lib/themes'
+import { MODE_INIT_SCRIPT } from '@/lib/color-mode'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
@@ -34,13 +36,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // The theme script sets `class` and `data-palette` on <html> before hydration, so React must not flag the mismatch.
+    // The theme scripts set `class` (dark mode) and `data-theme` (palette) on <html> before hydration, so React must not flag the mismatch.
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: MODE_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="antialiased">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
