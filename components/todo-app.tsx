@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
+  Blocks,
   CalendarDays,
   Check,
   CheckCheck,
@@ -29,6 +30,7 @@ import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/task
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
+import { TetrisGame } from '@/components/tetris-game'
 import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
@@ -40,11 +42,12 @@ import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-type GameKey = 'snake' | 'ski' | 'theseus'
+type GameKey = 'snake' | 'ski' | 'tetris' | 'theseus'
 
 const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
   { id: 'snake', label: 'Snake', icon: Worm },
   { id: 'ski', label: 'Downhill Skiing', icon: MountainSnow },
+  { id: 'tetris', label: 'Tetris', icon: Blocks },
   { id: 'theseus', label: 'Theseus & the Minotaur', icon: Waypoints },
 ]
 
@@ -329,7 +332,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'tetris' ? <TetrisGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
