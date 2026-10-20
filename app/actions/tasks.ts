@@ -6,6 +6,7 @@ import { tasks, type TaskPriority } from '@/lib/db/schema'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { trackEvent } from '@/lib/usage'
 
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -58,6 +59,7 @@ export async function createTask(input: {
       priority: input.priority,
     })
     .returning()
+  trackEvent('task_created', { userId, path: '/', metadata: { priority: input.priority, hasDueDate: input.dueDate !== null } })
   revalidatePath('/')
   return task
 }
@@ -73,6 +75,7 @@ export async function updateTaskCompletion(id: string, completed: boolean) {
     .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
     .returning()
   if (!task) throw new Error('Task not found')
+  trackEvent(completed ? 'task_completed' : 'task_uncompleted', { userId, path: '/' })
   revalidatePath('/')
   return task
 }
@@ -81,5 +84,6 @@ export async function deleteTask(id: string) {
   const userId = await getUserId()
   if (typeof id !== 'string' || id.length < 1 || id.length > 80) throw new Error('Invalid task')
   await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+  trackEvent('task_deleted', { userId, path: '/' })
   revalidatePath('/')
 }

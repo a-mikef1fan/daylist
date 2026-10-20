@@ -11,6 +11,7 @@ import {
   type Direction,
   type SnakeState,
 } from '@/lib/snake'
+import { trackClientEvent } from '@/lib/track-client'
 
 type Status = 'ready' | 'running' | 'paused' | 'over'
 
@@ -49,6 +50,15 @@ export function SnakeGame() {
     }
     boardRef.current?.focus()
   }, [])
+
+  // Report a started round (not a resume from pause) and the final score when it ends.
+  const prevStatus = useRef<Status>('ready')
+  useEffect(() => {
+    const previous = prevStatus.current
+    prevStatus.current = status
+    if (status === 'running' && previous !== 'paused') trackClientEvent('game_started', { game: 'snake' })
+    if (status === 'over') trackClientEvent('game_over', { game: 'snake', score: gameRef.current.score })
+  }, [status])
 
   const commit = useCallback((next: SnakeState) => {
     gameRef.current = next

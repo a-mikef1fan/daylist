@@ -9,6 +9,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short bell sound) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Admin-only usage dashboard at `/admin/usage` (page views, feature usage, top pages, recent events)
 
 ## Tech stack
 
@@ -34,6 +35,7 @@ Create `.env.local` (git-ignored) in the project root:
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | PostgreSQL connection string, used by `lib/db/index.ts` |
+| `ADMIN_EMAILS` | No | Comma-separated emails allowed to open `/admin/usage` and see its menu link. Unset means nobody can. List only accounts that already exist, since sign-up does not verify email addresses |
 | `BETTER_AUTH_URL` | No | Public base URL for auth. On Vercel preview deployments (`VERCEL_ENV=preview`) the branch URL (`VERCEL_BRANCH_URL`, else `VERCEL_URL`) takes precedence. Otherwise falls back to `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, `V0_RUNTIME_URL`, then `http://localhost:3000` |
 
 #### Preview test user (optional)
@@ -58,7 +60,13 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
 
+- Usage table: `usage_events` (`id`, `name`, `path`, `userId`, `metadata`, `createdAt`). Apply `migrations/0001_create_usage_events.sql` (idempotent) with `psql "$DATABASE_URL" -f migrations/0001_create_usage_events.sql`. Until it is applied, the app works normally (tracking failures are logged and ignored) and the dashboard shows an "unavailable" notice.
+
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
+
+### Usage dashboard
+
+Signed-in admins (see `ADMIN_EMAILS`) get a "Usage dashboard" item in the account menu, or can open `/admin/usage` directly with a `?range=24h|7d|30d` selector. Everyone else gets a 404. Events are recorded in `usage_events`: `page_view` from a small beacon in the root layout (`POST /api/track`, skipped on `/admin` pages), task events from the server actions, and filter, search, and game events reported by the client through the same endpoint. Only event names, page paths, an optional user id, and small enum or number fields are stored; task titles and other content are never logged. Writes never block or fail a user action.
 
 ### Run
 
@@ -85,6 +93,8 @@ app/
   layout.tsx                  Root layout and metadata
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
+  api/track/route.ts          Validates and records client usage events
+  admin/usage/page.tsx        Admin-only usage dashboard
 components/
   auth-screen.tsx             Sign-in / sign-up UI
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
@@ -94,5 +104,9 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  usage.ts                    trackEvent helper and event names
+  usage-stats.ts              Dashboard aggregate queries
+  admin.ts                    ADMIN_EMAILS check
   utils.ts                    Helpers
+migrations/                   Hand-applied SQL for tables added after the initial schema
 ```

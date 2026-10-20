@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { PageViewTracker } from '@/components/page-view-tracker'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="antialiased">
         {children}
+        <PageViewTracker />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

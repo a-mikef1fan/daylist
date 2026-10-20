@@ -29,6 +29,7 @@ import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
+import { trackClientEvent } from '@/lib/track-client'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
@@ -79,7 +80,7 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; userName: string }) {
+export function TodoApp({ initialTasks, userName, isAdmin = false }: { initialTasks: Task[]; userName: string; isAdmin?: boolean }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
@@ -96,6 +97,21 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
   const [showTaskIcons, setShowTaskIcons] = useState(true)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
+  const filterTracked = useRef(false)
+
+  // Usage events for the admin dashboard; filter, search and game choices are client-only state.
+  useEffect(() => {
+    if (!filterTracked.current) { filterTracked.current = true; return }
+    trackClientEvent('filter_changed', { filter })
+  }, [filter])
+  useEffect(() => {
+    if (!search.trim()) return
+    const id = window.setTimeout(() => trackClientEvent('search_used'), 1000)
+    return () => window.clearTimeout(id)
+  }, [search])
+  useEffect(() => {
+    if (activeGame) trackClientEvent('game_opened', { game: activeGame })
+  }, [activeGame])
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
@@ -310,7 +326,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><Check aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
+          <UserMenu userName={userName} isAdmin={isAdmin} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} />
         </header>
 
         <div className="dashboard-content">

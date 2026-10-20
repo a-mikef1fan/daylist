@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
-import { KeyRound, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
+import { BarChart3, KeyRound, LogOut, SlidersHorizontal, UserRoundCog, X } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 // Matches the minimum enforced on the sign-up form in auth-screen.tsx.
@@ -12,11 +13,12 @@ const MIN_PASSWORD_LENGTH = 8
 
 type UserMenuProps = {
   userName: string
+  isAdmin?: boolean
   showTaskIcons: boolean
   onShowTaskIconsChange: (value: boolean) => void
 }
 
-export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
+export function UserMenu({ userName, isAdmin = false, showTaskIcons, onShowTaskIconsChange }: UserMenuProps) {
   const [dialog, setDialog] = useState<'password' | 'preferences' | null>(null)
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
@@ -43,6 +45,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange }: Use
               </div>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('password')}><KeyRound aria-hidden="true" />Change password</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('preferences')}><SlidersHorizontal aria-hidden="true" />User preferences</Menu.Item>
+              {isAdmin && <Menu.Item className="user-menu-item" render={<Link href="/admin/usage" />}><BarChart3 aria-hidden="true" />Usage dashboard</Menu.Item>}
               <Menu.Separator className="user-menu-separator" />
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><UserRoundCog aria-hidden="true" />Change user</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><LogOut aria-hidden="true" />Sign out</Menu.Item>
