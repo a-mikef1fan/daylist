@@ -31,6 +31,7 @@ import { TheseusGame } from '@/components/theseus-game'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
+import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { TaskPriority } from '@/lib/db/schema'
@@ -100,6 +101,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [showTaskIcons, setShowTaskIcons] = useState(true)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
+  const burstFireworks = useFireworks()
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
@@ -229,6 +231,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   function handleToggle(task: TaskView) {
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
     if (!task.completed) playCompletionBell()
+    if (!task.completed) burstFireworks()
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
