@@ -30,6 +30,8 @@ import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { TheseusGame } from '@/components/theseus-game'
+import { HashtagHint, HashtagShortcutsPanel, useCustomHashtags } from '@/components/hashtag-shortcuts'
+import { parseHashtags } from '@/lib/hashtags'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
@@ -104,6 +106,10 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [showTaskIcons, setShowTaskIcons] = useState(true)
   const dragRef = useRef({ startX: 0, startWidth: SIDEBAR_DEFAULT_WIDTH, width: SIDEBAR_DEFAULT_WIDTH })
   const router = useRouter()
+  const { custom: customHashtags, update: setCustomHashtags } = useCustomHashtags()
+  // Hashtags in the title (e.g. #p0) override the priority selector and are stripped on save.
+  const parsedTitle = useMemo(() => parseHashtags(title, customHashtags), [title, customHashtags])
+  const effectivePriority = parsedTitle.priority ?? priority
   const burstFireworks = useFireworks()
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
@@ -213,12 +219,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
 
   function handleAddTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!title.trim()) return
+    if (!parsedTitle.title) return
     setMessage('')
     startTransition(async () => {
       try {
         // A repeating task needs a start date, so default it to today.
-        const task = await createTask({ title: title.trim(), dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority, repeat })
+        const task = await createTask({ title: parsedTitle.title, dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority: effectivePriority, repeat })
         setTasks((current) => [task, ...current])
         setTitle('')
         setDueDate('')
@@ -342,10 +348,11 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
             <form className="quick-add-form" onSubmit={handleAddTask}>
               <label className="sr-only" htmlFor="task-title">Task name</label>
               <input id="task-title" className="task-title-input" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="What would you like to get done?" maxLength={180} required />
+              <HashtagHint rawTitle={title} parsed={parsedTitle} />
               <div className="form-control-row">
                 <label className="select-control" aria-label="Priority">
                   <ArrowDownWideNarrow aria-hidden="true" />
-                  <select value={priority} onChange={(event) => setPriority(event.target.value as TaskPriority)} aria-label="Priority">
+                  <select value={effectivePriority} onChange={(event) => setPriority(event.target.value as TaskPriority)} aria-label="Priority">
                     <option value="normal">Normal priority</option><option value="high">High priority</option><option value="low">Low priority</option>
                   </select>
                 </label>
@@ -356,7 +363,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                   </select>
                 </label>
                 <label className="date-control" aria-label="Due date"><CalendarDays aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
-                <button className="add-task-button" type="submit" disabled={isPending || !title.trim()}><Plus aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
+                <HashtagShortcutsPanel custom={customHashtags} onChange={setCustomHashtags} />
+                <button className="add-task-button" type="submit" disabled={isPending || !parsedTitle.title}><Plus aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
               </div>
             </form>
           </section>
