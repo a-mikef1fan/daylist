@@ -279,6 +279,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .meta-separator { color: var(--separator); }
 .due-label { display: inline-flex; align-items: center; gap: 4px; }
 .due-label svg { width: 11px; height: 11px; }
+.repeat-label { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; color: var(--primary); }
+.repeat-label svg { width: 11px; height: 11px; }
 .due-label.is-overdue { color: var(--overdue); }
 .delete-task-button { display: grid; width: 31px; height: 31px; flex: none; place-items: center; border: 0; border-radius: 8px; background: transparent; color: transparent; cursor: pointer; transition: color .15s, background .15s; }
 .task-row:hover .delete-task-button, .delete-task-button:focus-visible { color: var(--muted-foreground); }
