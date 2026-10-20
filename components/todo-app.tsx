@@ -30,6 +30,7 @@ import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
 import { playCompletionBell } from '@/lib/completion-bell'
 import { getTaskIcon } from '@/lib/task-icon'
+import { DailyHeader } from '@/components/daily-header'
 import type { Task, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
@@ -315,6 +316,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: Task[]; user
 
         <div className="dashboard-content">
           {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          <DailyHeader />
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>

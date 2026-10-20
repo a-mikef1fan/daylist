@@ -138,6 +138,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .avatar-button { width: 34px; height: 34px; border: 1px solid oklch(0.85 0.045 153); border-radius: 50%; background: var(--sage); color: var(--sage-deep); cursor: pointer; font-size: 13px; font-weight: 700; }
 .dashboard-content { max-width: 866px; margin: 0 auto; padding: 53px clamp(24px, 6vw, 88px) 30px; }
 .eyebrow { color: var(--muted-foreground); font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+.daily-header { display: grid; gap: 12px; margin-bottom: 28px; }
+.daily-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.daily-card { display: flex; min-height: 92px; align-items: flex-start; gap: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 14px 16px; color: var(--card-foreground); }
+.daily-card.is-placeholder { background: var(--muted); border-color: transparent; }
+.daily-card-icon { display: grid; flex: none; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: color-mix(in oklch, var(--primary) 14%, var(--card)); color: var(--primary); }
+.daily-card.is-joke .daily-card-icon { background: color-mix(in oklch, var(--coral) 18%, var(--card)); color: var(--coral); }
+.daily-card-icon svg { width: 16px; height: 16px; }
+.daily-card-body { min-width: 0; }
+.daily-card-body p { margin: 5px 0 0; color: var(--ink-soft); font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.daily-card-body strong { color: var(--foreground); font-weight: 700; }
 .greeting-block h1 { margin: 10px 0 8px; font-size: clamp(30px, 3.4vw, 39px); font-weight: 680; letter-spacing: -.055em; line-height: 1.15; }
 .greeting-period { color: var(--coral); }
 .greeting-block > p { margin: 0; color: var(--muted-foreground); font-size: 14px; line-height: 1.65; }
@@ -280,6 +290,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .topbar-date { margin-left: auto; font-size: 10px; }
   .avatar-button { width: 30px; height: 30px; }
   .dashboard-content { padding: 37px 18px 24px; }
+  .daily-header { margin-bottom: 22px; }
+  .daily-cards { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .daily-card { min-height: 0; padding: 12px 14px; }
+  .daily-card.is-placeholder { min-height: 76px; }
   .greeting-block h1 { font-size: 31px; }
   .greeting-block > p { font-size: 12px; }
   .quick-add-card { margin-top: 24px; padding: 16px 14px 14px; }
