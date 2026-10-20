@@ -87,10 +87,17 @@ function writeProgress(progress: Progress) {
 function Theseus({ at, lost }: { at: Point; lost: boolean }) {
   return (
     <g className="theseus-piece" style={{ transform: `translate(${(at.x + 0.5) * CELL}px, ${(at.y + 0.5) * CELL}px)` }}>
-      <circle r="14" fill="var(--sage-deep)" stroke="var(--card)" strokeWidth="2" />
-      <path d="M-6 -4 Q0 -11 6 -4" fill="none" stroke="var(--card)" strokeWidth="2" strokeLinecap="round" />
-      <text y="7" textAnchor="middle" fontSize="15" fontWeight="700" fill="var(--card)" fontFamily="var(--font-display)">T</text>
-      {lost && <circle r="17" fill="none" stroke="var(--destructive)" strokeWidth="3" strokeDasharray="4 3" />}
+      <circle r="17" fill="#1d8a8c" stroke="#1b0f16" strokeWidth="2.4" />
+      <path d="M-12 12 Q-14 5 -6 4 L6 4 Q14 5 12 12 A17 17 0 0 1 -12 12 Z" fill="#f0b93a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-12 12 Q-13 7 -9 5.5 M12 12 Q13 7 9 5.5" fill="none" stroke="#b57d22" strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="-2.6" y="1.5" width="5.2" height="4" fill="#b8744c" />
+      <path d="M-6.4 -5 Q-7 3.5 0 6.5 Q7 3.5 6.4 -5 Q6 -11 0 -11 Q-6 -11 -6.4 -5 Z" fill="#dc9a6a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-6.2 -3 Q-6.5 4 0 6.6 Q6.5 4 6.2 -3 Q4 1.5 0 1.5 Q-4 1.5 -6.2 -3 Z" fill="#4b2a1c" />
+      <path d="M-6.6 -6 Q-7 -12 0 -12 Q7 -12 6.6 -6 Q3 -9 0 -8 Q-3 -9 -6.6 -6 Z" fill="#4b2a1c" stroke="#1b0f16" strokeWidth="1.2" />
+      <circle cx="-2.6" cy="-4" r="1" fill="#1b0f16" /><circle cx="2.6" cy="-4" r="1" fill="#1b0f16" />
+      <path d="M-4.2 -6.2 L-1.4 -5.4 M4.2 -6.2 L1.4 -5.4" stroke="#1b0f16" strokeWidth="1.1" strokeLinecap="round" />
+      <ellipse cx="-9.1" cy="-2.6" rx="2.7" ry="1.5" transform="rotate(230 -9.1 -2.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-9.4" cy="-5.8" rx="2.7" ry="1.5" transform="rotate(250 -9.4 -5.8)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-8.5" cy="-9.0" rx="2.7" ry="1.5" transform="rotate(270 -8.5 -9.0)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-6.6" cy="-11.6" rx="2.7" ry="1.5" transform="rotate(290 -6.6 -11.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-4.0" cy="-13.5" rx="2.7" ry="1.5" transform="rotate(310 -4.0 -13.5)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-0.8" cy="-14.4" rx="2.7" ry="1.5" transform="rotate(330 -0.8 -14.4)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="9.1" cy="-2.6" rx="2.7" ry="1.5" transform="rotate(-50 9.1 -2.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="9.4" cy="-5.8" rx="2.7" ry="1.5" transform="rotate(-70 9.4 -5.8)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="8.5" cy="-9.0" rx="2.7" ry="1.5" transform="rotate(-90 8.5 -9.0)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="6.6" cy="-11.6" rx="2.7" ry="1.5" transform="rotate(-110 6.6 -11.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="4.0" cy="-13.5" rx="2.7" ry="1.5" transform="rotate(-130 4.0 -13.5)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="0.8" cy="-14.4" rx="2.7" ry="1.5" transform="rotate(-150 0.8 -14.4)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" />
+      {lost && <circle r="21" fill="none" stroke="var(--destructive)" strokeWidth="3" strokeDasharray="4 3" />}
     </g>
   )
 }
@@ -98,16 +105,21 @@ function Theseus({ at, lost }: { at: Point; lost: boolean }) {
 function Minotaur({ at }: { at: Point }) {
   return (
     <g className="theseus-piece" style={{ transform: `translate(${(at.x + 0.5) * CELL}px, ${(at.y + 0.5) * CELL}px)` }}>
-      <path d="M-9 -8 C-19 -9 -18 -19 -11 -20" fill="none" stroke="var(--foreground)" strokeWidth="3.4" strokeLinecap="round" />
-      <path d="M9 -8 C19 -9 18 -19 11 -20" fill="none" stroke="var(--foreground)" strokeWidth="3.4" strokeLinecap="round" />
-      <rect x="-12" y="-12" width="24" height="26" rx="10" fill="var(--coral)" stroke="var(--card)" strokeWidth="2" />
-      <ellipse cx="0" cy="7" rx="7.5" ry="5.5" fill="var(--warm)" />
-      <circle cx="-3" cy="7" r="1.4" fill="var(--foreground)" />
-      <circle cx="3" cy="7" r="1.4" fill="var(--foreground)" />
-      <circle cx="-5" cy="-3" r="2.4" fill="var(--card)" />
-      <circle cx="5" cy="-3" r="2.4" fill="var(--card)" />
-      <circle cx="-5" cy="-3" r="1.1" fill="var(--foreground)" />
-      <circle cx="5" cy="-3" r="1.1" fill="var(--foreground)" />
+      <circle r="17" fill="#6c1523" stroke="#1b0f16" strokeWidth="2.4" />
+      <path d="M-13 11 Q-15 5 -8 4 L8 4 Q15 5 13 11 A17 17 0 0 1 -13 11 Z" fill="#c0773a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-13 11 L-15 6 M13 11 L15 6" stroke="#1b0f16" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M-7 -8 C-14 -8 -15 -15 -10.5 -19 C-12 -14 -9 -12 -5 -11 Z" fill="#f1e4be" stroke="#1b0f16" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M7 -8 C14 -8 15 -15 10.5 -19 C12 -14 9 -12 5 -11 Z" fill="#f1e4be" stroke="#1b0f16" strokeWidth="1.6" strokeLinejoin="round" />
+      <ellipse cx="-8.6" cy="-5" rx="3" ry="1.8" transform="rotate(25 -8.6 -5)" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.4" />
+      <ellipse cx="8.6" cy="-5" rx="3" ry="1.8" transform="rotate(-25 8.6 -5)" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.4" />
+      <path d="M-7.5 -9 Q0 -12.5 7.5 -9 Q8.5 -3 5.8 3 Q0 8 -5.8 3 Q-8.5 -3 -7.5 -9 Z" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-3.6 -9.6 Q0 -6.5 3.6 -9.6" fill="none" stroke="#c9694f" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M-5.2 1 Q-5.6 7.4 0 7.6 Q5.6 7.4 5.2 1 Q3 -1 0 -1 Q-3 -1 -5.2 1 Z" fill="#e2a07a" stroke="#1b0f16" strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="-2" cy="2.4" r="0.9" fill="#1b0f16" /><circle cx="2" cy="2.4" r="0.9" fill="#1b0f16" />
+      <path d="M-2.4 6.6 Q0 9.6 2.4 6.6" fill="none" stroke="#1b0f16" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M-2.4 6.6 Q0 9.6 2.4 6.6" fill="none" stroke="#f0b93a" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M-5.4 -6 L-1.6 -4.2 M5.4 -6 L1.6 -4.2" stroke="#1b0f16" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="-3.2" cy="-3.2" r="1" fill="#ffe08a" /><circle cx="3.2" cy="-3.2" r="1" fill="#ffe08a" />
     </g>
   )
 }

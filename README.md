@@ -8,7 +8,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Group tasks under Goals (title, optional description and target date) with a progress bar; link a task to a goal when adding it, or change or clear its goal from the task list, and filter tasks by goal
-- Mark tasks complete (with a short bell sound) or delete them
+- Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
