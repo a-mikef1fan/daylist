@@ -2,6 +2,10 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
 import { PageViewTracker } from '@/components/page-view-tracker'
+import { CustomThemeProvider } from '@/components/custom-theme-provider'
+import { ThemeProvider } from '@/components/theme-provider'
+import { CUSTOM_THEME_INIT_SCRIPT } from '@/lib/custom-theme/css'
+import { THEME_INIT_SCRIPT } from '@/lib/themes'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
@@ -31,9 +35,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: CUSTOM_THEME_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased">
-        {children}
+        <ThemeProvider>
+          <CustomThemeProvider>{children}</CustomThemeProvider>
+        </ThemeProvider>
         <PageViewTracker />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

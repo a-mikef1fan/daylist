@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 const MAX_BODY_BYTES = 2048
 const MAX_PATH_LENGTH = 200
 const PATH_PATTERN = /^\/[A-Za-z0-9\-._~/]*$/
-const GAMES = ['snake', 'theseus']
+const GAMES = ['snake', 'theseus', 'ski']
 const FILTERS = ['all', 'today', 'upcoming', 'urgent', 'completed']
 
 // Best-effort per-instance throttle so one client can't flood the table.

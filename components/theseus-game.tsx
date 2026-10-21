@@ -12,7 +12,10 @@ import {
   RotateCcw,
   Undo2,
 } from 'lucide-react'
+import { TheseusLeaderboard } from '@/components/theseus-leaderboard'
 import { THESEUS_LEVELS } from '@/lib/theseus-levels'
+import { ApiError, fetchOwnBest, submitSolution } from '@/lib/theseus-client'
+import { encodeMoves, isMoveString } from '@/lib/theseus-moves'
 import { parseMaze, solveMaze, takeTurn, type Maze, type Move, type Outcome, type Point, type Positions } from '@/lib/theseus'
 import './theseus-game.css'
 import { trackClientEvent } from '@/lib/track-client'
@@ -22,12 +25,16 @@ const CELL = 40
 const PAD = 14
 const LEVEL_COUNT = THESEUS_LEVELS.length
 
-type Progress = { level: number; best: Record<string, number> }
+// `best` is what the board shows. `moves` holds the winning turn list for levels won on this device (shortest kept), so a
+// win that could not be saved to the server can be submitted again later; the server replays it, so nothing here is trusted.
+type Progress = { level: number; best: Record<string, number>; moves: Record<string, string> }
+type Tab = 'play' | 'leaderboard'
 
 type Game = {
   level: number
   positions: Positions
   history: Positions[] // earlier positions, so undo can step back one turn at a time
+  moves: Move[] // the turns taken so far, parallel to history
   outcome: Outcome
 }
 
@@ -45,7 +52,7 @@ const dPad: { move: Move; label: string; icon: typeof ArrowUp }[] = [
 ]
 
 function startGame(level: number, maze: Maze): Game {
-  return { level, positions: { theseus: maze.theseus, minotaur: maze.minotaur }, history: [], outcome: 'playing' }
+  return { level, positions: { theseus: maze.theseus, minotaur: maze.minotaur }, history: [], moves: [], outcome: 'playing' }
 }
 
 function exitSide(maze: Maze) {
@@ -69,12 +76,33 @@ function readProgress(): Progress {
           }
         }
       }
-      return { level: Number.isInteger(level) && level >= 0 && level < LEVEL_COUNT ? level : 0, best }
+      const moves: Record<string, string> = {}
+      if (parsed.moves && typeof parsed.moves === 'object') {
+        for (const [key, value] of Object.entries(parsed.moves)) {
+          const index = Number(key)
+          if (Number.isInteger(index) && index >= 0 && index < LEVEL_COUNT && isMoveString(value)) moves[key] = value
+        }
+      }
+      return { level: Number.isInteger(level) && level >= 0 && level < LEVEL_COUNT ? level : 0, best, moves }
     }
   } catch {
     // Storage can be unavailable or corrupt; progress just won't persist.
   }
-  return { level: 0, best: {} }
+  return { level: 0, best: {}, moves: {} }
+}
+
+// Fold the server's best step counts into local progress, keeping the lower count for each level.
+function mergeBest(progress: Progress, server: Record<string, number>): Progress {
+  const best = { ...progress.best }
+  for (const [key, steps] of Object.entries(server)) {
+    if (best[key] === undefined || steps < best[key]) best[key] = steps
+  }
+  return { ...progress, best }
+}
+
+// Levels with a locally kept winning turn list that the server does not have (or has a worse score for).
+function unsentLevels(progress: Progress, server: Record<string, number>): string[] {
+  return Object.keys(progress.moves).filter((key) => server[key] === undefined || server[key] > progress.moves[key].length)
 }
 
 function writeProgress(progress: Progress) {
@@ -88,10 +116,17 @@ function writeProgress(progress: Progress) {
 function Theseus({ at, lost }: { at: Point; lost: boolean }) {
   return (
     <g className="theseus-piece" style={{ transform: `translate(${(at.x + 0.5) * CELL}px, ${(at.y + 0.5) * CELL}px)` }}>
-      <circle r="14" fill="var(--sage-deep)" stroke="var(--card)" strokeWidth="2" />
-      <path d="M-6 -4 Q0 -11 6 -4" fill="none" stroke="var(--card)" strokeWidth="2" strokeLinecap="round" />
-      <text y="7" textAnchor="middle" fontSize="15" fontWeight="700" fill="var(--card)" fontFamily="var(--font-display)">T</text>
-      {lost && <circle r="17" fill="none" stroke="var(--destructive)" strokeWidth="3" strokeDasharray="4 3" />}
+      <circle r="17" fill="#1d8a8c" stroke="#1b0f16" strokeWidth="2.4" />
+      <path d="M-12 12 Q-14 5 -6 4 L6 4 Q14 5 12 12 A17 17 0 0 1 -12 12 Z" fill="#f0b93a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-12 12 Q-13 7 -9 5.5 M12 12 Q13 7 9 5.5" fill="none" stroke="#b57d22" strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="-2.6" y="1.5" width="5.2" height="4" fill="#b8744c" />
+      <path d="M-6.4 -5 Q-7 3.5 0 6.5 Q7 3.5 6.4 -5 Q6 -11 0 -11 Q-6 -11 -6.4 -5 Z" fill="#dc9a6a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-6.2 -3 Q-6.5 4 0 6.6 Q6.5 4 6.2 -3 Q4 1.5 0 1.5 Q-4 1.5 -6.2 -3 Z" fill="#4b2a1c" />
+      <path d="M-6.6 -6 Q-7 -12 0 -12 Q7 -12 6.6 -6 Q3 -9 0 -8 Q-3 -9 -6.6 -6 Z" fill="#4b2a1c" stroke="#1b0f16" strokeWidth="1.2" />
+      <circle cx="-2.6" cy="-4" r="1" fill="#1b0f16" /><circle cx="2.6" cy="-4" r="1" fill="#1b0f16" />
+      <path d="M-4.2 -6.2 L-1.4 -5.4 M4.2 -6.2 L1.4 -5.4" stroke="#1b0f16" strokeWidth="1.1" strokeLinecap="round" />
+      <ellipse cx="-9.1" cy="-2.6" rx="2.7" ry="1.5" transform="rotate(230 -9.1 -2.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-9.4" cy="-5.8" rx="2.7" ry="1.5" transform="rotate(250 -9.4 -5.8)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-8.5" cy="-9.0" rx="2.7" ry="1.5" transform="rotate(270 -8.5 -9.0)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-6.6" cy="-11.6" rx="2.7" ry="1.5" transform="rotate(290 -6.6 -11.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-4.0" cy="-13.5" rx="2.7" ry="1.5" transform="rotate(310 -4.0 -13.5)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="-0.8" cy="-14.4" rx="2.7" ry="1.5" transform="rotate(330 -0.8 -14.4)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="9.1" cy="-2.6" rx="2.7" ry="1.5" transform="rotate(-50 9.1 -2.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="9.4" cy="-5.8" rx="2.7" ry="1.5" transform="rotate(-70 9.4 -5.8)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="8.5" cy="-9.0" rx="2.7" ry="1.5" transform="rotate(-90 8.5 -9.0)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="6.6" cy="-11.6" rx="2.7" ry="1.5" transform="rotate(-110 6.6 -11.6)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="4.0" cy="-13.5" rx="2.7" ry="1.5" transform="rotate(-130 4.0 -13.5)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" /><ellipse cx="0.8" cy="-14.4" rx="2.7" ry="1.5" transform="rotate(-150 0.8 -14.4)" fill="#ffe08a" stroke="#b57d22" strokeWidth="0.8" />
+      {lost && <circle r="21" fill="none" stroke="var(--destructive)" strokeWidth="3" strokeDasharray="4 3" />}
     </g>
   )
 }
@@ -99,16 +134,21 @@ function Theseus({ at, lost }: { at: Point; lost: boolean }) {
 function Minotaur({ at }: { at: Point }) {
   return (
     <g className="theseus-piece" style={{ transform: `translate(${(at.x + 0.5) * CELL}px, ${(at.y + 0.5) * CELL}px)` }}>
-      <path d="M-9 -8 C-19 -9 -18 -19 -11 -20" fill="none" stroke="var(--foreground)" strokeWidth="3.4" strokeLinecap="round" />
-      <path d="M9 -8 C19 -9 18 -19 11 -20" fill="none" stroke="var(--foreground)" strokeWidth="3.4" strokeLinecap="round" />
-      <rect x="-12" y="-12" width="24" height="26" rx="10" fill="var(--coral)" stroke="var(--card)" strokeWidth="2" />
-      <ellipse cx="0" cy="7" rx="7.5" ry="5.5" fill="var(--warm)" />
-      <circle cx="-3" cy="7" r="1.4" fill="var(--foreground)" />
-      <circle cx="3" cy="7" r="1.4" fill="var(--foreground)" />
-      <circle cx="-5" cy="-3" r="2.4" fill="var(--card)" />
-      <circle cx="5" cy="-3" r="2.4" fill="var(--card)" />
-      <circle cx="-5" cy="-3" r="1.1" fill="var(--foreground)" />
-      <circle cx="5" cy="-3" r="1.1" fill="var(--foreground)" />
+      <circle r="17" fill="#6c1523" stroke="#1b0f16" strokeWidth="2.4" />
+      <path d="M-13 11 Q-15 5 -8 4 L8 4 Q15 5 13 11 A17 17 0 0 1 -13 11 Z" fill="#c0773a" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-13 11 L-15 6 M13 11 L15 6" stroke="#1b0f16" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M-7 -8 C-14 -8 -15 -15 -10.5 -19 C-12 -14 -9 -12 -5 -11 Z" fill="#f1e4be" stroke="#1b0f16" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M7 -8 C14 -8 15 -15 10.5 -19 C12 -14 9 -12 5 -11 Z" fill="#f1e4be" stroke="#1b0f16" strokeWidth="1.6" strokeLinejoin="round" />
+      <ellipse cx="-8.6" cy="-5" rx="3" ry="1.8" transform="rotate(25 -8.6 -5)" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.4" />
+      <ellipse cx="8.6" cy="-5" rx="3" ry="1.8" transform="rotate(-25 8.6 -5)" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.4" />
+      <path d="M-7.5 -9 Q0 -12.5 7.5 -9 Q8.5 -3 5.8 3 Q0 8 -5.8 3 Q-8.5 -3 -7.5 -9 Z" fill="#8f2d2d" stroke="#1b0f16" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-3.6 -9.6 Q0 -6.5 3.6 -9.6" fill="none" stroke="#c9694f" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M-5.2 1 Q-5.6 7.4 0 7.6 Q5.6 7.4 5.2 1 Q3 -1 0 -1 Q-3 -1 -5.2 1 Z" fill="#e2a07a" stroke="#1b0f16" strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="-2" cy="2.4" r="0.9" fill="#1b0f16" /><circle cx="2" cy="2.4" r="0.9" fill="#1b0f16" />
+      <path d="M-2.4 6.6 Q0 9.6 2.4 6.6" fill="none" stroke="#1b0f16" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M-2.4 6.6 Q0 9.6 2.4 6.6" fill="none" stroke="#f0b93a" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M-5.4 -6 L-1.6 -4.2 M5.4 -6 L1.6 -4.2" stroke="#1b0f16" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="-3.2" cy="-3.2" r="1" fill="#ffe08a" /><circle cx="3.2" cy="-3.2" r="1" fill="#ffe08a" />
     </g>
   )
 }
@@ -168,7 +208,14 @@ function MazeBoard({ maze, positions, outcome, label }: { maze: Maze; positions:
 }
 
 export function TheseusGame() {
-  const [progress, setProgress] = useState<Progress>({ level: 0, best: {} })
+  const [progress, setProgress] = useState<Progress>({ level: 0, best: {}, moves: {} })
+  const [tab, setTab] = useState<Tab>('play')
+  // The server's best steps per level, or null until it has answered (or when it cannot be reached).
+  const [serverBest, setServerBest] = useState<Record<string, number> | null>(null)
+  const [boardVersion, setBoardVersion] = useState(0)
+  const progressRef = useRef(progress)
+  progressRef.current = progress
+  const mounted = useRef(true)
   const [game, setGame] = useState<Game>(() => startGame(0, parseMaze(THESEUS_LEVELS[0])))
   const [notice, setNotice] = useState('')
 
@@ -182,13 +229,68 @@ export function TheseusGame() {
   const maze = useMemo(() => parseMaze(THESEUS_LEVELS[game.level]), [game.level])
   const par = useMemo(() => solveMaze(maze).minMoves, [maze])
 
-  // Restore saved progress (and the level last played) once on the client.
+  // Load the server's progress and send up any locally kept wins it is missing. The server verifies every solution by
+  // replaying it, so local step counts are never uploaded on their own. If the API fails the game just stays local.
+  const syncWithServer = useCallback(async () => {
+    try {
+      let best = await fetchOwnBest()
+      for (const key of unsentLevels(progressRef.current, best)) {
+        try {
+          best = await submitSolution(Number(key), progressRef.current.moves[key])
+        } catch (error) {
+          if (!(error instanceof ApiError) || error.status !== 422) throw error
+          // A solution the rules reject (a stale or edited save) is dropped rather than retried forever.
+          setProgress((current) => {
+            const moves = { ...current.moves }
+            delete moves[key]
+            const next = { ...current, moves }
+            writeProgress(next)
+            return next
+          })
+        }
+      }
+      if (!mounted.current) return
+      setServerBest(best)
+      setProgress((current) => {
+        const next = mergeBest(current, best)
+        writeProgress(next)
+        return next
+      })
+    } catch {
+      if (mounted.current) setServerBest(null)
+    }
+    if (mounted.current) setBoardVersion((version) => version + 1)
+  }, [])
+
+  // Restore saved progress (and the level last played) once on the client, then sync with the server.
   useEffect(() => {
+    mounted.current = true
     const saved = readProgress()
+    progressRef.current = saved
     setProgress(saved)
     if (saved.level !== 0) setGame(startGame(saved.level, parseMaze(THESEUS_LEVELS[saved.level])))
     boardRef.current?.focus()
-  }, [])
+    void syncWithServer()
+    return () => {
+      mounted.current = false
+    }
+  }, [syncWithServer])
+
+  // The board is hidden on the leaderboard tab, so hand it keyboard focus only once it is back on screen.
+  useEffect(() => {
+    if (tab === 'play') boardRef.current?.focus()
+  }, [tab])
+
+  // Opening the board retries any win that could not be saved earlier.
+  const showTab = useCallback(
+    (next: Tab) => {
+      setTab(next)
+      if (next === 'leaderboard' && (serverBest === null || unsentLevels(progressRef.current, serverBest).length > 0)) {
+        void syncWithServer()
+      }
+    },
+    [serverBest, syncWithServer],
+  )
 
   const selectLevel = useCallback((level: number) => {
     setGame(startGame(level, parseMaze(THESEUS_LEVELS[level])))
@@ -211,15 +313,38 @@ export function TheseusGame() {
       }
       setNotice('')
       const moves = game.history.length + 1
-      setGame({ ...game, positions: result.positions, history: [...game.history, game.positions], outcome: result.outcome })
+      const turns = [...game.moves, move]
+      setGame({ ...game, positions: result.positions, history: [...game.history, game.positions], moves: turns, outcome: result.outcome })
       if (result.outcome === 'won') {
+        const key = String(game.level)
+        const solution = encodeMoves(turns)
         setProgress((current) => {
-          const key = String(game.level)
-          if (current.best[key] !== undefined && current.best[key] <= moves) return current
-          const next = { ...current, best: { ...current.best, [key]: moves } }
+          const better = current.best[key] === undefined || moves < current.best[key]
+          const keep = current.moves[key] === undefined || solution.length < current.moves[key].length
+          if (!better && !keep) return current
+          const next = {
+            ...current,
+            best: better ? { ...current.best, [key]: moves } : current.best,
+            moves: keep ? { ...current.moves, [key]: solution } : current.moves,
+          }
           writeProgress(next)
           return next
         })
+        // Send the win to the leaderboard; the server replays it and keeps the best. On failure the local copy is retried later.
+        submitSolution(game.level, solution)
+          .then((best) => {
+            if (!mounted.current) return
+            setServerBest(best)
+            setProgress((current) => {
+              const next = mergeBest(current, best)
+              writeProgress(next)
+              return next
+            })
+            setBoardVersion((version) => version + 1)
+          })
+          .catch(() => {
+            if (mounted.current) setServerBest(null)
+          })
       }
     },
     [game, maze],
@@ -228,7 +353,7 @@ export function TheseusGame() {
   const undo = useCallback(() => {
     if (game.history.length === 0) return
     setNotice('')
-    setGame({ ...game, positions: game.history[game.history.length - 1], history: game.history.slice(0, -1), outcome: 'playing' })
+    setGame({ ...game, positions: game.history[game.history.length - 1], history: game.history.slice(0, -1), moves: game.moves.slice(0, -1), outcome: 'playing' })
   }, [game])
 
   const reset = useCallback(() => {
@@ -292,6 +417,17 @@ export function TheseusGame() {
           <span className="theseus-best">{best !== undefined ? `Best ${best}` : 'Not yet solved'}{par !== null ? ` · Shortest ${par}` : ''}</span>
         </div>
       </div>
+      <div className="theseus-tabs" role="group" aria-label="Game view">
+        <button type="button" className="theseus-tab" aria-pressed={tab === 'play'} onClick={() => showTab('play')}>Play</button>
+        <button type="button" className="theseus-tab" aria-pressed={tab === 'leaderboard'} onClick={() => showTab('leaderboard')}>Leaderboard</button>
+      </div>
+      {tab === 'leaderboard' && (
+        <TheseusLeaderboard
+          refreshKey={boardVersion}
+          unsavedLevels={serverBest ? Object.keys(progress.best).filter((key) => serverBest[key] === undefined && progress.moves[key] === undefined).length : 0}
+        />
+      )}
+      <div hidden={tab !== 'play'}>
       <p className="theseus-help" id="theseus-help">
         Lead Theseus to the exit. After every move the Minotaur takes two steps toward you, sideways first, then up or down. Use the arrow keys or W A S D to move, Space to wait, Z to undo and R to restart.
       </p>
@@ -348,6 +484,7 @@ export function TheseusGame() {
             <RotateCcw aria-hidden="true" /> Reset
           </button>
         </div>
+      </div>
       </div>
     </section>
   )
