@@ -10,6 +10,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Admin-only usage dashboard at `/admin/usage` (page views, feature usage, top pages, recent events)
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 - Backgrounds: pick a wallpaper (Alpine, Ocean, Aurora, Forest, Starry, Dunes, Clouds, City, Bloom) from account menu > User preferences, or None for the plain page. A first-time visitor gets a random scene, which is saved so it stays the same until they change it (choosing None is saved too). The scenes are inline SVG, so there are no image files or network requests; the page gets a theme-colored scrim and frosted panels so text stays readable in every color theme and in dark custom themes. Remembered per browser (`localStorage`, key `daylist:background`)
@@ -39,6 +40,7 @@ Create `.env.local` (git-ignored) in the project root:
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | PostgreSQL connection string, used by `lib/db/index.ts` |
+| `ADMIN_EMAILS` | No | Comma-separated emails allowed to open `/admin/usage` and see its menu link. Unset means nobody can. List only accounts that already exist, since sign-up does not verify email addresses |
 | `BETTER_AUTH_URL` | No | Public base URL for auth. On Vercel preview deployments (`VERCEL_ENV=preview`) the branch URL (`VERCEL_BRANCH_URL`, else `VERCEL_URL`) takes precedence. Otherwise falls back to `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, `V0_RUNTIME_URL`, then `http://localhost:3000` |
 | `ANTHROPIC_API_KEY` | No | Enables **Describe a theme** (the Theme button in the top bar). Used only on the server by `POST /api/theme/generate`; without it that route returns 503 and the panel shows a friendly message |
 | `ANTHROPIC_THEME_MODEL` | No | Overrides the Claude model used for theme generation (default `claude-opus-5-5`; a smaller model is cheaper and faster) |
@@ -65,6 +67,8 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
 
+- Usage table: `usage_events` (`id`, `name`, `path`, `userId`, `metadata`, `createdAt`). Apply `migrations/0001_create_usage_events.sql` (idempotent) with `psql "$DATABASE_URL" -f migrations/0001_create_usage_events.sql`. Until it is applied, the app works normally (tracking failures are logged and ignored) and the dashboard shows an "unavailable" notice.
+
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
 Theseus & the Minotaur progress needs no table of its own (a demo shortcut): each player's progress is one reserved row in `tasks` with `id` and `userId` set to `theseus:<user id>` and a JSON payload in `description`. Because every task query filters on the signed-in user's real id, these rows never appear in task lists and cannot be changed by the task actions. See `lib/theseus-store.ts`; moving to a dedicated table later means copying each payload's levels into rows and deleting the `theseus:%` task rows.
@@ -72,6 +76,10 @@ Theseus & the Minotaur progress needs no table of its own (a demo shortcut): eac
 Snake and Downhill Skiing high scores are stored the same way, one reserved row per player and game (`snake:<user id>`, `skiing:<user id>`), through the shared helper in `lib/reserved-rows.ts`. A player's best per board is kept (`lib/score-store.ts`): Snake has one board, Downhill Skiing one per course (Trees, Groomed run, Terrain park). Ranking is the highest score, then whoever reached it first, then display name and id (`lib/score-ranking.ts`). Unlike Theseus, these games run in the browser on random boards, so the server cannot replay a run: `POST /api/snake/score` and `POST /api/skiing/score` trust the reported score but reject numbers the game could not have produced (maximum score, and a play time that fits the score; see `lib/snake-rules.ts` and `lib/ski-rules.ts`). Moving to a dedicated table later means copying each payload's boards into rows and deleting the `snake:%` and `skiing:%` task rows.
 
 Column names are camelCase (for example `"userId"`), so they are case-sensitive and must be quoted in SQL.
+
+### Usage dashboard
+
+Signed-in admins (see `ADMIN_EMAILS`) get a "Usage dashboard" item in the account menu, or can open `/admin/usage` directly with a `?range=24h|7d|30d` selector. Everyone else gets a 404. Events are recorded in `usage_events`: `page_view` from a small beacon in the root layout (`POST /api/track`, skipped on `/admin` pages), task events from the server actions, and filter, search, and game events reported by the client through the same endpoint. Only event names, page paths, an optional user id, and small enum or number fields are stored; task titles and other content are never logged. Writes never block or fail a user action.
 
 ### Run
 
@@ -100,6 +108,8 @@ app/
   backgrounds.css             Background scenes (inline SVG), the picker styles and the scrim and glass panel rules
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
+  api/track/route.ts          Validates and records client usage events
+  admin/usage/page.tsx        Admin-only usage dashboard
   api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
   api/theseus/leaderboard/route.ts  GET the top players plus the signed-in user's own row
@@ -134,11 +144,15 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  usage.ts                    trackEvent helper and event names
+  usage-stats.ts              Dashboard aggregate queries
+  admin.ts                    ADMIN_EMAILS check
   themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter
   utils.ts                    Helpers
+migrations/                   Hand-applied SQL for tables added after the initial schema
 ```
 
 ## Describe a theme

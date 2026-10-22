@@ -1,0 +1,46 @@
+/* Self-contained light/dark tokens so the dashboard reads correctly whichever scheme the viewer uses. */
+.usage-page {
+  color-scheme: light;
+  --u-bg: #f7f7f3;
+  --u-surface: #fcfcfb;
+  --u-text: #0b0b0b;
+  --u-text-2: #52514e;
+  --u-muted: #6f6e69;
+  --u-grid: #e6e5e0;
+  --u-border: #e3e2dc;
+  --u-series-1: #2a78d6;
+  --u-series-2: #eb6834;
+  --u-focus: #2a78d6;
+  background: var(--u-bg);
+  color: var(--u-text);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) .usage-page {
+    color-scheme: dark;
+    --u-bg: #121211;
+    --u-surface: #1a1a19;
+    --u-text: #f0efec;
+    --u-text-2: #c3c2b7;
+    --u-muted: #9a998f;
+    --u-grid: #2c2c2a;
+    --u-border: #2f2f2c;
+    --u-series-1: #3987e5;
+    --u-series-2: #d95926;
+    --u-focus: #3987e5;
+  }
+}
+:root[data-theme='dark'] .usage-page {
+  color-scheme: dark;
+  --u-bg: #121211;
+  --u-surface: #1a1a19;
+  --u-text: #f0efec;
+  --u-text-2: #c3c2b7;
+  --u-muted: #9a998f;
+  --u-grid: #2c2c2a;
+  --u-border: #2f2f2c;
+  --u-series-1: #3987e5;
+  --u-series-2: #d95926;
+  --u-focus: #3987e5;
+}
+.usage-page a:focus-visible, .usage-page summary:focus-visible, .usage-page svg:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 2px; }
+.usage-page .num { font-variant-numeric: tabular-nums; }

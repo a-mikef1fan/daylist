@@ -18,6 +18,7 @@ import { ApiError, fetchOwnBest, submitSolution } from '@/lib/theseus-client'
 import { encodeMoves, isMoveString } from '@/lib/theseus-moves'
 import { parseMaze, solveMaze, takeTurn, type Maze, type Move, type Outcome, type Point, type Positions } from '@/lib/theseus'
 import './theseus-game.css'
+import { trackClientEvent } from '@/lib/track-client'
 
 const STORAGE_KEY = 'daylist:theseus-progress'
 const CELL = 40
@@ -217,6 +218,12 @@ export function TheseusGame() {
   const mounted = useRef(true)
   const [game, setGame] = useState<Game>(() => startGame(0, parseMaze(THESEUS_LEVELS[0])))
   const [notice, setNotice] = useState('')
+
+  // Report the first move of each level as a started round.
+  const started = game.history.length > 0
+  useEffect(() => {
+    if (started) trackClientEvent('game_started', { game: 'theseus' })
+  }, [started, game.level])
   const boardRef = useRef<HTMLDivElement>(null)
 
   const maze = useMemo(() => parseMaze(THESEUS_LEVELS[game.level]), [game.level])

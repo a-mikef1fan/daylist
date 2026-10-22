@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { PageViewTracker } from '@/components/page-view-tracker'
 import { BackgroundProvider } from '@/components/background-provider'
 import { CustomThemeProvider } from '@/components/custom-theme-provider'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <CustomThemeProvider>{children}</CustomThemeProvider>
           </BackgroundProvider>
         </ThemeProvider>
+        <PageViewTracker />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

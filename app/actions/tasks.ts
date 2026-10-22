@@ -7,6 +7,7 @@ import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, ty
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { trackEvent } from '@/lib/usage'
 
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -64,6 +65,7 @@ export async function createTask(input: {
       description: encodeRepeat(repeat, null),
     })
     .returning()
+  trackEvent('task_created', { userId, path: '/', metadata: { priority: input.priority, hasDueDate: input.dueDate !== null } })
   revalidatePath('/')
   return toTaskView(task)
 }
@@ -125,6 +127,7 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
     }
     return { task: toTaskView(task), next: next && toTaskView(next) }
   })
+  trackEvent(completed ? 'task_completed' : 'task_uncompleted', { userId, path: '/' })
   revalidatePath('/')
   return result
 }
@@ -133,5 +136,6 @@ export async function deleteTask(id: string) {
   const userId = await getUserId()
   if (typeof id !== 'string' || id.length < 1 || id.length > 80) throw new Error('Invalid task')
   await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+  trackEvent('task_deleted', { userId, path: '/' })
   revalidatePath('/')
 }

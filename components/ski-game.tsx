@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUp, Download, Pause, Play, RotateCcw } from 'lucide-react'
 import { GameLeaderboard, GameTabs, type GameTab } from '@/components/game-leaderboard'
 import { SKI_RULES } from '@/lib/ski-rules'
+import { trackClientEvent } from '@/lib/track-client'
 import { useScoreSync } from '@/lib/use-score-sync'
 
 type Status = 'ready' | 'running' | 'paused' | 'over' | 'won'
@@ -634,6 +635,14 @@ export function SkiGame() {
     statusRef.current = next
     setStatus(next)
   }, [])
+
+  // Report a started run (not a resume from pause) for the admin usage dashboard.
+  const prevStatus = useRef<Status>('ready')
+  useEffect(() => {
+    const previous = prevStatus.current
+    prevStatus.current = status
+    if (status === 'running' && previous !== 'paused') trackClientEvent('game_started', { game: 'ski' })
+  }, [status])
 
   const render = useCallback(() => {
     const canvas = canvasRef.current

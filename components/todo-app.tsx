@@ -27,6 +27,7 @@ import { UserMenu } from '@/components/user-menu'
 import { DEFAULT_COMPLETION_SOUND, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
+import { trackClientEvent } from '@/lib/track-client'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
 import type { TaskPriority } from '@/lib/db/schema'
@@ -80,7 +81,7 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; userName: string }) {
+export function TodoApp({ initialTasks, userName, isAdmin = false }: { initialTasks: TaskView[]; userName: string; isAdmin?: boolean }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
@@ -104,6 +105,21 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const parsedTitle = useMemo(() => parseHashtags(title, customHashtags), [title, customHashtags])
   const effectivePriority = parsedTitle.priority ?? priority
   const burstFireworks = useFireworks()
+  const filterTracked = useRef(false)
+
+  // Usage events for the admin dashboard; filter, search and game choices are client-only state.
+  useEffect(() => {
+    if (!filterTracked.current) { filterTracked.current = true; return }
+    trackClientEvent('filter_changed', { filter })
+  }, [filter])
+  useEffect(() => {
+    if (!search.trim()) return
+    const id = window.setTimeout(() => trackClientEvent('search_used'), 1000)
+    return () => window.clearTimeout(id)
+  }, [search])
+  useEffect(() => {
+    if (activeGame) trackClientEvent('game_opened', { game: activeGame })
+  }, [activeGame])
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
@@ -335,7 +351,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><ThemedIcon slot="brand" aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
-          <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={handleCompletionSoundChange} />
+          <UserMenu userName={userName} isAdmin={isAdmin} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={handleCompletionSoundChange} />
         </header>
 
         <div className="dashboard-content">
