@@ -2,7 +2,8 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { tasks, type Assignee, type TaskPriority } from '@/lib/db/schema'
+import { ASSIGNEE_NAME_MAX, getSlackMembers, SLACK_ID_PATTERN } from '@/lib/slack'
 import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -12,6 +13,22 @@ async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) throw new Error('Unauthorized')
   return session.user.id
+}
+
+// Checks the assignee id against the Slack member list and returns the DB columns to store.
+// Name and image come from Slack, not from the client. New assignments are rejected when the list is unavailable.
+async function resolveAssignee(assignee: Assignee | null | undefined) {
+  if (assignee === null || assignee === undefined) {
+    return { assigneeSlackId: null, assigneeName: null, assigneeImage: null }
+  }
+  if (typeof assignee !== 'object' || typeof assignee.id !== 'string' || !SLACK_ID_PATTERN.test(assignee.id)) {
+    throw new Error('Invalid assignee')
+  }
+  const { members, connected } = await getSlackMembers()
+  if (!connected) throw new Error('Slack is not connected')
+  const member = members.find((item) => item.id === assignee.id)
+  if (!member) throw new Error('Unknown assignee')
+  return { assigneeSlackId: member.id, assigneeName: member.name.trim().slice(0, ASSIGNEE_NAME_MAX), assigneeImage: member.image }
 }
 
 export async function getTasks() {
@@ -28,6 +45,7 @@ export async function createTask(input: {
   title: string
   dueDate: string | null
   priority: TaskPriority
+  assignee?: Assignee | null
   repeat?: TaskRepeat
 }) {
   const userId = await getUserId()
@@ -53,6 +71,8 @@ export async function createTask(input: {
     throw new Error('A repeating task needs a due date')
   }
 
+  const assigneeColumns = await resolveAssignee(input.assignee)
+
   const [task] = await db
     .insert(tasks)
     .values({
@@ -62,6 +82,7 @@ export async function createTask(input: {
       dueDate: input.dueDate,
       priority: input.priority,
       description: encodeRepeat(repeat, null),
+      ...assigneeColumns,
     })
     .returning()
   revalidatePath('/')
@@ -119,6 +140,9 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
             description: task.description,
             dueDate: nextDue,
             priority: task.priority,
+            assigneeSlackId: task.assigneeSlackId,
+            assigneeName: task.assigneeName,
+            assigneeImage: task.assigneeImage,
           })
           .returning()
       }
@@ -127,6 +151,20 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
   })
   revalidatePath('/')
   return result
+}
+
+export async function updateTaskAssignee(id: string, assignee: Assignee | null) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80) throw new Error('Invalid task update')
+  const assigneeColumns = await resolveAssignee(assignee)
+  const [task] = await db
+    .update(tasks)
+    .set({ ...assigneeColumns, updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+    .returning()
+  if (!task) throw new Error('Task not found')
+  revalidatePath('/')
+  return toTaskView(task)
 }
 
 export async function deleteTask(id: string) {

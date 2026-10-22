@@ -10,10 +10,13 @@ import {
   PanelLeftOpen,
   Repeat,
   MountainSnow,
+  UserRound,
   Waypoints,
   Worm,
 } from 'lucide-react'
-import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { createTask, deleteTask, updateTaskAssignee, updateTaskCompletion } from '@/app/actions/tasks'
+import { listSlackMembers } from '@/app/actions/slack'
+import { AssigneePicker, type MembersState } from '@/components/assignee-picker'
 import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
@@ -29,9 +32,9 @@ import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { TaskPriority } from '@/lib/db/schema'
+import type { Assignee, TaskPriority } from '@/lib/db/schema'
 
-type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
+type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'assigned' | 'completed'
 
 type GameKey = 'snake' | 'ski' | 'theseus'
 
@@ -54,11 +57,13 @@ function clampSidebarWidth(value: number) {
   return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, Math.round(value)))
 }
 
-const filterOptions: { id: FilterKey; label: string; slot: IconSlot; urgent?: boolean }[] = [
+const filterOptions: { id: FilterKey; label: string; slot?: IconSlot; icon?: typeof UserRound; urgent?: boolean }[] = [
   { id: 'all', label: 'All tasks', slot: 'filterAll' },
   { id: 'today', label: 'Today', slot: 'filterToday' },
   { id: 'upcoming', label: 'Upcoming', slot: 'filterUpcoming' },
   { id: 'urgent', label: 'Urgent', slot: 'filterUrgent', urgent: true },
+  // No theme icon slot for this one, so it always uses the plain icon.
+  { id: 'assigned', label: 'Assigned', icon: UserRound },
   { id: 'completed', label: 'Completed', slot: 'filterDone' },
 ]
 
@@ -67,6 +72,16 @@ function dateKey(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+function taskAssignee(task: TaskView): Assignee | null {
+  return task.assigneeSlackId && task.assigneeName
+    ? { id: task.assigneeSlackId, name: task.assigneeName, image: task.assigneeImage }
+    : null
+}
+
+function assigneeColumns(assignee: Assignee | null) {
+  return { assigneeSlackId: assignee?.id ?? null, assigneeName: assignee?.name ?? null, assigneeImage: assignee?.image ?? null }
 }
 
 function formatDueDate(value: string | null) {
@@ -88,6 +103,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState<TaskPriority>('normal')
+  const [assignee, setAssignee] = useState<Assignee | null>(null)
+  const [membersState, setMembersState] = useState<MembersState>({ status: 'idle', members: [] })
   const [repeat, setRepeat] = useState<TaskRepeat>('none')
   const [message, setMessage] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -189,6 +206,18 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     setAndSaveSidebarWidth(sidebarWidth + (event.key === 'ArrowRight' ? SIDEBAR_KEY_STEP : -SIDEBAR_KEY_STEP))
   }
 
+  // Slack members load the first time a picker opens, and again on the next open if Slack was unavailable.
+  async function loadMembers() {
+    if (membersState.status === 'loading' || membersState.status === 'ready') return
+    setMembersState({ status: 'loading', members: [] })
+    try {
+      const { members, connected } = await listSlackMembers()
+      setMembersState({ status: connected ? 'ready' : 'unavailable', members })
+    } catch {
+      setMembersState({ status: 'unavailable', members: [] })
+    }
+  }
+
   const counts = useMemo(() => {
     const today = dateKey(new Date())
     return {
@@ -196,6 +225,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
       today: tasks.filter((task) => !task.completed && task.dueDate === today).length,
       upcoming: tasks.filter((task) => !task.completed && task.dueDate && task.dueDate > today).length,
       urgent: tasks.filter((task) => !task.completed && task.priority === 'high').length,
+      assigned: tasks.filter((task) => !task.completed && task.assigneeSlackId).length,
       completed: tasks.filter((task) => task.completed).length,
     }
   }, [tasks])
@@ -208,6 +238,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         if (filter === 'today' && (task.completed || task.dueDate !== today)) return false
         if (filter === 'upcoming' && (task.completed || !task.dueDate || task.dueDate <= today)) return false
         if (filter === 'urgent' && (task.completed || task.priority !== 'high')) return false
+        if (filter === 'assigned' && (task.completed || !task.assigneeSlackId)) return false
         if (filter === 'completed' && !task.completed) return false
         if (filter === 'all' && task.completed) return false
         return !normalizedSearch || task.title.toLowerCase().includes(normalizedSearch)
@@ -228,11 +259,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     startTransition(async () => {
       try {
         // A repeating task needs a start date, so default it to today.
-        const task = await createTask({ title: parsedTitle.title, dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority: effectivePriority, repeat })
+        const task = await createTask({ title: parsedTitle.title, dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority: effectivePriority, repeat, assignee })
         setTasks((current) => [task, ...current])
         setTitle('')
         setDueDate('')
         setPriority('normal')
+        setAssignee(null)
         setRepeat('none')
         router.refresh()
       } catch {
@@ -257,6 +289,21 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
         setMessage('Could not update that task. Please try again.')
+      }
+    })
+  }
+
+  function handleAssign(task: TaskView, next: Assignee | null) {
+    const previous = taskAssignee(task)
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, ...assigneeColumns(next) } : item))
+    startTransition(async () => {
+      try {
+        const updated = await updateTaskAssignee(task.id, next)
+        setTasks((current) => current.map((item) => item.id === updated.id ? updated : item))
+        router.refresh()
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, ...assigneeColumns(previous) } : item))
+        setMessage('Could not update the assignee. Please try again.')
       }
     })
   }
@@ -294,9 +341,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </div>
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
-          {filterOptions.map(({ id, label, slot, urgent }) => (
+          {filterOptions.map(({ id, label, slot, icon: Icon, urgent }) => (
             <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
-              <ThemedIcon slot={slot} aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
+              {slot ? <ThemedIcon slot={slot} aria-hidden="true" /> : Icon ? <Icon aria-hidden="true" /> : null} <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
         </nav>
@@ -366,6 +413,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                     {TASK_REPEATS.map((option) => <option key={option} value={option}>{option === 'none' ? 'Never repeats' : `Repeats ${repeatLabels[option].toLowerCase()}`}</option>)}
                   </select>
                 </label>
+                <AssigneePicker variant="form" label="Assignee" value={assignee} membersState={membersState} onOpen={loadMembers} onChange={setAssignee} />
                 <label className="date-control" aria-label="Due date"><ThemedIcon slot="dueDate" aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
                 <HashtagShortcutsPanel custom={customHashtags} onChange={setCustomHashtags} />
                 <button className="add-task-button" type="submit" disabled={isPending || !parsedTitle.title}><ThemedIcon slot="add" aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
@@ -387,13 +435,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       <ThemedIcon slot={task.completed ? 'taskDone' : 'taskOpen'} aria-hidden="true" />
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><ThemedIcon slot="dueDate" aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><ThemedIcon slot="dueDate" aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}<span className="meta-separator">·</span><AssigneePicker variant="row" label={`Assignee for ${task.title}`} value={taskAssignee(task)} membersState={membersState} onOpen={loadMembers} onChange={(next) => handleAssign(task, next)} /></div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><ThemedIcon slot="remove" aria-hidden="true" /></button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><ThemedIcon slot="brand" aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p>{!search && counts.all === 0 && <CalmScenery />}</div>
+              <div className="empty-state"><div className="empty-illustration"><ThemedIcon slot="brand" aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'assigned' ? 'Nothing assigned yet' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : filter === 'assigned' ? 'Tasks you assign to a teammate will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p>{!search && counts.all === 0 && <CalmScenery />}</div>
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><ThemedIcon slot="filterDone" aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>

@@ -64,16 +64,22 @@ export const tasks = pgTable('tasks', {
   dueDate: date('dueDate'),
   priority: text('priority').notNull().default('normal'),
   completed: boolean('completed').notNull().default(false),
+  // Slack member shown on the task. Display only: the assignee gets no access to it.
+  assigneeSlackId: text('assigneeSlackId'),
+  assigneeName: text('assigneeName'),
+  assigneeImage: text('assigneeImage'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
 export type Task = typeof tasks.$inferSelect
 export type TaskPriority = 'low' | 'normal' | 'high'
+export type Assignee = { id: string; name: string; image: string | null }
 export type NewTaskInput = {
   title: string
   dueDate: string
   priority: TaskPriority
+  assignee?: Assignee | null
 }
 
 export const authSchema = { user, session, account, verification }
