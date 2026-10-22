@@ -2,7 +2,9 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { tasks, xpAwards, type TaskPriority } from '@/lib/db/schema'
+import { lockStats, recomputeStats } from '@/lib/gamification-server'
+import { isPlausibleLocalDate, isValidDateKey, taskXp, type Progress } from '@/lib/gamification'
 import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -69,7 +71,9 @@ export async function createTask(input: {
 }
 
 // `today` is the caller's local 'YYYY-MM-DD' date, used so a late completion of a
-// recurring task schedules its next occurrence in the future, not the past.
+// recurring task schedules its next occurrence in the future, not the past. It is also the
+// day XP and streaks are credited to. When `today` is given the XP change is applied in the
+// same transaction and the user's new progress is returned; un-completing removes the XP.
 export async function updateTaskCompletion(id: string, completed: boolean, today?: string) {
   const userId = await getUserId()
   if (typeof id !== 'string' || id.length > 80 || typeof completed !== 'boolean') {
@@ -78,7 +82,9 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
   if (today !== undefined && (typeof today !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(today))) {
     throw new Error('Invalid date')
   }
+  if (today !== undefined && (!isValidDateKey(today) || !isPlausibleLocalDate(today))) throw new Error('Invalid date')
   const result = await db.transaction(async (tx) => {
+    if (today !== undefined) await lockStats(tx, userId)
     const [task] = await tx
       .update(tasks)
       .set({ completed, updatedAt: new Date() })
@@ -123,7 +129,28 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
           .returning()
       }
     }
-    return { task: toTaskView(task), next: next && toTaskView(next) }
+
+    // XP is derived from one grant row per task: complete adds it (idempotent), un-complete deletes it.
+    let progress: Progress | null = null
+    if (today !== undefined) {
+      const awardId = `task:${task.id}`
+      if (completed) {
+        await tx
+          .insert(xpAwards)
+          .values({
+            id: awardId,
+            userId,
+            kind: 'task',
+            xp: taskXp({ priority: task.priority, dueDate: task.dueDate, completedOn: today }),
+            awardedOn: today,
+          })
+          .onConflictDoNothing()
+      } else {
+        await tx.delete(xpAwards).where(and(eq(xpAwards.id, awardId), eq(xpAwards.userId, userId)))
+      }
+      progress = await recomputeStats(tx, userId)
+    }
+    return { task: toTaskView(task), next: next && toTaskView(next), progress }
   })
   revalidatePath('/')
   return result

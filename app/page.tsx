@@ -6,6 +6,7 @@ import { eq, asc, desc } from 'drizzle-orm'
 import { AuthScreen } from '@/components/auth-screen'
 import { TodoApp } from '@/components/todo-app'
 import { isPreviewTestLoginEnabled } from '@/lib/preview-login'
+import { getUserProgress } from '@/lib/gamification-server'
 import { toTaskView } from '@/lib/recurrence'
 
 export default async function HomePage() {
@@ -18,5 +19,7 @@ export default async function HomePage() {
     .where(eq(tasks.userId, session.user.id))
     .orderBy(asc(tasks.completed), desc(tasks.createdAt))
 
-  return <TodoApp initialTasks={userTasks.map(toTaskView)} userName={session.user.name} />
+  const progress = await getUserProgress(session.user.id)
+
+  return <TodoApp initialTasks={userTasks.map(toTaskView)} userName={session.user.name} initialProgress={progress} />
 }

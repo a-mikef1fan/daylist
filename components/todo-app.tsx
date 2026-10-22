@@ -14,8 +14,10 @@ import {
   Worm,
 } from 'lucide-react'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { CelebrationToasts, ProgressCard, type CelebrationToast } from '@/components/gamification'
 import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
+import { effectiveStreak, emptyProgress, levelFromXp, unlockedAchievementIds, achievements, type Progress } from '@/lib/gamification'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { ThemedIcon } from '@/components/themed-icon'
@@ -80,8 +82,13 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; userName: string }) {
+export function TodoApp({ initialTasks, userName, initialProgress = emptyProgress }: { initialTasks: TaskView[]; userName: string; initialProgress?: Progress }) {
   const [tasks, setTasks] = useState(initialTasks)
+  const [progress, setProgress] = useState(initialProgress)
+  const progressRef = useRef(initialProgress)
+  const [today, setToday] = useState<string | null>(null)
+  const [toasts, setToasts] = useState<CelebrationToast[]>([])
+  const toastId = useRef(0)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
   const [search, setSearch] = useState('')
@@ -104,6 +111,38 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const parsedTitle = useMemo(() => parseHashtags(title, customHashtags), [title, customHashtags])
   const effectivePriority = parsedTitle.priority ?? priority
   const burstFireworks = useFireworks()
+
+  // The browser's local date drives streaks; it is only known after mount.
+  useEffect(() => {
+    setToday(dateKey(new Date()))
+  }, [])
+
+  function dismissToast(id: number) {
+    setToasts((current) => current.filter((toast) => toast.id !== id))
+  }
+
+  // Stores the new progress and celebrates whatever changed (XP, level-up, streak, new badges).
+  function applyProgress(next: Progress) {
+    const prev = progressRef.current
+    progressRef.current = next
+    setProgress(next)
+    const now = dateKey(new Date())
+    const added: Omit<CelebrationToast, 'id'>[] = []
+    const xpDelta = next.totalXp - prev.totalXp
+    if (xpDelta > 0) added.push({ kind: 'xp', title: `+${xpDelta} XP` })
+    if (xpDelta < 0) added.push({ kind: 'undo', title: `${xpDelta} XP`, detail: 'Task marked incomplete' })
+    const level = levelFromXp(next.totalXp)
+    if (level > levelFromXp(prev.totalXp)) added.push({ kind: 'level', title: `Level ${level}!`, detail: 'You levelled up. Keep going.' })
+    const streak = effectiveStreak(next, now)
+    if (streak > effectiveStreak(prev, now) && streak > 1) added.push({ kind: 'streak', title: `${streak} day streak`, detail: 'Nice consistency.' })
+    const before = new Set(unlockedAchievementIds(prev))
+    for (const id of unlockedAchievementIds(next)) {
+      if (before.has(id)) continue
+      const achievement = achievements.find((item) => item.id === id)
+      if (achievement) added.push({ kind: 'badge', title: `Badge: ${achievement.label}`, detail: achievement.description })
+    }
+    if (added.length > 0) setToasts((current) => [...current, ...added.map((toast) => ({ ...toast, id: ++toastId.current }))].slice(-4))
+  }
 
   // Restore the saved sidebar state after mount so server and client markup match on hydration.
   useEffect(() => {
@@ -248,11 +287,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
     startTransition(async () => {
       try {
-        const { task: updated, next } = await updateTaskCompletion(task.id, !task.completed, dateKey(new Date()))
+        const { task: updated, next, progress: nextProgress } = await updateTaskCompletion(task.id, !task.completed, dateKey(new Date()))
         setTasks((current) => {
           const synced = current.map((item) => item.id === updated.id ? updated : item)
           return next && !synced.some((item) => item.id === next.id) ? [next, ...synced] : synced
         })
+        if (nextProgress) applyProgress(nextProgress)
         router.refresh()
       } catch {
         setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
@@ -347,6 +387,8 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
           </div>
           <DailyQuote />
 
+          <ProgressCard progress={progress} today={today} />
+
           <section className="quick-add-card" aria-labelledby="quick-add-title">
             <div className="quick-add-heading"><span className="quick-add-icon"><ThemedIcon slot="add" aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
             <form className="quick-add-form" onSubmit={handleAddTask}>
@@ -401,6 +443,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
           <footer className="dashboard-footer"><span><ThemedIcon slot="taskDone" aria-hidden="true" /> Progress over perfection.</span><span>Made for your everyday.</span></footer>
         </div>
       </section>
+      <CelebrationToasts toasts={toasts} onDismiss={dismissToast} />
     </main>
   )
 }

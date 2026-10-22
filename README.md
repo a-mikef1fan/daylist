@@ -10,10 +10,22 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
+- Gamification: earn XP for completed tasks, level up, keep a daily streak, unlock a few badges
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
 - Backgrounds: pick a wallpaper (Alpine, Ocean, Aurora, Forest, Starry, Dunes, Clouds, City, Bloom) from account menu > User preferences, or None for the plain page. A first-time visitor gets a random scene, which is saved so it stays the same until they change it (choosing None is saved too). The scenes are inline SVG, so there are no image files or network requests; the page gets a theme-colored scrim and frosted panels so text stays readable in every color theme and in dark custom themes. Remembered per browser (`localStorage`, key `daylist:background`)
 - Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
+
+## Gamification rules
+
+All rules live in `lib/gamification.ts` (pure functions, covered by `pnpm test`).
+
+- XP per completed task: 10 base, +5 for high priority, +5 if completed on or before its due date.
+- Un-completing a task deletes the XP it granted, so toggling cannot farm XP. Deleting a completed task keeps its XP.
+- Level `n` needs `25 * n * (n - 1)` total XP (level 2 = 50, level 3 = 150, level 4 = 300, ...).
+- Streak: consecutive local calendar days with at least one XP grant. The browser sends its local date (`YYYY-MM-DD`) with each completion; the server only accepts dates within one day of its UTC date. A streak stays alive through the day after the last active day, then resets.
+- Badges: First step (1 task), On a roll (10 tasks), Week warrior (best streak of 7).
+- Stats are derived from the `xp_awards` table and cached in `user_stats`, both keyed by Better Auth user id.
 
 ## Tech stack
 
@@ -64,6 +76,7 @@ The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). Thi
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
 - App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- Gamification tables: `xp_awards` and `user_stats`. Apply `migrations/0001_gamification.sql` (idempotent; also backfills XP for tasks that were already completed): `psql "$DATABASE_URL" -f migrations/0001_gamification.sql`
 
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
@@ -89,6 +102,7 @@ Open http://localhost:3000.
 | `pnpm dev` | `next dev` | Start the development server |
 | `pnpm build` | `next build` | Create a production build |
 | `pnpm start` | `next start` | Serve the production build |
+| `pnpm test` | `node --test` | Run unit tests (`lib/**/*.test.ts`) |
 
 ## Project structure
 
@@ -98,7 +112,7 @@ app/
   layout.tsx                  Root layout and metadata
   themes.css                  Hue definitions for each color theme
   backgrounds.css             Background scenes (inline SVG), the picker styles and the scrim and glass panel rules
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks and applies XP), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
   api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
@@ -117,6 +131,7 @@ components/
   theme-studio.tsx            The Describe a theme panel
   themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  gamification.tsx            Progress card, celebration toasts
   game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
@@ -135,6 +150,8 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  gamification.ts             Pure XP, level, streak and badge rules (unit tested)
+  gamification-server.ts      Recomputes and loads per-user stats
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter
