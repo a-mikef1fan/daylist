@@ -279,8 +279,13 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     window.location.assign('/')
   }
 
-  const greeting = new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening'
-  const dateLabel = new Intl.DateTimeFormat('en', { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
+  // The time of day and date depend on the visitor's timezone, which the server can't know, so they are filled in
+  // after mount. Rendering them during the first render made server and client markup differ, and React then
+  // threw away the server HTML and re-rendered the whole document (clearing attributes on <html>).
+  const [now, setNow] = useState<Date | null>(null)
+  useEffect(() => setNow(new Date()), [])
+  const greeting = !now ? 'Hello' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
+  const dateLabel = now ? new Intl.DateTimeFormat('en', { weekday: 'long', month: 'long', day: 'numeric' }).format(now) : ''
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
 
   return (
