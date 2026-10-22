@@ -1,6 +1,6 @@
 # daylist
 
-A calm, private to-do list. Sign up with email and password, add tasks with a due date and priority, and work through them by filter or search. Each user only sees their own tasks.
+A calm, private, minimal to-do list. Sign up with email and password, add tasks with a due date and priority, and work through them by filter or search. Each user only sees their own tasks.
 
 ## Features
 
