@@ -39,7 +39,7 @@ export function reservedRows<T>(options: { prefix: string; title: string; empty:
       return db.transaction(async (tx) => {
         await tx
           .insert(tasks)
-          .values({ id, userId: id, title, description: JSON.stringify(empty()), completed: true })
+          .values({ id, userId: id, title, description: JSON.stringify(empty()), completed: true, status: 'done' })
           .onConflictDoNothing({ target: tasks.id })
         const [row] = await tx.select({ description: tasks.description }).from(tasks).where(eq(tasks.id, id)).for('update')
         const next = change(parse(row?.description ?? null))

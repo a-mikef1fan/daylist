@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
+  Columns3,
   Gamepad2,
   LogOut,
   PanelLeftClose,
@@ -18,6 +19,7 @@ import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
+import { TaskBoard } from '@/components/task-board'
 import { ThemedIcon } from '@/components/themed-icon'
 import { TheseusGame } from '@/components/theseus-game'
 import { HashtagHint, HashtagShortcutsPanel, useCustomHashtags } from '@/components/hashtag-shortcuts'
@@ -84,6 +86,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [activeGame, setActiveGame] = useState<GameKey | null>(null)
+  const [boardOpen, setBoardOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -245,7 +248,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
     // Ring only when completing a task, not when un-completing it. Runs inside the click handler for autoplay policy.
     if (!task.completed) playCompletionBell(completionSound)
     if (!task.completed) burstFireworks()
-    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed } : item))
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: !item.completed, status: !item.completed ? 'done' : 'todo' } : item))
     startTransition(async () => {
       try {
         const { task: updated, next } = await updateTaskCompletion(task.id, !task.completed, dateKey(new Date()))
@@ -255,7 +258,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         })
         router.refresh()
       } catch {
-        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed } : item))
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, completed: task.completed, status: task.status } : item))
         setMessage('Could not update that task. Please try again.')
       }
     })
@@ -295,15 +298,18 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <div className="rail-caption">YOUR SPACE</div>
         <nav className="filter-nav" aria-label="Task filters">
           {filterOptions.map(({ id, label, slot, urgent }) => (
-            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null) }} aria-current={!activeGame && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+            <button key={id} type="button" className={`filter-link${urgent ? ' is-urgent' : ''}${!activeGame && !boardOpen && filter === id ? ' is-active' : ''}`} onClick={() => { setFilter(id); setActiveGame(null); setBoardOpen(false) }} aria-current={!activeGame && !boardOpen && filter === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <ThemedIcon slot={slot} aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
+          <button type="button" className={`filter-link tracker-link${!activeGame && boardOpen ? ' is-active' : ''}`} onClick={() => { setBoardOpen(true); setActiveGame(null) }} aria-current={!activeGame && boardOpen ? 'page' : undefined} title={collapsed ? 'Task board' : undefined}>
+            <Columns3 aria-hidden="true" /> <span className="rail-label">Task board</span><span className="filter-count">{tasks.length}</span>
+          </button>
         </nav>
         <div className="rail-caption fun-caption">JUST FOR FUN</div>
         <nav className="filter-nav fun-nav" aria-label="Games">
           {gameOptions.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => setActiveGame(id)} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
+            <button key={id} type="button" className={`filter-link${activeGame === id ? ' is-active' : ''}`} onClick={() => { setActiveGame(id); setBoardOpen(false) }} aria-current={activeGame === id ? 'page' : undefined} title={collapsed ? label : undefined}>
               <Icon aria-hidden="true" /> <span className="rail-label">{label}</span>
             </button>
           ))}
@@ -339,7 +345,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : boardOpen ? <TaskBoard tasks={tasks} onTasksChange={setTasks} /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>

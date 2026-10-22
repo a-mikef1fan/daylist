@@ -2,8 +2,9 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { tasks, type TaskPriority, type TaskStatus } from '@/lib/db/schema'
 import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
+import { isTaskStatus } from '@/lib/task-status'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -68,20 +69,20 @@ export async function createTask(input: {
   return toTaskView(task)
 }
 
+function isDateKey(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
+// Applies a new status/completed pair to a task (always kept in sync: `done` if and only
+// if `completed`) and, when a recurring task becomes completed, adds its next occurrence.
 // `today` is the caller's local 'YYYY-MM-DD' date, used so a late completion of a
 // recurring task schedules its next occurrence in the future, not the past.
-export async function updateTaskCompletion(id: string, completed: boolean, today?: string) {
-  const userId = await getUserId()
-  if (typeof id !== 'string' || id.length > 80 || typeof completed !== 'boolean') {
-    throw new Error('Invalid task update')
-  }
-  if (today !== undefined && (typeof today !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(today))) {
-    throw new Error('Invalid date')
-  }
-  const result = await db.transaction(async (tx) => {
+async function applyTaskState(userId: string, id: string, status: TaskStatus, today?: string) {
+  const completed = status === 'done'
+  return db.transaction(async (tx) => {
     const [task] = await tx
       .update(tasks)
-      .set({ completed, updatedAt: new Date() })
+      .set({ completed, status, updatedAt: new Date() })
       .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
       .returning()
     if (!task) throw new Error('Task not found')
@@ -119,12 +120,33 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
             description: task.description,
             dueDate: nextDue,
             priority: task.priority,
+            status: 'todo',
           })
           .returning()
       }
     }
     return { task: toTaskView(task), next: next && toTaskView(next) }
   })
+}
+
+export async function updateTaskCompletion(id: string, completed: boolean, today?: string) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80 || typeof completed !== 'boolean') {
+    throw new Error('Invalid task update')
+  }
+  if (today !== undefined && !isDateKey(today)) throw new Error('Invalid date')
+  const result = await applyTaskState(userId, id, completed ? 'done' : 'todo', today)
+  revalidatePath('/')
+  return result
+}
+
+export async function updateTaskStatus(id: string, status: TaskStatus, today?: string) {
+  const userId = await getUserId()
+  if (typeof id !== 'string' || id.length < 1 || id.length > 80 || !isTaskStatus(status)) {
+    throw new Error('Invalid task update')
+  }
+  if (today !== undefined && !isDateKey(today)) throw new Error('Invalid date')
+  const result = await applyTaskState(userId, id, status, today)
   revalidatePath('/')
   return result
 }

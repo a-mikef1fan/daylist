@@ -8,6 +8,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
 - Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
+- Task board: a Kanban-style tracker with To do, In progress and Done columns, a progress bar with counts and percent complete, move buttons on every card, and drag and drop on desktop
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
@@ -63,7 +64,9 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `status`, `createdAt`, `updatedAt`)
+
+`tasks.status` is one of `todo`, `in_progress`, `done` and defaults to `todo`. It is kept in sync with `completed` (`done` if and only if `completed` is true). If you already have a `tasks` table from before the task board existed, run `lib/db/migrations/0001_add_task_status.sql` once. It is safe to re-run.
 
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
@@ -98,7 +101,7 @@ app/
   layout.tsx                  Root layout and metadata
   themes.css                  Hue definitions for each color theme
   backgrounds.css             Background scenes (inline SVG), the picker styles and the scrim and glass panel rules
-  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
+  actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), updateTaskStatus, deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
   api/theme/generate/route.ts Signed-in, rate-limited route that asks Claude for a theme and returns it validated
   api/theseus/progress/route.ts     GET own best steps per level; POST a level completion (move list, verified by replay)
@@ -117,6 +120,7 @@ components/
   theme-studio.tsx            The Describe a theme panel
   themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  task-board.tsx              Task tracker board (columns, progress summary, move between statuses)
   game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
@@ -134,8 +138,10 @@ lib/
   auth-client.ts              Better Auth React client
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
+  db/migrations/              Hand-run SQL for schema changes
   themes.ts                   Theme ids, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
+  task-status.ts              Task status labels and progress helpers
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter
   utils.ts                    Helpers
