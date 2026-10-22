@@ -389,6 +389,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .check-field { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); cursor: pointer; font-size: 12px; }
 .check-field input { width: 16px; height: 16px; accent-color: var(--sage-deep); }
 .form-success { margin: 0; border-radius: 9px; background: var(--sage); padding: 12px 14px; color: var(--sage-deep); font-size: 13px; }
+.gt-panel { display: flex; flex-direction: column; }
+.gt-note { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
+.gt-warning { border-radius: 9px; background: var(--accent); padding: 12px 14px; color: var(--accent-foreground); }
+.gt-field { display: flex; flex-direction: column; gap: 7px; color: var(--ink-soft); font-size: 11px; font-weight: 620; }
+.gt-field select { height: 45px; border: 1px solid var(--border); border-radius: 9px; background: white; padding: 0 12px; color: var(--foreground); font-size: 12px; }
 
 /* Describe-a-theme dialog */
 .theme-button { display: inline-flex; flex: none; align-items: center; gap: 7px; height: 36px; border: 1px solid var(--avatar-border); border-radius: 999px; background: var(--sage); padding: 0 14px 0 12px; color: var(--sage-deep); cursor: pointer; font-size: 12px; font-weight: 650; transition: background .18s; }

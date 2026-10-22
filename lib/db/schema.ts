@@ -1,9 +1,13 @@
+import { sql } from 'drizzle-orm'
+import type { SyncSummary } from '@/lib/google-tasks'
 import {
   boolean,
   date,
+  jsonb,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
@@ -66,6 +70,24 @@ export const tasks = pgTable('tasks', {
   completed: boolean('completed').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  // Google Tasks link (null for tasks that did not come from Google).
+  googleTaskId: text('googleTaskId'),
+  googleListId: text('googleListId'),
+  googleSyncedAt: timestamp('googleSyncedAt'),
+}, (table) => [
+  uniqueIndex('tasks_user_google_task_idx')
+    .on(table.userId, table.googleTaskId)
+    .where(sql`${table.googleTaskId} is not null`),
+])
+
+// Per-user Google Tasks sync state: which list to sync and the last result.
+export const googleTasksSync = pgTable('google_tasks_sync', {
+  userId: text('userId')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  listId: text('listId').notNull().default('@default'),
+  lastSyncedAt: timestamp('lastSyncedAt'),
+  lastResult: jsonb('lastResult').$type<SyncSummary>(),
 })
 
 export type Task = typeof tasks.$inferSelect
@@ -77,5 +99,5 @@ export type NewTaskInput = {
 }
 
 export const authSchema = { user, session, account, verification }
-export const appSchema = { tasks }
+export const appSchema = { tasks, googleTasksSync }
 export const schema = { ...authSchema, ...appSchema }

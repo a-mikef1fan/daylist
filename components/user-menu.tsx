@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
-import { KeyRound, LogOut, SlidersHorizontal, Sparkles, UserRoundCog, X } from 'lucide-react'
+import { KeyRound, ListChecks, LogOut, SlidersHorizontal, Sparkles, UserRoundCog, X } from 'lucide-react'
 import { BackgroundPicker } from '@/components/background-picker'
+import { GoogleTasksPanel } from '@/components/google-tasks-panel'
 import { ThemePicker } from '@/components/theme-picker'
 import { ThemeStudio } from '@/components/theme-studio'
 import { authClient } from '@/lib/auth-client'
@@ -20,11 +21,26 @@ type UserMenuProps = {
   onShowTaskIconsChange: (value: boolean) => void
   completionSound: CompletionSoundId
   onCompletionSoundChange: (value: CompletionSoundId) => void
+  onTasksChanged: () => void
 }
 
-export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange }: UserMenuProps) {
-  const [dialog, setDialog] = useState<'password' | 'preferences' | 'theme' | null>(null)
+export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, completionSound, onCompletionSoundChange, onTasksChanged }: UserMenuProps) {
+  const [dialog, setDialog] = useState<'password' | 'preferences' | 'theme' | 'google' | null>(null)
+  const [googleNotice, setGoogleNotice] = useState<'connected' | 'error' | null>(null)
   const firstName = userName.trim().split(/\s+/)[0] || 'there'
+
+  // Returning from Google's consent screen lands on /?google=connected or ?google=error:
+  // reopen the Google Tasks dialog with the outcome, then tidy the URL.
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const result = url.searchParams.get('google')
+    if (result !== 'connected' && result !== 'error') return
+    setGoogleNotice(result)
+    setDialog('google')
+    url.searchParams.delete('google')
+    url.searchParams.delete('error')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [])
 
   async function handleChangeUser() {
     try {
@@ -52,6 +68,7 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
               </div>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('password')}><KeyRound aria-hidden="true" />Change password</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={() => setDialog('preferences')}><SlidersHorizontal aria-hidden="true" />User preferences</Menu.Item>
+              <Menu.Item className="user-menu-item" onClick={() => { setGoogleNotice(null); setDialog('google') }}><ListChecks aria-hidden="true" />Google Tasks</Menu.Item>
               <Menu.Separator className="user-menu-separator" />
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><UserRoundCog aria-hidden="true" />Change user</Menu.Item>
               <Menu.Item className="user-menu-item" onClick={handleChangeUser}><LogOut aria-hidden="true" />Sign out</Menu.Item>
@@ -75,6 +92,12 @@ export function UserMenu({ userName, showTaskIcons, onShowTaskIconsChange, compl
       <Dialog.Root open={dialog === 'preferences'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogShell title="User preferences" description="Personalize how daylist looks for you.">
           <PreferencesForm userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={onShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={onCompletionSoundChange} onDone={() => setDialog(null)} />
+        </DialogShell>
+      </Dialog.Root>
+
+      <Dialog.Root open={dialog === 'google'} onOpenChange={(open) => !open && setDialog(null)}>
+        <DialogShell title="Google Tasks" description="Import tasks from Google Tasks and keep completion in sync.">
+          <GoogleTasksPanel notice={googleNotice} onSynced={onTasksChanged} onDone={() => setDialog(null)} />
         </DialogShell>
       </Dialog.Root>
     </>
