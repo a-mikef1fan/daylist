@@ -60,12 +60,12 @@
   --ink-soft: oklch(0.44 0.028 var(--hue));
   --sage: oklch(0.92 0.045 var(--hue));
   --sage-deep: oklch(0.39 0.085 var(--hue));
+  --sage-deep-hover: oklch(0.36 0.09 var(--hue));
+  --on-sage-deep: white;
   --warm: oklch(0.95 0.045 84);
+  --warm-border: oklch(0.91 0.035 88);
   --coral: oklch(0.65 0.14 39);
   /* Derived tokens: a generated custom theme (see lib/custom-theme/css.ts) overrides these along with the ones above. */
-  --on-sage-deep: white;
-  --sage-deep-hover: oklch(0.36 0.09 var(--hue));
-  --warm-border: oklch(0.91 0.035 88);
   --coral-text: oklch(0.55 0.13 39);
   --coral-deep: oklch(0.45 0.13 39);
   --coral-soft: oklch(0.94 0.045 55);
@@ -89,6 +89,60 @@
   --intro-text: oklch(0.4 0.04 var(--hue));
   --intro-muted: oklch(0.43 0.065 var(--hue));
   --backdrop: oklch(0.24 0.025 var(--hue) / 35%);
+}
+
+:root.dark {
+  color-scheme: dark;
+  --background: oklch(0.19 0.012 var(--surface-hue));
+  --foreground: oklch(0.94 0.012 var(--surface-hue));
+  --card: oklch(0.235 0.014 var(--surface-hue));
+  --card-foreground: oklch(0.94 0.012 var(--surface-hue));
+  --popover: oklch(0.235 0.014 var(--surface-hue));
+  --popover-foreground: oklch(0.94 0.012 var(--surface-hue));
+  --primary: oklch(0.72 0.1 var(--hue));
+  --primary-foreground: oklch(0.2 0.02 var(--hue));
+  --secondary: oklch(0.28 0.018 var(--surface-hue));
+  --secondary-foreground: oklch(0.92 0.02 var(--hue));
+  --muted: oklch(0.27 0.014 var(--surface-hue));
+  --muted-foreground: oklch(0.72 0.02 var(--hue));
+  --accent: oklch(0.3 0.025 var(--surface-hue));
+  --accent-foreground: oklch(0.9 0.03 var(--hue));
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(0.32 0.014 var(--surface-hue));
+  --input: oklch(0.34 0.014 var(--surface-hue));
+  --ring: oklch(0.65 0.1 var(--hue));
+  --sidebar: oklch(0.215 0.012 var(--surface-hue));
+  --ink-soft: oklch(0.8 0.02 var(--hue));
+  --sage: oklch(0.32 0.05 var(--hue));
+  --sage-deep: oklch(0.78 0.11 var(--hue));
+  --sage-deep-hover: oklch(0.84 0.11 var(--hue));
+  --on-sage-deep: oklch(0.2 0.03 var(--hue));
+  --warm: oklch(0.3 0.045 84);
+  --warm-border: oklch(0.38 0.04 88);
+  --coral: oklch(0.72 0.14 39);
+  --coral-text: oklch(0.76 0.12 39);
+  --coral-deep: oklch(0.82 0.1 45);
+  --coral-soft: oklch(0.34 0.06 45);
+  --overdue: oklch(0.74 0.15 28);
+  --danger-soft: oklch(0.32 0.06 27);
+  --low: oklch(0.72 0.1 var(--hue));
+  --low-text: oklch(0.78 0.1 var(--hue));
+  --hover: oklch(0.29 0.018 var(--surface-hue));
+  --active-bg: oklch(0.33 0.05 var(--hue));
+  --avatar-border: oklch(0.45 0.06 var(--hue));
+  --avatar-hover: oklch(0.38 0.06 var(--hue));
+  --field: oklch(0.2 0.012 var(--surface-hue));
+  --placeholder: oklch(0.58 0.02 var(--hue));
+  --row-hover-border: oklch(0.45 0.05 var(--hue));
+  --dashed-border: oklch(0.4 0.03 var(--hue));
+  --check-idle: oklch(0.5 0.025 var(--hue));
+  --dot: oklch(0.6 0.025 var(--hue));
+  --separator: oklch(0.5 0.02 var(--hue));
+  --intro-bg: oklch(0.26 0.04 var(--hue));
+  --intro-title: oklch(0.95 0.02 var(--hue));
+  --intro-text: oklch(0.8 0.03 var(--hue));
+  --intro-muted: oklch(0.72 0.05 var(--hue));
+  --backdrop: oklch(0 0 0 / 55%);
 }
 
 * { box-sizing: border-box; }
@@ -174,7 +228,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .ski-mode:hover { background: var(--muted); }
 .ski-mode[aria-pressed='true'] { border-color: var(--sage-deep); background: var(--sage); color: var(--sage-deep); }
 .ski-mode-blurb { padding: 0 16px; }
-.ski-download { min-height: 42px; padding: 0 18px; font-size: 13px; text-decoration: none; box-shadow: 0 6px 16px oklch(0.28 0.04 157 / 18%); }
+.ski-download { min-height: 42px; padding: 0 18px; font-size: 13px; text-decoration: none; box-shadow: 0 6px 16px color-mix(in oklch, var(--foreground) 18%, transparent); }
 .ski-download:hover { filter: brightness(1.08); }
 .ski-download:focus-visible, .ski-again:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
 .snake-action.ski-again { background: var(--secondary); color: var(--secondary-foreground); margin-top: 0; }
@@ -373,6 +427,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .user-menu-item { display: flex; align-items: center; gap: 11px; border-radius: 9px; padding: 9px 10px; color: var(--ink-soft); cursor: pointer; font-size: 13px; outline: none; user-select: none; }
 .user-menu-item svg { width: 16px; height: 16px; flex: none; }
 .user-menu-item[data-highlighted] { background: var(--hover); color: var(--foreground); }
+.user-menu-item[data-popup-open] { background: var(--hover); color: var(--foreground); }
+.user-menu-chevron { margin-left: auto; }
+.user-menu-group-label { display: block; padding: 8px 10px 4px; }
+.user-menu-hint { max-width: 220px; margin: 4px 0 2px; padding: 0 10px 6px; color: var(--muted-foreground); font-size: 11px; line-height: 1.45; }
+.user-menu-check { display: grid; margin-left: auto; place-items: center; color: var(--sage-deep); }
+.theme-menu-swatch { background: oklch(0.62 0.1 var(--hue)); width: 16px; height: 16px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--foreground) 14%, transparent); }
 .user-menu-separator { height: 1px; margin: 5px 4px; background: var(--border); }
 .dialog-backdrop { position: fixed; inset: 0; z-index: 70; background: var(--backdrop); }
 .dialog-popup { position: fixed; top: 50%; left: 50%; z-index: 71; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto; transform: translate(-50%, -50%); border: 1px solid var(--border); border-radius: 18px; background: var(--card); padding: 28px; box-shadow: 0 24px 60px color-mix(in oklch, var(--foreground) 18%, transparent); outline: none; }

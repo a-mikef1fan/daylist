@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { CUSTOM_THEME_INIT_SCRIPT } from '@/lib/custom-theme/css'
 import { BACKGROUND_INIT_SCRIPT } from '@/lib/backgrounds'
 import { THEME_INIT_SCRIPT } from '@/lib/themes'
+import { MODE_INIT_SCRIPT } from '@/lib/color-mode'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
@@ -28,16 +29,21 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f7f7f3',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f7f3' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1b19' },
+  ],
   width: 'device-width',
   initialScale: 1,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
+    // The theme scripts set `class` (dark mode) and `data-theme` (palette) on <html> before hydration, so React must not flag the mismatch.
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: MODE_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: BACKGROUND_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CUSTOM_THEME_INIT_SCRIPT }} />

@@ -11,7 +11,7 @@
 .theseus-level.is-solved { background: var(--sage); color: var(--sage-deep); }
 .theseus-level.is-active { border-color: var(--sage-deep); background: var(--sage-deep); color: var(--on-sage-deep); }
 .theseus-level svg { width: 15px; height: 15px; }
-.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
+.theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px color-mix(in oklch, var(--foreground) 3%, transparent); }
 .theseus-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
 .theseus-svg { display: block; width: 100%; height: auto; max-height: 68vh; margin: 0 auto; }
 .theseus-svg[data-outcome='lost'] { filter: saturate(.8); }
