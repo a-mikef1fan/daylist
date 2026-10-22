@@ -52,7 +52,7 @@ html[data-background] { --bg-grain: url("data:image/svg+xml,<svg xmlns='http://w
 
 /*
  * Applied background. The attribute is only present for a real background (never "none"), so none of
- * these rules touch the default look. The art is a fixed layer behind the page, with a scrim made from
+ * these rules touch the plain page. The art is a fixed layer behind the page, with a scrim made from
  * the theme's own background color so it follows light and dark palettes. Layers sit at z-index -3 (art),
  * -2 (scrim) and -1 (content panel); the completion fireworks canvas is also -1 but later in the
  * document, so its sparks still show above the panel and behind the cards.

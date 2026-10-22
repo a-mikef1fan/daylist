@@ -1,22 +1,22 @@
 'use client'
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
-import { BACKGROUND_STORAGE_KEY, DEFAULT_BACKGROUND, isBackgroundId, type BackgroundId } from '@/lib/backgrounds'
+import { BACKGROUND_STORAGE_KEY, NO_BACKGROUND, isBackgroundId, type BackgroundId } from '@/lib/backgrounds'
 
 type BackgroundContextValue = { background: BackgroundId; setBackground: (background: BackgroundId) => void }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null)
 
-// The data-background attribute on <html> is the source of truth, and it is absent for the default
-// ("none"). The inline script in the root layout sets it before paint, so the server snapshot is only
-// used during hydration.
+// The data-background attribute on <html> is the source of truth, and it is absent for "none". The
+// inline script in the root layout sets it before paint (including the random first-visit pick), so the
+// server snapshot is only used during hydration.
 function readBackground(): BackgroundId {
   const value = document.documentElement.getAttribute('data-background')
-  return isBackgroundId(value) ? value : DEFAULT_BACKGROUND
+  return isBackgroundId(value) ? value : NO_BACKGROUND
 }
 
 function applyBackground(background: BackgroundId) {
-  if (background === DEFAULT_BACKGROUND) document.documentElement.removeAttribute('data-background')
+  if (background === NO_BACKGROUND) document.documentElement.removeAttribute('data-background')
   else document.documentElement.setAttribute('data-background', background)
 }
 
@@ -35,7 +35,7 @@ function subscribe(onChange: () => void) {
 }
 
 export function BackgroundProvider({ children }: { children: React.ReactNode }) {
-  const background = useSyncExternalStore(subscribe, readBackground, () => DEFAULT_BACKGROUND)
+  const background = useSyncExternalStore(subscribe, readBackground, () => NO_BACKGROUND)
   const value = useMemo<BackgroundContextValue>(
     () => ({
       background,
