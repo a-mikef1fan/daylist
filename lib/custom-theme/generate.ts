@@ -34,6 +34,13 @@ Typography
 - Pair them deliberately. Keep bodyFont legible at small sizes; expressive fonts (handwriting, pixel, display) belong in headingFont unless the description clearly asks for them everywhere.
 - headingTransform is none, uppercase or capitalize.
 
+Background
+- background.kind picks one page background and everything else in that object tunes it. You cannot make photos, images or GIFs. When the description asks for one, choose the closest pattern or animated effect from this list.
+- Patterns: pinstripes (thin lines: size 10-18, thickness 1, angle 90 vertical or 0 horizontal), stripes (wide bands in color and color2), grid, dots, checker (color and color2), hatch (crosshatch), zigzag, waves, noise (speckle), gradient (color to color2 at angle).
+- Animated: matrix (falling characters; glyphs katakana, binary, hex or code; color is the trail and color2 the bright head; use on a dark palette), stars, emoji (one emoji or one of the shapes in emoji), snow, confetti, rain, scanlines (CRT lines), gradientShift (slowly moving gradient), retroGrid (synthwave perspective grid).
+- Examples: "NYY pinstripes" is pinstripes in navy (#0c2340) on a white or light grey palette, size 14, thickness 1, angle 90. "Matrix text rolling down the background" is matrix with a bright green color, a near-black palette and katakana glyphs. "Geocities homepage" is checker or emoji with loud clashing colours.
+- Keep opacity between 0.12 and 0.4 so text stays readable; the app adjusts text colours that would be hard to read over the pattern. Use kind none when the description does not ask for a pattern or effect. Always fill every background field, using sensible values for ones the kind ignores.
+
 Shape and icons
 - radius is the base corner radius in rem: 0 sharp, 0.4 crisp, 0.75 default, 1.25 soft, 1.75 pillowy.
 - iconStrokeWidth: 1.25 delicate, 2 normal, 2.75 bold.

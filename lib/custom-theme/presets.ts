@@ -1,9 +1,10 @@
 import { ICON_PACKS, type IconPackId } from './icons'
+import type { Background } from './background'
 import { sanitizeTheme, type Theme, type ThemeColors } from './schema'
 
 // Hand-made themes. They go through the same sanitiser as generated ones, so contrast is repaired too.
 
-type PresetInput = Omit<Theme, 'icons' | 'colors' | 'description'> & { description: string; pack: IconPackId; colors: ThemeColors }
+type PresetInput = Omit<Theme, 'icons' | 'colors' | 'description' | 'background'> & { description: string; pack: IconPackId; colors: ThemeColors; background?: Partial<Background> }
 
 const define = ({ pack, ...theme }: PresetInput): Theme => sanitizeTheme({ ...theme, icons: ICON_PACKS[pack].slots }).theme
 
@@ -109,5 +110,50 @@ export const PRESET_THEMES: Theme[] = [
       destructive: 'oklch(0.7 0.22 20)', highlight: 'oklch(0.85 0.2 105)',
     },
     radius: 0.2, headingFont: 'orbitron', bodyFont: 'jetbrainsMono', headingTransform: 'uppercase', iconStrokeWidth: 2.25, pack: 'cyber',
+  }),
+
+  define({
+    name: 'Yankees Pinstripe', description: 'Navy pinstripes on white, with a classic serif.',
+    colors: {
+      background: '#f5f6f8', foreground: '#0c2340', card: '#ffffff', primary: '#0c2340',
+      primaryForeground: '#ffffff', secondary: '#e8ebf0', muted: '#eceff3',
+      mutedForeground: '#4a5a70', accent: '#d9dee6', border: '#cfd5de',
+      destructive: '#c4122e', highlight: '#7b8794',
+    },
+    radius: 0.2, headingFont: 'libreBaskerville', bodyFont: 'workSans', headingTransform: 'uppercase', iconStrokeWidth: 2, pack: 'classic',
+    background: { kind: 'pinstripes', color: '#0c2340', size: 14, thickness: 1, angle: 90, opacity: 0.3 },
+  }),
+  define({
+    name: 'Matrix', description: 'Green code raining down a black screen.',
+    colors: {
+      background: '#020a04', foreground: '#b8ffc8', card: '#06140a', primary: '#00ff41',
+      primaryForeground: '#001a07', secondary: '#0a1d10', muted: '#08180d',
+      mutedForeground: '#6fcf88', accent: '#0f2b17', border: '#12361c',
+      destructive: '#ff5c5c', highlight: '#00d4ff',
+    },
+    radius: 0, headingFont: 'vt323', bodyFont: 'jetbrainsMono', headingTransform: 'uppercase', iconStrokeWidth: 2, pack: 'cyber',
+    background: { kind: 'matrix', color: '#00ff41', color2: '#d8ffe0', glyphs: 'katakana', speed: 1, density: 1, opacity: 0.35 },
+  }),
+  define({
+    name: 'Geocities 1996', description: 'Loud clashing colours, a checkerboard and a comic font.',
+    colors: {
+      background: '#fff200', foreground: '#1a0066', card: '#ffffff', primary: '#d4009b',
+      primaryForeground: '#ffffff', secondary: '#00e5ff', muted: '#ffe94d',
+      mutedForeground: '#4b1fa0', accent: '#7cff00', border: '#0000ff',
+      destructive: '#e00000', highlight: '#00c000',
+    },
+    radius: 0, headingFont: 'bangers', bodyFont: 'comicNeue', headingTransform: 'none', iconStrokeWidth: 3, pack: 'web90s',
+    background: { kind: 'checker', color: '#ff00cc', color2: '#00e5ff', size: 48, opacity: 0.25 },
+  }),
+  define({
+    name: 'Synthwave', description: 'Neon pink grid sliding toward a purple horizon.',
+    colors: {
+      background: '#1a0b2e', foreground: '#ffe6ff', card: '#241046', primary: '#ff3cac',
+      primaryForeground: '#1a0b2e', secondary: '#2d1458', muted: '#281250',
+      mutedForeground: '#c8a6ff', accent: '#3a1a6e', border: '#4a2090',
+      destructive: '#ff6b6b', highlight: '#2de2e6',
+    },
+    radius: 0.5, headingFont: 'righteous', bodyFont: 'dmSans', headingTransform: 'none', iconStrokeWidth: 2.25, pack: 'arcade',
+    background: { kind: 'retroGrid', color: '#ff3cac', size: 40, thickness: 2, opacity: 0.4, speed: 1 },
   }),
 ]

@@ -116,3 +116,12 @@ export function toHex(value: string): string {
     .map((v) => Math.round(clamp(toGamma(clamp(v, 0, 1)), 0, 1) * 255).toString(16).padStart(2, '0'))
     .join('')}`
 }
+
+// `t` of the way from `a` to `b`, mixed in OKLab like color-mix(in oklab).
+export function blend(a: Oklch, b: Oklch, t: number): Oklch {
+  const lab = (c: Oklch) => ({ l: c.l, a: c.c * Math.cos((c.h * Math.PI) / 180), b: c.c * Math.sin((c.h * Math.PI) / 180) })
+  const x = lab(a)
+  const y = lab(b)
+  const m = { l: x.l + (y.l - x.l) * t, a: x.a + (y.a - x.a) * t, b: x.b + (y.b - x.b) * t }
+  return toGamut({ l: m.l, c: Math.hypot(m.a, m.b), h: ((Math.atan2(m.b, m.a) * 180) / Math.PI + 360) % 360 })
+}

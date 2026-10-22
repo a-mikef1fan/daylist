@@ -54,6 +54,7 @@ export const ICON_PACKS = {
   nature: { label: 'Nature', slots: { brand: 'Sprout', add: 'CirclePlus', taskDone: 'Leaf', remove: 'Wind', dueDate: 'Sun', tip: 'Flower2', filterAll: 'TreePine', filterToday: 'Sun', filterUpcoming: 'Cloud', filterUrgent: 'Flame', filterDone: 'Leaf' } },
   ocean: { label: 'Ocean', slots: { brand: 'Anchor', add: 'CirclePlus', taskDone: 'CircleCheckBig', remove: 'Droplet', dueDate: 'Clock3', tip: 'Ship', filterAll: 'ListChecks', filterToday: 'Sun', filterUpcoming: 'Waves', filterUrgent: 'Zap', filterDone: 'Fish' } },
   sweet: { label: 'Sweet', slots: { brand: 'Heart', add: 'CirclePlus', taskDone: 'Heart', remove: 'Feather', tip: 'Flower2', filterAll: 'ListChecks', filterToday: 'Star', filterUpcoming: 'Moon', filterUrgent: 'Flame', filterDone: 'Sparkles' } },
+  web90s: { label: 'Web 1996', slots: { brand: 'Star', add: 'Zap', taskDone: 'BadgeCheck', remove: 'Skull', dueDate: 'Hourglass', tip: 'Sparkles', filterAll: 'ListChecks', filterToday: 'Sun', filterUpcoming: 'Rocket', filterUrgent: 'Flame', filterDone: 'Trophy' } },
   sunset: { label: 'Sunset', slots: { brand: 'Sun', add: 'CirclePlus', taskDone: 'CircleCheckBig', filterAll: 'ListChecks', filterToday: 'Sun', filterUpcoming: 'Moon', filterUrgent: 'Flame', filterDone: 'BadgeCheck' } },
 } as const satisfies Record<string, { label: string; slots: Partial<Record<IconSlot, IconName>> }>
 

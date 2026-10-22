@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { ThemeBackground } from '@/components/theme-background'
 import { applyCustomTheme, loadActiveTheme, loadSavedThemes, MAX_SAVED_THEMES, storeActiveTheme, storeSavedThemes } from '@/lib/custom-theme/browser'
 import type { Theme } from '@/lib/custom-theme/schema'
 
@@ -99,5 +100,10 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
     [active, preview, shown, saved, activate, discardPreview, reset],
   )
 
-  return <CustomThemeContext.Provider value={value}>{children}</CustomThemeContext.Provider>
+  return (
+    <CustomThemeContext.Provider value={value}>
+      <ThemeBackground />
+      {children}
+    </CustomThemeContext.Provider>
+  )
 }
