@@ -119,6 +119,7 @@ export async function updateTaskCompletion(id: string, completed: boolean, today
             description: task.description,
             dueDate: nextDue,
             priority: task.priority,
+            goalId: task.goalId,
           })
           .returning()
       }

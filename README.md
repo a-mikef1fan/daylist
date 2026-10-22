@@ -7,6 +7,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Email and password sign-up and sign-in
 - Create tasks with a title (1-180 characters), optional due date, and priority (`low`, `normal`, `high`)
 - Repeat a task Daily, on Weekdays (Mon-Fri), or Weekly; completing it adds the next occurrence
+- Group tasks under Goals (title, optional description and target date) with a progress bar; link a task to a goal when adding it, or change or clear its goal from the task list, and filter tasks by goal
 - Mark tasks complete (with a short sound you can choose in User preferences: Ding, Chime, Bell, Pop, or Blip) or delete them
 - Filter by All tasks, Today, Upcoming, and Completed; search by text
 - Per-user data: every task query is scoped to the signed-in user
@@ -63,7 +64,10 @@ Deployment origins are trusted from `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERC
 The schema is defined in `lib/db/schema.ts` (Drizzle `pgTable` definitions). This repo has no Drizzle config, no `drizzle-kit` dependency, and no migrations, so there is no migration command. Create these tables in your database yourself, matching the schema:
 
 - Auth tables used by Better Auth: `user`, `session`, `account`, `verification`
-- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`)
+- App table: `tasks` (`id`, `userId`, `title`, `description`, `dueDate`, `priority`, `completed`, `createdAt`, `updatedAt`, `goalId`)
+- App table: `goals` (`id`, `userId`, `title`, `description`, `targetDate`, `createdAt`, `updatedAt`)
+
+`tasks.goalId` is a nullable foreign key to `goals.id` with `ON DELETE SET NULL`, so deleting a goal keeps its tasks and just unlinks them. If you already have a `tasks` table, run `migrations/0001_create_goals.sql` (idempotent, safe to re-run) to add the `goals` table and the `goalId` column before deploying: `psql "$DATABASE_URL" -f migrations/0001_create_goals.sql`.
 
 A task's repeat rule (daily, weekdays, weekly) is stored in the `description` column as a one-line marker (`[daylist:v1 repeat=weekly]`), so no extra column or migration is needed. The marker is stripped before tasks reach the UI, and ordinary descriptions are left as they are.
 
@@ -97,6 +101,7 @@ app/
   page.tsx                    Shows the auth screen or the signed-in task list
   layout.tsx                  Root layout and metadata
   themes.css                  Hue definitions for each color theme
+  actions/goals.ts            Server actions: getGoals (with progress), createGoal, updateGoal, deleteGoal, setTaskGoal
   backgrounds.css             Background scenes (inline SVG), the picker styles and the scrim and glass panel rules
   actions/tasks.ts            Server actions: getTasks, createTask, updateTaskCompletion (adds the next occurrence of repeating tasks), deleteTask
   api/auth/[...all]/route.ts  Better Auth route handler
@@ -117,6 +122,8 @@ components/
   theme-studio.tsx            The Describe a theme panel
   themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  goals-view.tsx              Goals page: add, edit, delete goals and see progress
+  task-goal.tsx               Goal chip on task rows and the goal filter chip
   game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
@@ -135,6 +142,7 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  goals.ts                    Goal limits, date helpers, and per-goal progress counts
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter

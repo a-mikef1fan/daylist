@@ -9,15 +9,19 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Repeat,
+  Target,
   MountainSnow,
   Waypoints,
   Worm,
 } from 'lucide-react'
+import { setTaskGoal } from '@/app/actions/goals'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
+import { GoalsView } from '@/components/goals-view'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
+import { TaskGoalSelect, GoalFilterChip } from '@/components/task-goal'
 import { ThemedIcon } from '@/components/themed-icon'
 import { TheseusGame } from '@/components/theseus-game'
 import { HashtagHint, HashtagShortcutsPanel, useCustomHashtags } from '@/components/hashtag-shortcuts'
@@ -29,7 +33,7 @@ import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
-import type { TaskPriority } from '@/lib/db/schema'
+import type { Goal, TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
@@ -80,10 +84,14 @@ function formatDueDate(value: string | null) {
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(due)
 }
 
-export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; userName: string }) {
+export function TodoApp({ initialTasks, initialGoals, userName }: { initialTasks: TaskView[]; initialGoals: Goal[]; userName: string }) {
   const [tasks, setTasks] = useState(initialTasks)
+  const [goals, setGoals] = useState(initialGoals)
+  const [goalFilter, setGoalFilter] = useState<string | null>(null)
+  const [newTaskGoalId, setNewTaskGoalId] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
-  const [activeGame, setActiveGame] = useState<GameKey | null>(null)
+  // The Goals view shares this slot: like a game, it replaces the task list in the main pane.
+  const [activeGame, setActiveGame] = useState<GameKey | 'goals' | null>(null)
   const [search, setSearch] = useState('')
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -209,7 +217,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         if (filter === 'upcoming' && (task.completed || !task.dueDate || task.dueDate <= today)) return false
         if (filter === 'urgent' && (task.completed || task.priority !== 'high')) return false
         if (filter === 'completed' && !task.completed) return false
-        if (filter === 'all' && task.completed) return false
+        if (goalFilter && task.goalId !== goalFilter) return false
+        // Viewing one goal's tasks on 'All tasks' also shows its finished ones.
+        if (filter === 'all' && task.completed && !goalFilter) return false
         return !normalizedSearch || task.title.toLowerCase().includes(normalizedSearch)
       })
       .sort((a, b) => {
@@ -219,7 +229,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         if (!a.dueDate && b.dueDate) return 1
         return b.createdAt.getTime() - a.createdAt.getTime()
       })
-  }, [tasks, filter, search])
+  }, [tasks, filter, search, goalFilter])
+
+  const filteredGoal = goalFilter ? goals.find((goal) => goal.id === goalFilter) : undefined
 
   function handleAddTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -229,11 +241,20 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
       try {
         // A repeating task needs a start date, so default it to today.
         const task = await createTask({ title: parsedTitle.title, dueDate: dueDate || (repeat !== 'none' ? dateKey(new Date()) : null), priority: effectivePriority, repeat })
-        setTasks((current) => [task, ...current])
+        let created: TaskView = task
+        if (newTaskGoalId) {
+          try {
+            created = await setTaskGoal(task.id, newTaskGoalId)
+          } catch {
+            setMessage('Task added, but it could not be linked to that goal. Try again from the task.')
+          }
+        }
+        setTasks((current) => [created, ...current])
         setTitle('')
         setDueDate('')
         setPriority('normal')
         setRepeat('none')
+        setNewTaskGoalId(goalFilter ?? '')
         router.refresh()
       } catch {
         setMessage('Could not save that task. Please try again.')
@@ -259,6 +280,35 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         setMessage('Could not update that task. Please try again.')
       }
     })
+  }
+
+  function handleTaskGoalChange(task: TaskView, goalId: string | null) {
+    const previous = task.goalId
+    setTasks((current) => current.map((item) => item.id === task.id ? { ...item, goalId } : item))
+    startTransition(async () => {
+      try {
+        const updated = await setTaskGoal(task.id, goalId)
+        setTasks((current) => current.map((item) => item.id === updated.id ? { ...item, goalId: updated.goalId } : item))
+      } catch {
+        setTasks((current) => current.map((item) => item.id === task.id ? { ...item, goalId: previous } : item))
+        setMessage('Could not change that task’s goal. Please try again.')
+      }
+    })
+  }
+
+  function handleGoalDeleted(id: string) {
+    setGoals((current) => current.filter((goal) => goal.id !== id))
+    // The database unlinks the goal's tasks (ON DELETE SET NULL); mirror that here.
+    setTasks((current) => current.map((task) => task.goalId === id ? { ...task, goalId: null } : task))
+    setGoalFilter((current) => current === id ? null : current)
+    setNewTaskGoalId((current) => current === id ? '' : current)
+  }
+
+  function handleViewGoalTasks(id: string) {
+    setGoalFilter(id)
+    setNewTaskGoalId(id)
+    setFilter('all')
+    setActiveGame(null)
   }
 
   function handleDelete(task: TaskView) {
@@ -299,6 +349,9 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
               <ThemedIcon slot={slot} aria-hidden="true" /> <span className="rail-label">{label}</span><span className="filter-count">{counts[id]}</span>
             </button>
           ))}
+          <button type="button" className={`filter-link${activeGame === 'goals' ? ' is-active' : ''}`} onClick={() => setActiveGame('goals')} aria-current={activeGame === 'goals' ? 'page' : undefined} title={collapsed ? 'Goals' : undefined}>
+            <Target aria-hidden="true" /> <span className="rail-label">Goals</span><span className="filter-count">{goals.length}</span>
+          </button>
         </nav>
         <div className="rail-caption fun-caption">JUST FOR FUN</div>
         <nav className="filter-nav fun-nav" aria-label="Games">
@@ -339,7 +392,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          {activeGame === 'goals' ? <GoalsView goals={goals} tasks={tasks} onCreated={(goal) => setGoals((current) => [...current, goal])} onUpdated={(goal) => setGoals((current) => current.map((item) => item.id === goal.id ? goal : item))} onDeleted={handleGoalDeleted} onViewTasks={handleViewGoalTasks} /> : activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
@@ -366,6 +419,15 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                     {TASK_REPEATS.map((option) => <option key={option} value={option}>{option === 'none' ? 'Never repeats' : `Repeats ${repeatLabels[option].toLowerCase()}`}</option>)}
                   </select>
                 </label>
+                {goals.length > 0 && (
+                  <label className="select-control" aria-label="Goal">
+                    <Target aria-hidden="true" />
+                    <select value={newTaskGoalId} onChange={(event) => setNewTaskGoalId(event.target.value)} aria-label="Goal">
+                      <option value="">No goal</option>
+                      {goals.map((goal) => <option key={goal.id} value={goal.id}>{goal.title}</option>)}
+                    </select>
+                  </label>
+                )}
                 <label className="date-control" aria-label="Due date"><ThemedIcon slot="dueDate" aria-hidden="true" /><span className="date-label">Due</span><input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} aria-label="Due date" /></label>
                 <HashtagShortcutsPanel custom={customHashtags} onChange={setCustomHashtags} />
                 <button className="add-task-button" type="submit" disabled={isPending || !parsedTitle.title}><ThemedIcon slot="add" aria-hidden="true" /><span>{isPending ? 'Adding…' : 'Add task'}</span></button>
@@ -380,6 +442,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
             </div>
 
             {message && <p className="task-message" role="alert">{message}</p>}
+            {filteredGoal && <GoalFilterChip goal={filteredGoal} onClear={() => { setGoalFilter(null); setNewTaskGoalId('') }} />}
             {visibleTasks.length > 0 ? (
               <ul className="task-list">
                 {visibleTasks.map((task) => (
@@ -387,7 +450,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
                     <button className="complete-button" type="button" onClick={() => handleToggle(task)} aria-label={task.completed ? `Mark ${task.title} incomplete` : `Complete ${task.title}`} aria-pressed={task.completed}>
                       <ThemedIcon slot={task.completed ? 'taskDone' : 'taskOpen'} aria-hidden="true" />
                     </button>
-                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><ThemedIcon slot="dueDate" aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}</div></div>
+                    <div className="task-copy"><span className="task-title">{showTaskIcons && <span className="task-icon" aria-hidden="true">{getTaskIcon(task.title)}</span>}{task.title}</span><div className="task-meta"><span className={`priority-dot priority-${task.priority}`} /><span className={`priority-label priority-text-${task.priority}`}>{task.priority} priority</span><span className="meta-separator">·</span><span className={`due-label${task.dueDate && task.dueDate < dateKey(new Date()) && !task.completed ? ' is-overdue' : ''}`}><ThemedIcon slot="dueDate" aria-hidden="true" />{formatDueDate(task.dueDate)}</span>{task.repeat !== 'none' && <span className="repeat-label" title={`Repeats ${repeatLabels[task.repeat].toLowerCase()}`}><Repeat aria-hidden="true" />{repeatLabels[task.repeat]}</span>}<TaskGoalSelect taskTitle={task.title} goalId={task.goalId} goals={goals} onChange={(goalId) => handleTaskGoalChange(task, goalId)} /></div></div>
                     <button className="delete-task-button" type="button" onClick={() => handleDelete(task)} aria-label={`Delete ${task.title}`}><ThemedIcon slot="remove" aria-hidden="true" /></button>
                   </li>
                 ))}
