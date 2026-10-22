@@ -3,6 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, type TaskPriority } from '@/lib/db/schema'
+import { isValidDueDate } from '@/lib/due-date'
 import { encodeRepeat, isTaskRepeat, nextOccurrence, parseRepeat, toTaskView, type TaskRepeat } from '@/lib/recurrence'
 import { and, asc, desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -37,14 +38,8 @@ export async function createTask(input: {
   if (!['low', 'normal', 'high'].includes(input.priority)) {
     throw new Error('Invalid task priority')
   }
-  if (input.dueDate !== null) {
-    if (typeof input.dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
-      throw new Error('Invalid due date')
-    }
-    const parsedDate = new Date(`${input.dueDate}T00:00:00.000Z`)
-    if (Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== input.dueDate) {
-      throw new Error('Invalid due date')
-    }
+  if (input.dueDate !== null && !isValidDueDate(input.dueDate)) {
+    throw new Error('Invalid due date')
   }
 
   const repeat = input.repeat ?? 'none'
