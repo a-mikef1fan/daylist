@@ -1,11 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { BackgroundProvider } from '@/components/background-provider'
 import { ColorModeProvider } from '@/components/color-mode-provider'
 import { CustomThemeProvider } from '@/components/custom-theme-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { COLOR_MODE_INIT_SCRIPT } from '@/lib/color-mode'
 import { CUSTOM_THEME_INIT_SCRIPT } from '@/lib/custom-theme/css'
+import { BACKGROUND_INIT_SCRIPT } from '@/lib/backgrounds'
 import { THEME_INIT_SCRIPT } from '@/lib/themes'
 import './globals.css'
 
@@ -43,12 +45,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: COLOR_MODE_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: BACKGROUND_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CUSTOM_THEME_INIT_SCRIPT }} />
       </head>
       <body className="antialiased">
         <ColorModeProvider>
           <ThemeProvider>
-            <CustomThemeProvider>{children}</CustomThemeProvider>
+            <BackgroundProvider>
+              <CustomThemeProvider>{children}</CustomThemeProvider>
+            </BackgroundProvider>
           </ThemeProvider>
         </ColorModeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}

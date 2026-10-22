@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import './themes.css';
+@import './backgrounds.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
