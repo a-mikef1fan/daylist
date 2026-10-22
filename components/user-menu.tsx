@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Menu } from '@base-ui/react/menu'
 import { Dialog } from '@base-ui/react/dialog'
 import { KeyRound, ListChecks, LogOut, SlidersHorizontal, Sparkles, UserRoundCog, X } from 'lucide-react'
+import { BackgroundPicker } from '@/components/background-picker'
 import { GoogleTasksPanel } from '@/components/google-tasks-panel'
 import { ThemePicker } from '@/components/theme-picker'
 import { ThemeStudio } from '@/components/theme-studio'
@@ -241,6 +242,7 @@ function PreferencesForm({ userName, showTaskIcons, onShowTaskIconsChange, compl
         <input name="name" autoComplete="name" defaultValue={userName} maxLength={80} required />
       </label>
       <ThemePicker />
+      <BackgroundPicker />
       <label className="check-field"><input type="checkbox" checked={showTaskIcons} onChange={(event) => onShowTaskIconsChange(event.target.checked)} /><span>Show emoji icons next to tasks</span></label>
       <label className="form-field">
         <span>Task completion sound</span>
