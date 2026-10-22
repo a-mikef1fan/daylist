@@ -89,6 +89,8 @@ Open http://localhost:3000.
 | `pnpm dev` | `next dev` | Start the development server |
 | `pnpm build` | `next build` | Create a production build |
 | `pnpm start` | `next start` | Serve the production build |
+| `pnpm typecheck` | `tsc --noEmit` | Type-check the project |
+| `pnpm test` | `vitest run` | Run the unit tests (for example the game logic in `lib/tetris.test.ts`) |
 
 ## Project structure
 
