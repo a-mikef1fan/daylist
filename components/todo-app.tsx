@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { setTaskGoal } from '@/app/actions/goals'
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
+import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
 import { GoalsView } from '@/components/goals-view'
 import { SkiGame } from '@/components/ski-game'
@@ -455,7 +456,7 @@ export function TodoApp({ initialTasks, initialGoals, userName }: { initialTasks
                 ))}
               </ul>
             ) : (
-              <div className="empty-state"><div className="empty-illustration"><ThemedIcon slot="brand" aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p></div>
+              <div className="empty-state"><div className="empty-illustration"><ThemedIcon slot="brand" aria-hidden="true" /></div><h3>{search ? 'No matching tasks' : filter === 'completed' ? 'Nothing checked off yet' : filter === 'today' ? 'Nothing due today' : filter === 'urgent' ? 'Nothing urgent right now' : filter === 'upcoming' ? 'Your future is looking clear' : 'A little breathing room'}</h3><p>{search ? 'Try another search, or clear the field to see your list.' : filter === 'completed' ? 'Finish a task and it’ll find its way here.' : filter === 'all' ? 'Add your first task above. Small steps count.' : filter === 'urgent' ? 'Tasks marked high priority will show up here.' : 'Enjoy the space, or add a task with a due date above.'}</p>{!search && counts.all === 0 && <CalmScenery />}</div>
             )}
             {counts.completed > 0 && filter !== 'completed' && <button className="completed-link" type="button" onClick={() => setFilter('completed')}><ThemedIcon slot="filterDone" aria-hidden="true" /> {counts.completed} {counts.completed === 1 ? 'task' : 'tasks'} completed <span>View</span></button>}
           </section>
