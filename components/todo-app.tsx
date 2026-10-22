@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowDownWideNarrow,
+  CarFront,
   Gamepad2,
   LogOut,
   PanelLeftClose,
@@ -16,6 +17,7 @@ import {
 import { createTask, deleteTask, updateTaskCompletion } from '@/app/actions/tasks'
 import { CalmScenery } from '@/components/calm-scenery'
 import { DailyQuote } from '@/components/daily-quote'
+import { F1Game } from '@/components/f1-game'
 import { SkiGame } from '@/components/ski-game'
 import { SnakeGame } from '@/components/snake-game'
 import { ThemedIcon } from '@/components/themed-icon'
@@ -33,12 +35,13 @@ import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
 
-type GameKey = 'snake' | 'ski' | 'theseus'
+type GameKey = 'snake' | 'ski' | 'theseus' | 'f1'
 
 const gameOptions: { id: GameKey; label: string; icon: typeof Worm }[] = [
   { id: 'snake', label: 'Snake', icon: Worm },
   { id: 'ski', label: 'Downhill Skiing', icon: MountainSnow },
   { id: 'theseus', label: 'Theseus & the Minotaur', icon: Waypoints },
+  { id: 'f1', label: 'F1 Grand Prix', icon: CarFront },
 ]
 
 const SIDEBAR_STORAGE_KEY = 'daylist:sidebar-collapsed'
@@ -339,7 +342,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         </header>
 
         <div className="dashboard-content">
-          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : activeGame === 'f1' ? <F1Game /> : (<>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>

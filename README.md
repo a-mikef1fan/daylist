@@ -12,6 +12,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Per-user data: every task query is scoped to the signed-in user
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Just for fun, behind the same sign-in: Snake, Theseus & the Minotaur, and an arcade F1 Grand Prix with the full 2026 grid (22 drivers, 11 teams), AI rivals, laps, lap times, and a finishing order
 - Backgrounds: pick a wallpaper (Alpine, Ocean, Aurora, Forest, Starry, Dunes, Clouds, City, Bloom) from account menu > User preferences, or None for the plain page. A first-time visitor gets a random scene, which is saved so it stays the same until they change it (choosing None is saved too). The scenes are inline SVG, so there are no image files or network requests; the page gets a theme-colored scrim and frosted panels so text stays readable in every color theme and in dark custom themes. Remembered per browser (`localStorage`, key `daylist:background`)
 - Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
 
@@ -117,6 +118,9 @@ components/
   theme-studio.tsx            The Describe a theme panel
   themed-icon.tsx             <ThemedIcon slot="..."/>: icon chosen by the active theme
   todo-app.tsx                Task list UI (filters, search, create, complete, delete)
+  snake-game.tsx              Snake
+  theseus-game.tsx            Theseus & the Minotaur
+  f1-game.tsx                 F1 Grand Prix: driver select, race loop, HUD, results (styles in f1-game.css)
   game-leaderboard.tsx        Play / Leaderboard switch and ranked list used by Snake and Downhill Skiing
   ui/                         Shared UI primitives
 lib/
@@ -135,6 +139,9 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  f1-grid.ts                  The 2026 F1 grid: teams, car names, colors, drivers (name, number, code, nationality)
+  f1.ts                       F1 race engine: circuit, car physics, AI, laps and classification
+  f1-render.ts                F1 canvas drawing (track layer and cars)
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter
