@@ -1,0 +1,31 @@
+/* Sailing game styles; colours come from the theme variables in globals.css. */
+.sailing-panel { max-width: 760px; margin: 0 auto; }
+.sailing-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.sailing-heading h2 { margin: 6px 0 0; font-size: 28px; font-weight: 680; letter-spacing: -.04em; }
+.sailing-scores { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: var(--muted-foreground); font-size: 11px; }
+.sailing-status { color: var(--foreground); font-size: 13px; font-weight: 650; }
+.sailing-help { margin: 12px 0 18px; color: var(--muted-foreground); font-size: 12px; line-height: 1.65; }
+.sailing-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
+.sailing-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
+.sailing-canvas { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.sailing-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: color-mix(in oklch, var(--card) 88%, transparent); padding: 16px; line-height: 1.5; text-align: center; animation: sailing-fade .2s ease; }
+.sailing-overlay strong { font-family: var(--font-display); font-size: 22px; font-weight: 680; letter-spacing: -.03em; }
+.sailing-overlay span { color: var(--muted-foreground); font-size: 12px; }
+.sailing-action, .sailing-pause { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 8px; background: var(--sage-deep); padding: 0 14px; color: white; cursor: pointer; font-size: 12px; font-weight: 650; }
+.sailing-action { margin-top: 6px; }
+.sailing-action svg, .sailing-pause svg { width: 15px; height: 15px; }
+.sailing-pause { background: var(--secondary); color: var(--secondary-foreground); }
+.sailing-pause:disabled { cursor: not-allowed; opacity: .52; }
+.sailing-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; margin-top: 16px; }
+.sailing-hold-group, .sailing-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.sailing-hold { display: inline-flex; min-height: 40px; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); padding: 0 12px; color: var(--ink-soft); cursor: pointer; font-size: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.sailing-hold:hover { background: var(--muted); }
+.sailing-hold:active { background: var(--sage); }
+.sailing-hold svg { width: 16px; height: 16px; }
+@media (max-width: 520px) {
+  .sailing-hold-group { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .sailing-hold { justify-content: center; }
+  .sailing-actions { width: 100%; }
+  .sailing-pause { flex: 1; }
+}
+@keyframes sailing-fade { from { opacity: 0; } to { opacity: 1; } }
