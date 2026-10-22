@@ -29,6 +29,7 @@ import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
 import { TASK_REPEATS, repeatLabels, type TaskRepeat, type TaskView } from '@/lib/recurrence'
 import { getTaskIcon } from '@/lib/task-icon'
+import { DailyHeader } from '@/components/daily-header'
 import type { TaskPriority } from '@/lib/db/schema'
 
 type FilterKey = 'all' | 'today' | 'upcoming' | 'urgent' | 'completed'
@@ -340,12 +341,12 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
 
         <div className="dashboard-content">
           {activeGame === 'snake' ? <SnakeGame /> : activeGame === 'ski' ? <SkiGame /> : activeGame === 'theseus' ? <TheseusGame /> : (<>
+          <DailyHeader><DailyQuote /></DailyHeader>
           <div className="greeting-block">
             <span className="eyebrow">A FRESH START, EVERY DAY</span>
             <h1>{greeting}, {firstName}<span className="greeting-period">.</span></h1>
             <p>{counts.all === 0 ? 'You’ve made space for what matters.' : `You have ${counts.all} ${counts.all === 1 ? 'thing' : 'things'} on your list. You’ve got this.`}</p>
           </div>
-          <DailyQuote />
 
           <section className="quick-add-card" aria-labelledby="quick-add-title">
             <div className="quick-add-heading"><span className="quick-add-icon"><ThemedIcon slot="add" aria-hidden="true" /></span><div><h2 id="quick-add-title">Add a task</h2><p>Get it out of your head and onto your list.</p></div></div>
