@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
+import { createContext, useContext, useLayoutEffect, useMemo, useSyncExternalStore } from 'react'
 import { BACKGROUND_STORAGE_KEY, NO_BACKGROUND, isBackgroundId, type BackgroundId } from '@/lib/backgrounds'
 
 type BackgroundContextValue = { background: BackgroundId; setBackground: (background: BackgroundId) => void }
@@ -20,6 +20,21 @@ function applyBackground(background: BackgroundId) {
   else document.documentElement.setAttribute('data-background', background)
 }
 
+// Put the saved scene back on <html> if it has gone missing. React strips every attribute from <html> when it
+// has to client-render the whole document after a recoverable hydration error (for example server and client
+// disagreeing on a time-of-day greeting), which would otherwise leave the page plain a moment after the
+// init script painted it. Runs before paint and only ever reads storage; it never writes it, so an explicit
+// "none" stays "none" and nothing is overwritten with a default.
+function restoreBackground() {
+  if (document.documentElement.hasAttribute('data-background')) return
+  try {
+    const saved = window.localStorage.getItem(BACKGROUND_STORAGE_KEY)
+    if (isBackgroundId(saved)) applyBackground(saved)
+  } catch {
+    // Storage can be unavailable (private mode, blocked cookies); there is nothing to restore.
+  }
+}
+
 function subscribe(onChange: () => void) {
   const observer = new MutationObserver(onChange)
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-background'] })
@@ -35,6 +50,8 @@ function subscribe(onChange: () => void) {
 }
 
 export function BackgroundProvider({ children }: { children: React.ReactNode }) {
+  // Before the external-store subscription below starts watching the attribute.
+  useLayoutEffect(restoreBackground, [])
   const background = useSyncExternalStore(subscribe, readBackground, () => NO_BACKGROUND)
   const value = useMemo<BackgroundContextValue>(
     () => ({
