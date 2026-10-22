@@ -1,0 +1,4354 @@
+{
+ "generatedAt": "2026-10-20",
+ "segments": [
+  {
+   "slug": "coding-agents",
+   "name": "Coding agents",
+   "description": "Agents that read, edit, test and ship code, from terminal/IDE assistants to cloud agents that open pull requests."
+  },
+  {
+   "slug": "general-computer-use-agents",
+   "name": "General, computer-use and browser agents",
+   "description": "Agents that operate a browser or computer, or complete open-ended multi-step tasks for a consumer or knowledge worker."
+  },
+  {
+   "slug": "enterprise-workflow-agents",
+   "name": "Enterprise and workflow agents",
+   "description": "Platforms for building and governing agents over company data and business systems (CRM, M365, Google Workspace, enterprise search)."
+  },
+  {
+   "slug": "customer-support-agents",
+   "name": "Customer-support agents",
+   "description": "Vertical agents that resolve customer conversations across chat, email and voice, usually priced per outcome or conversation."
+  },
+  {
+   "slug": "builder-frameworks-platforms",
+   "name": "Agent frameworks and platforms for builders",
+   "description": "SDKs, frameworks and managed infrastructure that developers use to build and run their own agents."
+  },
+  {
+   "slug": "research-agents",
+   "name": "Research agents",
+   "description": "Agents that plan and run long web/enterprise research and return cited reports."
+  }
+ ],
+ "features": [
+  {
+   "slug": "autonomous-execution",
+   "name": "Autonomous multi-step execution",
+   "category": "core",
+   "description": "Plans and carries out multi-step tasks with tool calls without a human driving each step."
+  },
+  {
+   "slug": "background-runs",
+   "name": "Background / cloud async runs",
+   "category": "core",
+   "description": "Tasks continue running remotely (cloud sandbox or hosted runtime) while the user is away."
+  },
+  {
+   "slug": "scheduling-triggers",
+   "name": "Scheduling and event triggers",
+   "category": "core",
+   "description": "Runs on a cron/schedule or in response to events (webhooks, PRs, tickets)."
+  },
+  {
+   "slug": "computer-browser-use",
+   "name": "Computer / browser use",
+   "category": "capability",
+   "description": "Can drive a GUI or web browser (clicks, typing, screenshots) rather than only APIs."
+  },
+  {
+   "slug": "code-execution",
+   "name": "Code execution and file editing",
+   "category": "capability",
+   "description": "Can edit files and execute code or shell commands in a sandbox or local environment."
+  },
+  {
+   "slug": "mcp-tools",
+   "name": "MCP / tool integrations",
+   "category": "integration",
+   "description": "Supports Model Context Protocol servers or comparable tool/connector extension points."
+  },
+  {
+   "slug": "memory-context",
+   "name": "Persistent memory / project context",
+   "category": "core",
+   "description": "Retains instructions or learnings across sessions (memory files, long-term memory stores)."
+  },
+  {
+   "slug": "multi-agent",
+   "name": "Multi-agent orchestration / subagents",
+   "category": "core",
+   "description": "Coordinates several agents (subagents, handoffs, parallel tasks) on one job."
+  },
+  {
+   "slug": "human-approvals",
+   "name": "Human-in-the-loop approvals",
+   "category": "safety",
+   "description": "Asks a person to approve or edit consequential actions or plans."
+  },
+  {
+   "slug": "enterprise-controls",
+   "name": "SSO and enterprise admin controls",
+   "category": "enterprise",
+   "description": "Admin governance such as SSO/SCIM, RBAC, audit logs, usage limits, data controls."
+  },
+  {
+   "slug": "open-source",
+   "name": "Open source / self-hostable",
+   "category": "deployment",
+   "description": "Core code under an open-source license and/or self-hostable by the customer."
+  },
+  {
+   "slug": "api-sdk",
+   "name": "API / SDK access",
+   "category": "integration",
+   "description": "Programmatic access (API, SDK, CLI headless mode) to run the agent from other software."
+  },
+  {
+   "slug": "voice",
+   "name": "Voice",
+   "category": "channel",
+   "description": "Voice input/output or phone-channel agents."
+  },
+  {
+   "slug": "observability-evals",
+   "name": "Observability, testing and evals",
+   "category": "operations",
+   "description": "Tracing, monitoring, simulations or evaluation tooling for agent behaviour."
+  },
+  {
+   "slug": "web-research",
+   "name": "Web research with citations",
+   "category": "capability",
+   "description": "Searches the web or enterprise data and returns sourced answers or reports."
+  },
+  {
+   "slug": "model-choice",
+   "name": "Multi-model / bring-your-own model",
+   "category": "deployment",
+   "description": "Lets the user choose among several models or providers."
+  },
+  {
+   "slug": "no-code-builder",
+   "name": "No-code / low-code agent builder",
+   "category": "builder",
+   "description": "Business users can define agents or workflows in natural language or visual tools."
+  },
+  {
+   "slug": "enterprise-connectors",
+   "name": "Enterprise data and app connectors",
+   "category": "integration",
+   "description": "Prebuilt connectors to business systems (CRM, Microsoft 365, Google Workspace, ticketing)."
+  },
+  {
+   "slug": "public-pricing",
+   "name": "Public self-serve pricing",
+   "category": "commercial",
+   "description": "Vendor publishes plan prices (not only 'contact sales')."
+  }
+ ],
+ "products": [
+  {
+   "slug": "claude-code",
+   "name": "Claude Code",
+   "vendor": "Anthropic",
+   "segmentSlug": "coding-agents",
+   "summary": "Agentic coding tool for terminal, IDE, desktop and web with subagents, hooks, MCP, scheduled cloud tasks and an Agent SDK; runs on Anthropic or Bedrock/Vertex/Foundry.",
+   "pricingModel": "Included in paid Claude plans: Pro $20/mo ($17 annual), Max from $100/mo, Team Standard $25/seat/mo ($20 annual) and Premium $125/seat/mo ($100 annual), Enterprise $20/seat/mo annual (20-seat minimum) plus usage at API rates; or pay-per-token via API/cloud providers (pricing page, fetched 2026-10-20).",
+   "openSource": false,
+   "website": "https://code.claude.com/",
+   "sourceUrls": [
+    "https://code.claude.com/docs/en/overview",
+    "https://claude.com/pricing",
+    "https://code.claude.com/docs/en/third-party-integrations",
+    "https://code.claude.com/docs/en/permissions",
+    "https://github.com/anthropics/claude-code"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "openai-codex",
+   "name": "OpenAI Codex",
+   "vendor": "OpenAI",
+   "segmentSlug": "coding-agents",
+   "summary": "OpenAI's coding agent family: open-source Codex CLI, IDE extension, desktop app and cloud-based Codex web, signed in with a ChatGPT plan or API key.",
+   "pricingModel": "Bundled with ChatGPT plans (Plus $20/mo and above, Business, Enterprise/Edu) with shared rolling usage allowances; API-key per-token usage also possible. Exact plan tiers and limits differ between secondary sources (low confidence).",
+   "openSource": true,
+   "website": "https://openai.com/codex/",
+   "sourceUrls": [
+    "https://github.com/openai/codex",
+    "https://developers.openai.com/codex/pricing",
+    "https://developers.openai.com/codex/agent-approvals-security",
+    "https://developers.openai.com/codex/enterprise/managed-configuration",
+    "https://openai.com/index/introducing-codex/",
+    "https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "github-copilot-agent",
+   "name": "GitHub Copilot (cloud agent and agent mode)",
+   "vendor": "GitHub (Microsoft)",
+   "segmentSlug": "coding-agents",
+   "summary": "Copilot cloud/coding agent takes assigned issues, works in an ephemeral firewalled environment and opens draft PRs; agent mode and Copilot CLI are also included in plans.",
+   "pricingModel": "Usage-based GitHub AI Credits (1 credit = $0.01): Free; Pro $10/mo; Pro+ $39/mo; Max $100/mo; Business and Enterprise per-seat with pooled credits. Completions do not consume credits. (github.com/features/copilot/plans, fetched.)",
+   "openSource": false,
+   "website": "https://github.com/features/copilot",
+   "sourceUrls": [
+    "https://github.com/features/copilot/plans",
+    "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/",
+    "https://github.blog/ai-and-ml/github-copilot/github-copilot-coding-agent-101-getting-started-with-agentic-workflows-on-github/",
+    "https://docs.github.com/en/copilot/responsible-use/agents",
+    "https://docs.github.com/copilot/how-tos/use-copilot-agents/coding-agent/assign-copilot-to-an-issue"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "cursor",
+   "name": "Cursor",
+   "vendor": "Anysphere",
+   "segmentSlug": "coding-agents",
+   "summary": "AI code editor and CLI with local agent, cloud agents, Automations (scheduled/event-triggered background agents), Bugbot PR review, mobile app and enterprise controls.",
+   "pricingModel": "Per-seat/usage-based subscriptions. Cursor's own pages describe a restructured lineup ('The X Subscription') alongside legacy Hobby/Pro $20/Pro+ $60/Ultra $200 and Teams seats; figures conflict across sources, so treat prices as low confidence and check cursor.com/pricing.",
+   "openSource": false,
+   "website": "https://cursor.com/",
+   "sourceUrls": [
+    "https://cursor.com/docs/cloud-agent/automations",
+    "https://cursor.com/help/ai-features/cloud-agents",
+    "https://cursor.com/docs/enterprise",
+    "https://cursor.com/help/account-and-billing/pricing",
+    "https://cursor.com/docs/models-and-pricing",
+    "https://cursor.com/docs/cloud-agent/mobile",
+    "https://cursor.com/docs/cli/using",
+    "https://cursor.com/docs/bugbot",
+    "https://cursor.com/docs/subagents"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "devin",
+   "name": "Devin (incl. Devin Desktop, formerly Windsurf)",
+   "vendor": "Cognition",
+   "segmentSlug": "coding-agents",
+   "summary": "Autonomous cloud software-engineering agent with MCP marketplace, API, schedules/Automations and enterprise (including dedicated single-tenant VPC) deployment; Windsurf editor now sold as Devin Desktop.",
+   "pricingModel": "Per Devin docs/pricing page (via search snippets): Free, Pro $20/mo, Max $200/mo, Teams $80/mo minimum plus $40/full seat, Enterprise negotiated; usage billed in ACUs/credits. Older Windsurf pricing posts show different numbers (medium confidence).",
+   "openSource": false,
+   "website": "https://devin.ai/",
+   "sourceUrls": [
+    "https://devin.ai/pricing",
+    "https://docs.devin.ai/admin/billing/self-serve",
+    "https://docs.devin.ai/work-with-devin/devin-mcp",
+    "https://docs.devin.ai/enterprise/deployment/overview",
+    "https://docs.devin.ai/release-notes/2026",
+    "https://docs.devin.ai/desktop/accounts/usage",
+    "https://docs.devin.ai/desktop/models"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "gemini-cli",
+   "name": "Gemini CLI / Antigravity CLI",
+   "vendor": "Google",
+   "segmentSlug": "coding-agents",
+   "summary": "Gemini CLI is Google's Apache-2.0 terminal agent (MCP, GEMINI.md); since 2026-06-18 consumer tiers moved to the Antigravity CLI while Gemini CLI remains for enterprise licences and paid API keys.",
+   "pricingModel": "Gemini CLI: API-key usage billed, enterprise via Gemini Code Assist Standard/Enterprise or Google Cloud. Consumer access now via Antigravity CLI under Google AI plans; plan prices and free-tier terms conflict across third-party sources (low confidence).",
+   "openSource": true,
+   "website": "https://github.com/google-gemini/gemini-cli",
+   "sourceUrls": [
+    "https://github.com/google-gemini/gemini-cli",
+    "https://github.com/google-gemini/gemini-cli/discussions/27274"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "replit-agent",
+   "name": "Replit Agent",
+   "vendor": "Replit",
+   "segmentSlug": "coding-agents",
+   "summary": "Browser-based agent that builds, tests (in a real browser) and deploys apps from chat; supports remote MCP servers, background tasks, parallel work and enterprise SSO/SCIM.",
+   "pricingModel": "Credit/effort-based within plans. Replit's blog gives Core $20/mo and Pro $100/mo; Agent modes are Free/Power/Max (+Auto). Third-party pages quote different Core/Pro figures (medium confidence).",
+   "openSource": false,
+   "website": "https://replit.com/products/agent",
+   "sourceUrls": [
+    "https://docs.replit.com/features/agent/agent-modes",
+    "https://blog.replit.com/pro-plan",
+    "https://replit.com/enterprise",
+    "https://docs.replit.com/updates/2026/05/15/changelog",
+    "https://replit.com/blog/introducing-agent-3-our-most-autonomous-agent-yet",
+    "https://replit.com/agent4",
+    "https://docs.replit.com/billing/ai-billing"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "chatgpt-work",
+   "name": "ChatGPT Work (successor to ChatGPT agent / Operator)",
+   "vendor": "OpenAI",
+   "segmentSlug": "general-computer-use-agents",
+   "summary": "OpenAI's goal-driven agent that returns finished files and can work for hours; reportedly replaced ChatGPT agent mode (which absorbed Operator in July 2025), with a cloud browser for browser workflows.",
+   "pricingModel": "No separate subscription; draws on each ChatGPT plan's usage allowance (secondary sources). Legacy ChatGPT agent had message caps (Plus 40/mo, Pro 400/mo).",
+   "openSource": false,
+   "website": "https://chatgpt.com/",
+   "sourceUrls": [
+    "https://help.openai.com/en/articles/11752874-chatgpt-agent",
+    "https://openai.com/index/introducing-chatgpt-agent/",
+    "https://help.openai.com/en/articles/11794368-chatgpt-agent-release-notes",
+    "https://openai.com/chatgpt/pricing",
+    "https://www.digitalapplied.com/blog/chatgpt-work-openai-agent-launch-2026",
+    "https://www.usecarly.com/blog/chatgpt-agent-mode/",
+    "https://aitoolsreview.co.uk/insights/chatgpt-work"
+   ],
+   "confidence": "low"
+  },
+  {
+   "slug": "claude-computer-use",
+   "name": "Claude computer use (API tool)",
+   "vendor": "Anthropic",
+   "segmentSlug": "general-computer-use-agents",
+   "summary": "API toolset (GA on Claude API and Google Cloud, beta on AWS/Bedrock/Foundry) that lets Claude see screenshots and drive a mouse/keyboard in a sandbox the developer provides.",
+   "pricingModel": "Pay-per-token API usage; each screenshot costs roughly 1,000-1,800 input tokens. No separate fee found. Rates not read from the pricing page.",
+   "openSource": false,
+   "website": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
+   "sourceUrls": [
+    "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "manus",
+   "name": "Manus",
+   "vendor": "Manus (acquired by Meta, announced Dec 2025)",
+   "segmentSlug": "general-computer-use-agents",
+   "summary": "General-purpose cloud agent with Wide Research (up to 20 parallel subtasks), browser operator and desktop app; Meta said it would keep the subscription service running.",
+   "pricingModel": "Credit-based: free daily credits; Pro from about $20/mo with from 4,000 monthly credits (annual discount); Team from $20/seat/mo (help-centre and docs pages).",
+   "openSource": false,
+   "website": "https://manus.im/",
+   "sourceUrls": [
+    "https://manus.im/docs/introduction/plans",
+    "https://help.manus.im/en/articles/11711111-what-is-the-current-membership-pricing-for-manus",
+    "https://help.manus.im/en/articles/11960169-what-is-wide-research",
+    "https://manus.im/team",
+    "https://www.techradar.com/pro/meta-buys-manus-for-usd2-billion-to-power-high-stakes-ai-agent-race?rand=141",
+    "https://manus.im/blog/manus-1.5-release"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "perplexity-comet",
+   "name": "Perplexity Comet",
+   "vendor": "Perplexity",
+   "segmentSlug": "general-computer-use-agents",
+   "summary": "Agentic AI browser with an assistant that acts across tabs, fills forms and runs background tasks; free to download since Oct 2025, with enterprise permission controls.",
+   "pricingModel": "Browser free for everyone (since 2025-10-02); paid Perplexity plans (Pro/Max) add agent capacity; Enterprise tiers. Agent limits per tier differ across secondary sources (low confidence).",
+   "openSource": false,
+   "website": "https://www.perplexity.ai/comet",
+   "sourceUrls": [
+    "https://www.perplexity.ai/hub/blog/introducing-comet",
+    "https://www.perplexity.ai/hub/blog/the-new-comet-assistant",
+    "https://www.perplexity.ai/changelog/what-we-shipped-october-3rd",
+    "https://www.perplexity.ai/enterprise/comet",
+    "https://www.perplexity.ai/help-center/en/articles/12781449-comet-for-enterprise",
+    "https://www.perplexity.ai/hub/blog/mitigating-prompt-injection-in-comet",
+    "https://www.cloudzero.com/blog/perplexity-pricing"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "copilot-studio",
+   "name": "Microsoft Copilot Studio",
+   "vendor": "Microsoft",
+   "segmentSlug": "enterprise-workflow-agents",
+   "summary": "Low-code platform to build agents with tools, MCP, computer use, event-triggered autonomous runs and multi-agent orchestration, governed through Power Platform.",
+   "pricingModel": "Copilot Credits: pay-as-you-go about $0.01/credit billed via Azure; capacity pack $200/mo for 25,000 credits; pre-purchase commit units (Microsoft pricing/Learn pages via search snippets).",
+   "openSource": false,
+   "website": "https://www.microsoft.com/en-us/copilot/products/copilot-studio",
+   "sourceUrls": [
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-messages-management",
+    "https://www.microsoft.com/en-us/copilot/pricing/copilot-studio",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/architecture/multi-agent-patterns",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-triggers-about",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/agent-tools",
+    "https://learn.microsoft.com/en-us/power-platform/release-plan/2026wave1/microsoft-copilot-studio/use-mcp-compliant-tools-agent-workflows",
+    "https://microsoft.github.io/mcscatblog/posts/copilot-harness-cost-governance/"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "agentforce",
+   "name": "Salesforce Agentforce",
+   "vendor": "Salesforce",
+   "segmentSlug": "enterprise-workflow-agents",
+   "summary": "Salesforce's agent platform (Atlas Reasoning Engine) with native MCP client, Agentforce Voice, Agentforce Observability (formerly Command Center) and Slack/CRM integration.",
+   "pricingModel": "Consumption: Flex Credits $500 per 100,000 credits, 20 credits (about $0.10) per standard action, 30 for voice; Agentforce user licence $5/user/mo (requires credits); per-conversation/resolution model also listed.",
+   "openSource": false,
+   "website": "https://www.salesforce.com/agentforce/",
+   "sourceUrls": [
+    "https://www.salesforce.com/agentforce/pricing/",
+    "https://help.salesforce.com/s/articleView?id=004811240&language=en_US&type=1",
+    "https://www.salesforce.com/news/press-releases/2025/06/23/agentforce-3-announcement/",
+    "https://www.salesforce.com/agentforce/observability/",
+    "https://www.salesforce.com/platform/agentforce-platform/",
+    "https://www.salesforce.com/blog/agentforce-mcp/",
+    "https://www.salesforce.com/blog/responsibly-manage-multi-agent-systems/"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "gemini-enterprise",
+   "name": "Gemini Enterprise (formerly Agentspace)",
+   "vendor": "Google Cloud",
+   "segmentSlug": "enterprise-workflow-agents",
+   "summary": "Google's work-agent platform with no-code Workflow Builder (formerly Agent Designer), Agent Gallery, Deep Research and Microsoft 365/Workspace connectors.",
+   "pricingModel": "Per-seat editions (Business, Standard, Plus, Frontline); launch pricing reported at $21 (Business) and $30 (Standard/Plus) per seat/mo, but current prices are quote-based and custom ADK agents bill separately (secondary sources; low confidence).",
+   "openSource": false,
+   "website": "https://cloud.google.com/gemini-enterprise",
+   "sourceUrls": [
+    "https://cloud.google.com/gemini-enterprise",
+    "https://cloud.google.com/gemini-enterprise/agents",
+    "https://docs.cloud.google.com/gemini/enterprise/docs/release-notes",
+    "https://cloud.google.com/blog/products/ai-machine-learning/whats-new-in-gemini-enterprise",
+    "https://www.gosearch.ai/faqs/gemini-enterprise-pricing/",
+    "https://redresscompliance.com/google-gemini-enterprise-licensing-guide-2026.html"
+   ],
+   "confidence": "low"
+  },
+  {
+   "slug": "glean",
+   "name": "Glean (Work AI platform and Agents)",
+   "vendor": "Glean",
+   "segmentSlug": "enterprise-workflow-agents",
+   "summary": "Permission-aware enterprise search and agent platform with no-code agents, hosted MCP server and gateway, and agents that run with the triggering user's permissions.",
+   "pricingModel": "Not published. Third-party estimates (about $40-50+/user/mo, large annual minimums) are unverified (low confidence).",
+   "openSource": false,
+   "website": "https://www.glean.com/",
+   "sourceUrls": [
+    "https://docs.glean.com/administration/platform/mcp/security",
+    "https://docs.glean.com/administration/platform/mcp/about",
+    "https://docs.glean.com/administration/platform/mcp/mcp-gateway",
+    "https://www.glean.com/blog/go-agents-launch",
+    "https://www.glean.com/platform/connectors",
+    "https://workativ.com/blog/glean-pricing",
+    "https://aiagentrank.io/agent/glean/pricing"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "sierra",
+   "name": "Sierra",
+   "vendor": "Sierra",
+   "segmentSlug": "customer-support-agents",
+   "summary": "Enterprise customer-experience agent platform (Agent OS, no-code Agent Studio, Agent SDK) across chat, voice, email and messaging.",
+   "pricingModel": "Outcome-based pricing (pay when the agent completes the task); rates are negotiated and not public. Reported valuation and ARR figures come from secondary sources (low confidence).",
+   "openSource": false,
+   "website": "https://sierra.ai/",
+   "sourceUrls": [
+    "https://sierra.ai/blog/outcome-based-pricing-for-ai-agents",
+    "https://sierra.ai/product",
+    "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform",
+    "https://www.beri.net/article/sierra-15b-cx-agent-layer-salesforce-2026",
+    "https://www.cloudtalk.io/blog/sierra-ai-pricing/"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "decagon",
+   "name": "Decagon",
+   "vendor": "Decagon",
+   "segmentSlug": "customer-support-agents",
+   "summary": "Support-agent platform built on natural-language Agent Operating Procedures (AOPs), with voice (ElevenLabs), simulations and Watchtower monitoring.",
+   "pricingModel": "Not published; per-conversation default with a per-resolution option. Rates, contract sizes and valuation come from third-party sources and conflict (low confidence).",
+   "openSource": false,
+   "website": "https://decagon.ai/",
+   "sourceUrls": [
+    "https://decagon.ai/",
+    "https://decagon.ai/blog/decagon-voice",
+    "https://decagon.ai/product/overview",
+    "https://trust.decagon.ai/controls",
+    "https://www.featurebase.app/blog/decagon-pricing",
+    "https://www.revenuememo.com/p/decagon-funding"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "intercom-fin",
+   "name": "Intercom Fin",
+   "vendor": "Intercom",
+   "segmentSlug": "customer-support-agents",
+   "summary": "Customer agent that resolves conversations in Intercom or other helpdesks (Zendesk, Salesforce), with Procedures, Simulations and Fin Voice.",
+   "pricingModel": "$0.99 per outcome (resolution or configured procedure handoff); sources disagree on whether a monthly minimum applies; helpdesk seats extra when used inside Intercom.",
+   "openSource": false,
+   "website": "https://fin.ai/",
+   "sourceUrls": [
+    "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing",
+    "https://www.intercom.com/learning-center/ai-customer-service-agent-pricing-comparison",
+    "https://www.intercom.com/help/en/articles/12495167-fin-procedures-explained",
+    "https://www.intercom.com/help/en/articles/14077180-simulations-vs-batch-tests-vs-previews",
+    "https://www.intercom.com/help/en/articles/16248514-fin-voice-faqs",
+    "https://www.intercom.com/security",
+    "https://www.intercom.com/blog/whats-new-with-fin-3"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "langgraph",
+   "name": "LangGraph (and LangSmith Deployment)",
+   "vendor": "LangChain",
+   "segmentSlug": "builder-frameworks-platforms",
+   "summary": "MIT-licensed low-level framework for long-running stateful agents with durable execution, human-in-the-loop and memory; deployable via LangSmith Deployment (cloud, hybrid, self-hosted).",
+   "pricingModel": "Library free (MIT). LangSmith: Developer free (1 seat), Plus $39/seat/mo plus usage, Enterprise custom (pricing page via search snippet).",
+   "openSource": true,
+   "website": "https://github.com/langchain-ai/langgraph",
+   "sourceUrls": [
+    "https://github.com/langchain-ai/langgraph",
+    "https://www.langchain.com/pricing",
+    "https://www.langchain.com/blog/langgraph-platform-ga"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "openai-agents-sdk",
+   "name": "OpenAI Agents SDK",
+   "vendor": "OpenAI",
+   "segmentSlug": "builder-frameworks-platforms",
+   "summary": "MIT-licensed Python SDK with handoffs, guardrails, tracing, sessions, MCP tools and realtime/voice agents; works with 100+ other LLMs.",
+   "pricingModel": "SDK free; pay for model/API usage.",
+   "openSource": true,
+   "website": "https://github.com/openai/openai-agents-python",
+   "sourceUrls": [
+    "https://github.com/openai/openai-agents-python"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "claude-agent-sdk",
+   "name": "Claude Agent SDK",
+   "vendor": "Anthropic",
+   "segmentSlug": "builder-frameworks-platforms",
+   "summary": "Python and TypeScript library exposing Claude Code's agent loop, tools, hooks, subagents, MCP, permissions and sessions; MIT-licensed repo but governed by Anthropic Commercial Terms.",
+   "pricingModel": "SDK free; API-key billing for model usage (third parties may not offer claude.ai login or rate limits).",
+   "openSource": true,
+   "website": "https://code.claude.com/docs/en/agent-sdk/overview",
+   "sourceUrls": [
+    "https://code.claude.com/docs/en/agent-sdk/overview",
+    "https://github.com/anthropics/claude-agent-sdk-python"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "microsoft-agent-framework",
+   "name": "Microsoft Agent Framework",
+   "vendor": "Microsoft",
+   "segmentSlug": "builder-frameworks-platforms",
+   "summary": "MIT-licensed .NET/Python framework (successor to AutoGen and Semantic Kernel) with graph workflows, checkpointing, human-in-the-loop and OpenTelemetry; reported 1.0 GA in April 2026.",
+   "pricingModel": "Framework free; hosted agents on Azure Foundry billed separately (not verified).",
+   "openSource": true,
+   "website": "https://github.com/microsoft/agent-framework",
+   "sourceUrls": [
+    "https://github.com/microsoft/agent-framework",
+    "https://techstrong.ai/features/microsoft-ships-agent-framework-1-0-a-production-ready-foundation-for-multi-agent-ai/"
+   ],
+   "confidence": "high"
+  },
+  {
+   "slug": "bedrock-agentcore",
+   "name": "Amazon Bedrock AgentCore",
+   "vendor": "Amazon Web Services",
+   "segmentSlug": "builder-frameworks-platforms",
+   "summary": "Managed, framework- and model-agnostic agent infrastructure: Runtime, Gateway (APIs to MCP tools), Identity, Memory, Browser, Code Interpreter, Observability, Evaluation, Policy.",
+   "pricingModel": "Consumption-based with no minimums; GA Oct 2025; Runtime example rates $0.0895/vCPU-hour and $0.00945/GB-hour (v1); short-term memory moved to usage-based pricing in Oct 2026 (AWS pages via search snippets).",
+   "openSource": false,
+   "website": "https://aws.amazon.com/bedrock/agentcore/",
+   "sourceUrls": [
+    "https://github.com/awslabs/amazon-bedrock-agentcore-samples",
+    "https://aws.amazon.com/bedrock/agentcore/pricing/",
+    "https://aws.amazon.com/about-aws/whats-new/2025/10/amazon-bedrock-agentcore-available/",
+    "https://aws.amazon.com/about-aws/whats-new/2026/10/agentcore-memory-consumption-based-pricing/"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "openai-deep-research",
+   "name": "ChatGPT deep research",
+   "vendor": "OpenAI",
+   "segmentSlug": "research-agents",
+   "summary": "ChatGPT mode that drafts an editable research plan, browses and returns a cited report; now also offered inside ChatGPT Work with a separate allowance.",
+   "pricingModel": "Included in ChatGPT plans with tiered allowances (Limited on Free/Go, Expanded on Plus, Maximum on Pro); exact current counts not found (older figures were 25/month Plus, 250 Pro).",
+   "openSource": false,
+   "website": "https://openai.com/index/introducing-deep-research/",
+   "sourceUrls": [
+    "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt",
+    "https://openai.com/index/introducing-deep-research/",
+    "https://openai.com/chatgpt/pricing"
+   ],
+   "confidence": "medium"
+  },
+  {
+   "slug": "gemini-deep-research",
+   "name": "Gemini Deep Research (app and API agent)",
+   "vendor": "Google",
+   "segmentSlug": "research-agents",
+   "summary": "Autonomous research agent in the Gemini API via the Interactions API (standard and Max versions, April 2026 previews) with collaborative planning, MCP and File Search; also surfaced in Gemini Enterprise.",
+   "pricingModel": "API usage on paid tiers during public preview; consumer limits by Google AI plan conflict across sources (low confidence).",
+   "openSource": false,
+   "website": "https://ai.google.dev/gemini-api/docs/deep-research",
+   "sourceUrls": [
+    "https://ai.google.dev/gemini-api/docs/deep-research",
+    "https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/",
+    "https://ai.google.dev/api/interactions-api",
+    "https://ai.google.dev/gemini-api/docs/changelog"
+   ],
+   "confidence": "medium"
+  }
+ ],
+ "productFeatures": [
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Plans, edits across files, runs commands and verifies work.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Web/cloud sessions, background agents view and cloud scheduled tasks keep running when the computer is off.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "scheduling-triggers",
+   "support": "yes",
+   "note": "Cloud scheduled tasks (cron, API or GitHub triggers), desktop scheduled tasks and /loop.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "computer-browser-use",
+   "support": "partial",
+   "note": "Chrome integration for debugging live web apps; not a general computer-use agent.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Runs shell commands and edits files locally or in cloud sessions.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP servers connect Drive, Jira, Slack and custom tools.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "CLAUDE.md files plus auto memory; can read AGENTS.md.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Subagents and background agents; lead agent coordinates parallel work.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Tiered permission system asks before Bash, file edits and web access unless allowed.",
+   "sourceUrl": "https://code.claude.com/docs/en/permissions"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Team/Enterprise: SSO, SCIM, audit logs, RBAC, spend limits; managed settings.",
+   "sourceUrl": "https://claude.com/pricing"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "open-source",
+   "support": "partial",
+   "note": "Runs on customer's Bedrock/Vertex/Foundry accounts and self-hosted cloud-session environments; source license not verified from the repo page (LICENSE.md not read), treated as proprietary.",
+   "sourceUrl": "https://code.claude.com/docs/en/third-party-integrations"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Headless -p mode and Agent SDK (Python/TypeScript).",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "Not verified in sources reviewed.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "observability-evals",
+   "support": "partial",
+   "note": "Usage dashboards/analytics and cloud-provider cost tracking; no built-in eval suite seen.",
+   "sourceUrl": "https://code.claude.com/docs/en/third-party-integrations"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "web-research",
+   "support": "partial",
+   "note": "WebSearch and WebFetch tools exist (permission-gated); not a dedicated research product.",
+   "sourceUrl": "https://code.claude.com/docs/en/permissions"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Claude models only, but selectable across Anthropic, Bedrock, Claude Platform on AWS, Vertex and Foundry, plus LLM gateways.",
+   "sourceUrl": "https://code.claude.com/docs/en/third-party-integrations"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "no-code-builder",
+   "support": "no",
+   "note": "Developer tool; skills/plugins are authored as files.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Via MCP servers and Slack/GitHub/GitLab integrations.",
+   "sourceUrl": "https://code.claude.com/docs/en/overview"
+  },
+  {
+   "productSlug": "claude-code",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Plan prices published on claude.com/pricing.",
+   "sourceUrl": "https://claude.com/pricing"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Local coding agent in terminal plus cloud tasks.",
+   "sourceUrl": "https://github.com/openai/codex"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Codex web/cloud tasks run remotely; cloud tasks draw on the shared plan allowance.",
+   "sourceUrl": "https://developers.openai.com/codex/pricing"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "computer-browser-use",
+   "support": "partial",
+   "note": "OpenAI docs refer to browser and Computer Use activity as separate surfaces; depth not verified.",
+   "sourceUrl": "https://developers.openai.com/codex/agent-approvals-security"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Sandboxed command execution with configurable network access.",
+   "sourceUrl": "https://developers.openai.com/codex/agent-approvals-security"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP servers with per-server/per-tool approval modes; admins can restrict servers.",
+   "sourceUrl": "https://developers.openai.com/codex/agent-approvals-security"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "memory-context",
+   "support": "partial",
+   "note": "AGENTS.md project instructions; no cross-session memory verified.",
+   "sourceUrl": "https://openai.com/index/introducing-codex/"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Approval modes; destructive MCP/app calls always require approval.",
+   "sourceUrl": "https://developers.openai.com/codex/agent-approvals-security"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Business/Enterprise/Edu plans and managed configuration for admins.",
+   "sourceUrl": "https://developers.openai.com/codex/enterprise/managed-configuration"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "open-source",
+   "support": "partial",
+   "note": "Codex CLI is Apache-2.0 on GitHub; cloud service and models are proprietary.",
+   "sourceUrl": "https://github.com/openai/codex"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "CLI can authenticate with an API key; developer CLI reference published.",
+   "sourceUrl": "https://github.com/openai/codex"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "Not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "GitHub code review and cloud integrations on paid plans; breadth not verified.",
+   "sourceUrl": "https://developers.openai.com/codex/pricing"
+  },
+  {
+   "productSlug": "openai-codex",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Bundled in ChatGPT plans; per-plan limits reported inconsistently across sources.",
+   "sourceUrl": "https://developers.openai.com/codex/pricing"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Cloud agent works an assigned issue and pushes commits to a draft PR.",
+   "sourceUrl": "https://github.blog/ai-and-ml/github-copilot/github-copilot-coding-agent-101-getting-started-with-agentic-workflows-on-github/"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Runs in an ephemeral, firewalled environment started from issues or the agents panel.",
+   "sourceUrl": "https://docs.github.com/en/copilot/responsible-use/agents"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Runs in its own development environment.",
+   "sourceUrl": "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP servers supported (network allow list must include remote servers); GitHub MCP server can launch the agent.",
+   "sourceUrl": "https://github.blog/ai-and-ml/github-copilot/github-copilot-coding-agent-101-getting-started-with-agentic-workflows-on-github/"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "multi-agent",
+   "support": "partial",
+   "note": "Pro+/Max can delegate to third-party agents such as Claude and OpenAI Codex (preview).",
+   "sourceUrl": "https://github.com/features/copilot/plans"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Cannot merge its own PR; Actions workflows from its PRs need approval from a write-access user.",
+   "sourceUrl": "https://docs.github.com/en/copilot/responsible-use/agents"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Business/Enterprise admins set usage limits and pooled credits.",
+   "sourceUrl": "https://github.com/features/copilot/plans"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Hosted service; not open source.",
+   "sourceUrl": "https://github.com/features/copilot/plans"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "Can be started programmatically via GitHub MCP create_pull_request_with_copilot tool.",
+   "sourceUrl": "https://docs.github.com/copilot/how-tos/use-copilot-agents/coding-agent/assign-copilot-to-an-issue"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "model-choice",
+   "support": "yes",
+   "note": "Models from Anthropic, OpenAI, Google, xAI, Microsoft and Kimi listed across plans.",
+   "sourceUrl": "https://github.com/features/copilot/plans"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Native to GitHub repos, issues and PRs; other systems via MCP.",
+   "sourceUrl": "https://github.blog/ai-and-ml/github-copilot/github-copilot-coding-agent-101-getting-started-with-agentic-workflows-on-github/"
+  },
+  {
+   "productSlug": "github-copilot-agent",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Plans and AI credit allowances published.",
+   "sourceUrl": "https://github.com/features/copilot/plans"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Agent plus cloud agents.",
+   "sourceUrl": "https://cursor.com/help/ai-features/cloud-agents"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Cloud agents run in the background; Automations run them unattended.",
+   "sourceUrl": "https://cursor.com/docs/cloud-agent/automations"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "scheduling-triggers",
+   "support": "yes",
+   "note": "Automations: cron schedules and events from GitHub, GitLab, Slack, webhooks, Linear.",
+   "sourceUrl": "https://cursor.com/docs/cloud-agent/automations"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Agent edits and runs code; CLI agent available.",
+   "sourceUrl": "https://cursor.com/docs/cli/using"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "Cloud agents support HTTP and stdio MCP servers with OAuth.",
+   "sourceUrl": "https://cursor.com/docs/cloud-agent/automations"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "Rules in .cursor/rules (CLI also reads AGENTS.md/CLAUDE.md) and a memory tool for automations.",
+   "sourceUrl": "https://cursor.com/docs/cli/using"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Subagents docs page; cloud subagents run from the Agents Window.",
+   "sourceUrl": "https://cursor.com/docs/subagents"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "SAML/OIDC SSO, SCIM, MCP allowlists, Protected Git Scopes.",
+   "sourceUrl": "https://cursor.com/docs/enterprise"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary editor and service.",
+   "sourceUrl": "https://cursor.com/help/account-and-billing/pricing"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "CLI agent and admin APIs documented; general agent API not verified.",
+   "sourceUrl": "https://cursor.com/docs/cli/using"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "voice",
+   "support": "partial",
+   "note": "Voice dictation to agents in the Cursor iOS app.",
+   "sourceUrl": "https://cursor.com/docs/cloud-agent/mobile"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "Not verified; Bugbot is PR review, not agent observability.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Docs reference several model families (e.g. Grok alongside Cursor models); full list not read.",
+   "sourceUrl": "https://cursor.com/docs/models-and-pricing"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Slack, GitHub, GitLab, Linear triggers; Cursor Marketplace.",
+   "sourceUrl": "https://cursor.com/docs/cloud-agent/automations"
+  },
+  {
+   "productSlug": "cursor",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Plan lineup restructured and sources conflict; check cursor.com/pricing.",
+   "sourceUrl": "https://cursor.com/help/account-and-billing/pricing"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Cloud agents work on tasks end to end in their own environment.",
+   "sourceUrl": "https://docs.devin.ai/desktop/accounts/usage"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Cloud agents and sessions run remotely.",
+   "sourceUrl": "https://docs.devin.ai/desktop/accounts/usage"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "scheduling-triggers",
+   "support": "yes",
+   "note": "Schedules (cron/one-time) via MCP/API; being migrated to Automations with iCalendar RRULE, new v3 schedule creation returns 403 for migrated orgs from 2026-09-24.",
+   "sourceUrl": "https://docs.devin.ai/release-notes/2026"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Software-engineering agent with a cloud VM.",
+   "sourceUrl": "https://docs.devin.ai/desktop/accounts/usage"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP Marketplace (Datadog, Sentry, Notion, etc.) and a Devin MCP server for sessions, playbooks, knowledge, schedules.",
+   "sourceUrl": "https://docs.devin.ai/work-with-devin/devin-mcp"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "memory-context",
+   "support": "partial",
+   "note": "Knowledge and playbooks exposed through the Devin MCP server.",
+   "sourceUrl": "https://docs.devin.ai/work-with-devin/devin-mcp"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Enterprise Cloud and Customer Dedicated single-tenant VPC (PrivateLink/IPSec); SSO details not verified.",
+   "sourceUrl": "https://docs.devin.ai/enterprise/deployment/overview"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary; dedicated VPC deployment available but not source-open.",
+   "sourceUrl": "https://docs.devin.ai/enterprise/deployment/overview"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Sessions API (idempotency keys) and MCP server.",
+   "sourceUrl": "https://docs.devin.ai/work-with-devin/devin-mcp"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Devin Desktop docs list multiple models; cloud agent model choice not verified.",
+   "sourceUrl": "https://docs.devin.ai/desktop/models"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "OAuth connectors via MCP Marketplace; enterprise-level MCP sharing across orgs.",
+   "sourceUrl": "https://docs.devin.ai/work-with-devin/devin-mcp"
+  },
+  {
+   "productSlug": "devin",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Plans listed; Enterprise negotiated; conflicting older pages exist.",
+   "sourceUrl": "https://devin.ai/pricing"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Terminal agent; successor Antigravity CLI adds async background workflows.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "background-runs",
+   "support": "partial",
+   "note": "Antigravity CLI (successor) supports asynchronous background workflows; Gemini CLI itself not verified.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Terminal agent with a sandboxing and security guide.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP servers configured in ~/.gemini/settings.json.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "GEMINI.md context files.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Subagents, Skills, Hooks and Extensions retained in Antigravity plugins.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Enterprise access via Gemini Code Assist Standard/Enterprise licences or Google Cloud; admin features not verified.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "open-source",
+   "support": "yes",
+   "note": "Gemini CLI is Apache-2.0; Antigravity CLI licence not stated in the announcement.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "Usable with paid Gemini/Agent Platform API keys.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-cli",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Gemini CLI free consumer use ended 2026-06-18; Antigravity tier prices conflict across third-party sources.",
+   "sourceUrl": "https://github.com/google-gemini/gemini-cli/discussions/27274"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Agent 3 can run up to 200 minutes autonomously, building, testing and fixing.",
+   "sourceUrl": "https://replit.com/blog/introducing-agent-3-our-most-autonomous-agent-yet"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Plans include active background tasks (e.g. Core 1, Pro 10).",
+   "sourceUrl": "https://blog.replit.com/pro-plan"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "scheduling-triggers",
+   "support": "yes",
+   "note": "Agents & Automations support scheduled workflows deployed to Slack/Telegram.",
+   "sourceUrl": "https://docs.replit.com/features/agent/agent-modes"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "computer-browser-use",
+   "support": "partial",
+   "note": "Tests the app in a real browser; not a general browser agent.",
+   "sourceUrl": "https://replit.com/blog/introducing-agent-3-our-most-autonomous-agent-yet"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Builds and runs apps in Replit's hosted environment.",
+   "sourceUrl": "https://replit.com/blog/introducing-agent-3-our-most-autonomous-agent-yet"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "Remote MCP servers supported (Dec 2025); hosted MCP directory (May 2026).",
+   "sourceUrl": "https://docs.replit.com/updates/2026/05/15/changelog"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "multi-agent",
+   "support": "partial",
+   "note": "Agent 4 page describes forking tasks and working concurrently; parallel task limits vary by plan.",
+   "sourceUrl": "https://replit.com/agent4"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "human-approvals",
+   "support": "partial",
+   "note": "Confirmation required before any paid action starts.",
+   "sourceUrl": "https://docs.replit.com/features/agent/agent-modes"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Enterprise: SSO/SAML, SCIM, RBAC, audit logs with SIEM, SOC 2 Type II (vendor-stated).",
+   "sourceUrl": "https://replit.com/enterprise"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Hosted proprietary platform.",
+   "sourceUrl": "https://blog.replit.com/pro-plan"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Auto mode picks a model per task within chosen mode; user cannot pick arbitrary vendors.",
+   "sourceUrl": "https://docs.replit.com/features/agent/agent-modes"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Builds apps from chat prompts.",
+   "sourceUrl": "https://replit.com/blog/introducing-agent-3-our-most-autonomous-agent-yet"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Integrations panel and MCP directory (Twilio, Mixpanel, etc.).",
+   "sourceUrl": "https://docs.replit.com/updates/2026/05/15/changelog"
+  },
+  {
+   "productSlug": "replit-agent",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Core $20/mo and Pro $100/mo per Replit blog; third-party pages differ.",
+   "sourceUrl": "https://blog.replit.com/pro-plan"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Takes a goal, pulls context from connected apps and returns finished files, working for hours (secondary sources).",
+   "sourceUrl": "https://www.digitalapplied.com/blog/chatgpt-work-openai-agent-launch-2026"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Can keep working on a project for hours; separate always-on 'dot' agent with its own cloud computer mentioned in help centre.",
+   "sourceUrl": "https://www.digitalapplied.com/blog/chatgpt-work-openai-agent-launch-2026"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "computer-browser-use",
+   "support": "partial",
+   "note": "Cloud browser for browser workflows; users report it cannot drive a logged-in browser session (secondary).",
+   "sourceUrl": "https://www.usecarly.com/blog/chatgpt-agent-mode/"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "code-execution",
+   "support": "partial",
+   "note": "Produces spreadsheets, slides, documents and web apps; legacy agent had a terminal. Sandbox details not verified.",
+   "sourceUrl": "https://aitoolsreview.co.uk/insights/chatgpt-work"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "mcp-tools",
+   "support": "partial",
+   "note": "Connectors to apps such as Gmail and GitHub (legacy agent); MCP specifically not verified.",
+   "sourceUrl": "https://openai.com/index/introducing-chatgpt-agent/"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Always asks confirmation before consequential actions such as payments (help-centre summary).",
+   "sourceUrl": "https://help.openai.com/en/articles/11752874-chatgpt-agent"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Available on Business/Enterprise/Edu plans; admin controls not verified.",
+   "sourceUrl": "https://help.openai.com/en/articles/11794368-chatgpt-agent-release-notes"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://openai.com/chatgpt/pricing"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Research across public sites, uploaded files and connected sources.",
+   "sourceUrl": "https://openai.com/index/introducing-chatgpt-agent/"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Connected apps such as email and GitHub.",
+   "sourceUrl": "https://openai.com/index/introducing-chatgpt-agent/"
+  },
+  {
+   "productSlug": "chatgpt-work",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "No standalone price; draws on plan allowances (secondary sources).",
+   "sourceUrl": "https://www.digitalapplied.com/blog/chatgpt-work-openai-agent-launch-2026"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "autonomous-execution",
+   "support": "partial",
+   "note": "Building block: model emits actions in a loop that the developer runs and returns results for.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "background-runs",
+   "support": "no",
+   "note": "Not available in Claude Managed Agents per docs.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "computer-browser-use",
+   "support": "yes",
+   "note": "17 member actions: screenshot, zoom, clicks, drag, scroll, type, key, wait.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "human-approvals",
+   "support": "partial",
+   "note": "Docs recommend human confirmation for consequential actions; classifiers prompt Claude to verify injected instructions; implementation is on the integrator.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "API tool; developer must supply sandbox.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Claude API tool, with Python and TypeScript SDK toolset classes (beta).",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Supported across several Claude models and across API, Google Cloud, AWS, Bedrock and Foundry.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-computer-use",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Pay-per-token API; screenshots about 1,000-1,800 input tokens; rates not read.",
+   "sourceUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Credit-metered agent that completes tasks; consumption scales with task complexity.",
+   "sourceUrl": "https://manus.im/docs/introduction/plans"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "computer-browser-use",
+   "support": "partial",
+   "note": "Browser Operator listed as a feature on Manus marketing page; details not verified.",
+   "sourceUrl": "https://manus.im/blog/manus-1.5-release"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Wide Research splits work into up to 20 parallel subtasks (paid only).",
+   "sourceUrl": "https://help.manus.im/en/articles/11960169-what-is-wide-research"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Team plan with shared credits and Teams/Enterprise page; SSO/audit not verified.",
+   "sourceUrl": "https://manus.im/team"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary service.",
+   "sourceUrl": "https://manus.im/docs/introduction/plans"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Wide Research for large-scale parallel research.",
+   "sourceUrl": "https://help.manus.im/en/articles/11960169-what-is-wide-research"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Manus-1.5 and Manus-1.5-Lite model tiers offered (Manus 1.5 post, about a year old).",
+   "sourceUrl": "https://manus.im/blog/manus-1.5-release"
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "manus",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Plans and credit packs published; Pro from about $20/mo; free daily credits.",
+   "sourceUrl": "https://manus.im/docs/introduction/plans"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Comet Assistant/Agent handles multi-step workflows such as forms, scheduling, email subscriptions.",
+   "sourceUrl": "https://www.perplexity.ai/hub/blog/the-new-comet-assistant"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Background assistants shipped Oct 2025; Max can run many agentic tasks in parallel.",
+   "sourceUrl": "https://www.perplexity.ai/changelog/what-we-shipped-october-3rd"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "computer-browser-use",
+   "support": "yes",
+   "note": "Agent acts inside the browser across tabs.",
+   "sourceUrl": "https://www.perplexity.ai/hub/blog/the-new-comet-assistant"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "multi-agent",
+   "support": "partial",
+   "note": "Max subscribers can launch many agentic tasks in parallel.",
+   "sourceUrl": "https://www.perplexity.ai/enterprise/comet"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Comet asks before taking browser actions; enterprise action approvals and website restrictions.",
+   "sourceUrl": "https://www.perplexity.ai/help-center/en/articles/12781449-comet-for-enterprise"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Enterprise agent permission controls; SOC 2 Type II/GDPR/HIPAA claims (vendor-stated); SSO not verified.",
+   "sourceUrl": "https://www.perplexity.ai/enterprise/comet"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary browser.",
+   "sourceUrl": "https://www.perplexity.ai/hub/blog/introducing-comet"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Built on Perplexity search; assistant reads pages and tabs.",
+   "sourceUrl": "https://www.perplexity.ai/hub/blog/introducing-comet"
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "perplexity-comet",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Browser free; agent capacity by paid tier, with conflicting secondary details.",
+   "sourceUrl": "https://www.cloudzero.com/blog/perplexity-pricing"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Autonomous agents act on event triggers without user input.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-triggers-about"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Triggered agents run unattended using maker credentials.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-triggers-about"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "scheduling-triggers",
+   "support": "partial",
+   "note": "Event triggers documented; schedule-specific triggers not verified.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-triggers-about"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "computer-browser-use",
+   "support": "yes",
+   "note": "Computer use tool drives websites and desktop apps via screenshots.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/architecture/multi-agent-patterns"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP servers supply tools (needs generative orchestration); MCP in agent workflows planned for Jul 2026 per release plan.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/power-platform/release-plan/2026wave1/microsoft-copilot-studio/use-mcp-compliant-tools-agent-workflows"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Child agents each with own orchestration and tools; A2A for cross-platform.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/architecture/multi-agent-patterns"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Power Platform admin center: credit allocation per environment, per-agent monthly credit limits.",
+   "sourceUrl": "https://microsoft.github.io/mcscatblog/posts/copilot-harness-cost-governance/"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary SaaS.",
+   "sourceUrl": "https://www.microsoft.com/en-us/copilot/pricing/copilot-studio"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Microsoft material references bringing your own models; scope not verified.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/architecture/multi-agent-patterns"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Low-code agent authoring with tools and triggers.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/agent-tools"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Agent tools include connectors, knowledge sources and MCP.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/agent-tools"
+  },
+  {
+   "productSlug": "copilot-studio",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "$0.01 per Copilot Credit PAYG; $200/mo 25,000-credit pack.",
+   "sourceUrl": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-messages-management"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Atlas Reasoning Engine breaks tasks into steps and plans actions.",
+   "sourceUrl": "https://www.salesforce.com/platform/agentforce-platform/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "Native MCP client announced with Agentforce 3; MCP in beta/rolling out per Salesforce blog.",
+   "sourceUrl": "https://www.salesforce.com/news/press-releases/2025/06/23/agentforce-3-announcement/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "multi-agent",
+   "support": "partial",
+   "note": "Salesforce guidance on managing multi-agent systems; orchestration depth not verified.",
+   "sourceUrl": "https://www.salesforce.com/blog/responsibly-manage-multi-agent-systems/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Agentforce Observability and platform governance; SSO/RBAC specifics not verified.",
+   "sourceUrl": "https://www.salesforce.com/agentforce/observability/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://www.salesforce.com/agentforce/pricing/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "voice",
+   "support": "yes",
+   "note": "Agentforce Voice priced at 30 Flex Credits per action.",
+   "sourceUrl": "https://www.salesforce.com/agentforce/pricing/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "Agentforce Observability (formerly Command Center) with session tracing and Datadog/Splunk integration.",
+   "sourceUrl": "https://www.salesforce.com/agentforce/observability/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "CRM, Data 360, Slack, AgentExchange.",
+   "sourceUrl": "https://www.salesforce.com/platform/agentforce-platform/"
+  },
+  {
+   "productSlug": "agentforce",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Flex Credits $500/100k, 20 credits per action, $5 user licence.",
+   "sourceUrl": "https://www.salesforce.com/agentforce/pricing/"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Agents and Deep Research that plan and perform hundreds of searches.",
+   "sourceUrl": "https://cloud.google.com/blog/products/ai-machine-learning/whats-new-in-gemini-enterprise"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Deep Research can work in the background for hours.",
+   "sourceUrl": "https://cloud.google.com/gemini-enterprise/agents"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Admins control which partner agents appear in Agent Gallery; other controls not verified from fetched content.",
+   "sourceUrl": "https://docs.cloud.google.com/gemini/enterprise/docs/release-notes"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://cloud.google.com/gemini-enterprise"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "Custom ADK agents supported (billed separately per secondary source).",
+   "sourceUrl": "https://redresscompliance.com/google-gemini-enterprise-licensing-guide-2026.html"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Deep Research across web and access-controlled enterprise data.",
+   "sourceUrl": "https://cloud.google.com/blog/products/ai-machine-learning/whats-new-in-gemini-enterprise"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Workflow Builder (formerly Agent Designer) is GA; Business edition can run but not build shared agents.",
+   "sourceUrl": "https://docs.cloud.google.com/gemini/enterprise/docs/release-notes"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Microsoft 365 (Outlook, SharePoint, OneDrive, Teams) and Google Workspace connectors.",
+   "sourceUrl": "https://cloud.google.com/gemini-enterprise/agents"
+  },
+  {
+   "productSlug": "gemini-enterprise",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Launch prices reported ($21/$30 per seat) but current prices quote-based.",
+   "sourceUrl": "https://www.gosearch.ai/faqs/gemini-enterprise-pricing/"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "autonomous-execution",
+   "support": "partial",
+   "note": "Agents execute with the triggering user's identity and permissions; autonomy depth not verified.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/security"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "Hosted Glean MCP server, remote MCP server connections and an MCP gateway.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/about"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "multi-agent",
+   "support": "partial",
+   "note": "Launch material cites open agent interoperability; orchestration depth not verified.",
+   "sourceUrl": "https://www.glean.com/blog/go-agents-launch"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Write actions in the web app pause for user approval.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/security"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Admin-governed MCP servers/tools, tenant isolation, least-privilege scopes, permission-aware access.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/security"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary SaaS.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/about"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "observability-evals",
+   "support": "partial",
+   "note": "Protect+ guardrails scan inputs/outputs for injection; observability tooling not verified.",
+   "sourceUrl": "https://docs.glean.com/administration/platform/mcp/security"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Custom/no-code agents for internal workflows (secondary source and launch post).",
+   "sourceUrl": "https://www.glean.com/blog/go-agents-launch"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Large connector catalog of app integrations.",
+   "sourceUrl": "https://www.glean.com/platform/connectors"
+  },
+  {
+   "productSlug": "glean",
+   "featureSlug": "public-pricing",
+   "support": "no",
+   "note": "Pricing not published; third-party estimates only.",
+   "sourceUrl": "https://workativ.com/blog/glean-pricing"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Agents complete customer tasks (returns, claims) end to end.",
+   "sourceUrl": "https://sierra.ai/product"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://sierra.ai/product"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Agent SDK for developers to declare agent behaviors in code.",
+   "sourceUrl": "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "voice",
+   "support": "yes",
+   "note": "Phone/IVR plus chat, WhatsApp and email; published tau-voice benchmark.",
+   "sourceUrl": "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "observability-evals",
+   "support": "partial",
+   "note": "Agent development life cycle content and tau-voice benchmark; product observability not verified.",
+   "sourceUrl": "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Agent Studio lets CX teams define journeys in plain English.",
+   "sourceUrl": "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Works with existing IVR and channels; system connectors not itemized.",
+   "sourceUrl": "https://sierra.ai/product"
+  },
+  {
+   "productSlug": "sierra",
+   "featureSlug": "public-pricing",
+   "support": "no",
+   "note": "Outcome-based, rates negotiated and not public.",
+   "sourceUrl": "https://sierra.ai/blog/outcome-based-pricing-for-ai-agents"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "AOP-driven agents execute workflows and call tools in CRM/billing systems.",
+   "sourceUrl": "https://decagon.ai/"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "memory-context",
+   "support": "partial",
+   "note": "Vendor says channels share underlying intelligence and memory.",
+   "sourceUrl": "https://decagon.ai/blog/decagon-voice"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "human-approvals",
+   "support": "partial",
+   "note": "AOPs combine natural-language rules with code-level controls and escalation handoffs.",
+   "sourceUrl": "https://decagon.ai/"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "SOC 2 trust centre controls; SSO/RBAC not verified.",
+   "sourceUrl": "https://trust.decagon.ai/controls"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://decagon.ai/"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "Write tools trigger actions in core systems; public API not verified.",
+   "sourceUrl": "https://decagon.ai/product/overview"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "voice",
+   "support": "yes",
+   "note": "Decagon Voice built with ElevenLabs speech models.",
+   "sourceUrl": "https://decagon.ai/blog/decagon-voice"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "Simulations with synthetic users and Watchtower monitoring of live conversations.",
+   "sourceUrl": "https://decagon.ai/product/overview"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Non-technical teams author AOPs in natural language (with Duet).",
+   "sourceUrl": "https://decagon.ai/"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Tools for CRM, billing, fulfillment systems.",
+   "sourceUrl": "https://decagon.ai/product/overview"
+  },
+  {
+   "productSlug": "decagon",
+   "featureSlug": "public-pricing",
+   "support": "no",
+   "note": "Not published; third-party estimates conflict.",
+   "sourceUrl": "https://www.featurebase.app/blog/decagon-pricing"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Procedures let Fin execute multi-step flows ending in resolution or handoff.",
+   "sourceUrl": "https://www.intercom.com/help/en/articles/12495167-fin-procedures-explained"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "human-approvals",
+   "support": "partial",
+   "note": "Procedures can end in a handoff to a human or workflow.",
+   "sourceUrl": "https://www.intercom.com/help/en/articles/12495167-fin-procedures-explained"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Vendor lists SOC 2 Type II, HIPAA, ISO 27001/42001 and AIUC-1 (page possibly dated).",
+   "sourceUrl": "https://www.intercom.com/security"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "api-sdk",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "voice",
+   "support": "yes",
+   "note": "Fin Voice deploys the agent over phone; Procedures over voice in beta.",
+   "sourceUrl": "https://www.intercom.com/help/en/articles/16248514-fin-voice-faqs"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "Simulations (AI customer + success criteria), batch tests and previews.",
+   "sourceUrl": "https://www.intercom.com/help/en/articles/14077180-simulations-vs-batch-tests-vs-previews"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "no-code-builder",
+   "support": "yes",
+   "note": "Procedures and no-code multilingual configuration.",
+   "sourceUrl": "https://www.intercom.com/help/en/articles/12495167-fin-procedures-explained"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "enterprise-connectors",
+   "support": "yes",
+   "note": "Works on Intercom or other helpdesks (Zendesk, Salesforce, Freshdesk, HubSpot).",
+   "sourceUrl": "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing"
+  },
+  {
+   "productSlug": "intercom-fin",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "$0.99 per outcome; minimum commitment reported inconsistently.",
+   "sourceUrl": "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Framework for long-running, stateful agents with durable execution.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "LangSmith Deployment hosts long-running stateful agents.",
+   "sourceUrl": "https://www.langchain.com/blog/langgraph-platform-ga"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "Short-term working memory and long-term cross-session memory.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Humans can inspect and modify agent state mid-run.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Enterprise plan adds hybrid/self-hosted deployment; SSO/RBAC details not verified.",
+   "sourceUrl": "https://www.langchain.com/blog/langgraph-platform-ga"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "open-source",
+   "support": "yes",
+   "note": "MIT licensed; self-hosting available (Developer plan free self-host up to a node limit, Enterprise fully self-hosted).",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Python library with JS counterpart LangGraph.js.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "LangSmith tracing, state-transition capture and runtime metrics.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "no-code-builder",
+   "support": "no",
+   "note": "Low-level code framework.",
+   "sourceUrl": "https://github.com/langchain-ai/langgraph"
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "langgraph",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "LangSmith Developer free, Plus $39/seat/mo, Enterprise custom.",
+   "sourceUrl": "https://www.langchain.com/pricing"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Agent loop with tools, handoffs and guardrails.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "MCP tools alongside function and hosted tools.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "Sessions manage conversation history across runs.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Handoffs and agents-as-tools.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "human-approvals",
+   "support": "partial",
+   "note": "Input/output guardrails for validation; explicit approval flows not verified.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "open-source",
+   "support": "yes",
+   "note": "MIT licensed.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Python SDK.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "voice",
+   "support": "yes",
+   "note": "Realtime agents and voice pipelines (STT, agent, TTS).",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "Built-in tracing.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "model-choice",
+   "support": "yes",
+   "note": "Responses and Chat Completions APIs and 100+ other LLMs.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "no-code-builder",
+   "support": "no",
+   "note": "Code SDK.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-agents-sdk",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Free SDK; pay model provider.",
+   "sourceUrl": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Same agent loop and tools as Claude Code.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "background-runs",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Built-in tools read, write, edit files and run commands.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "External and in-process SDK MCP servers.",
+   "sourceUrl": "https://github.com/anthropics/claude-agent-sdk-python"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "Loads skills, commands and memory from .claude/ directories; sessions resume or fork.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Subagents for focused subtasks.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Permissions with allowed/disallowed tools, permission modes and can_use_tool callback.",
+   "sourceUrl": "https://github.com/anthropics/claude-agent-sdk-python"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "open-source",
+   "support": "partial",
+   "note": "Repo is MIT, but use is governed by Anthropic Commercial Terms and it bundles the Claude Code CLI.",
+   "sourceUrl": "https://github.com/anthropics/claude-agent-sdk-python"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Python and TypeScript SDKs.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "observability-evals",
+   "support": "partial",
+   "note": "Hooks give lifecycle control points; tracing/evals product not verified.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Built-in tools include web search.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "model-choice",
+   "support": "partial",
+   "note": "Claude models; third-party cloud providers supported by the underlying CLI.",
+   "sourceUrl": "https://code.claude.com/docs/en/third-party-integrations"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "no-code-builder",
+   "support": "no",
+   "note": "Code SDK.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "claude-agent-sdk",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "SDK free; API-key billing; third parties may not offer claude.ai login.",
+   "sourceUrl": "https://code.claude.com/docs/en/agent-sdk/overview"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Production-grade agents and multi-agent workflows.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "background-runs",
+   "support": "partial",
+   "note": "Hosted agents on Foundry marked as new.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "multi-agent",
+   "support": "yes",
+   "note": "Graph workflows with sequential, concurrent, handoff and group patterns.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Workflows include human-in-the-loop control and checkpointing.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "open-source",
+   "support": "yes",
+   "note": "MIT licensed.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": ".NET and Python SDKs (Go in separate repo).",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "Built-in OpenTelemetry integration.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "web-research",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "no-code-builder",
+   "support": "partial",
+   "note": "Declarative YAML agents and DevUI.",
+   "sourceUrl": "https://github.com/microsoft/agent-framework"
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "microsoft-agent-framework",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Free framework; hosted costs separate.",
+   "sourceUrl": "https://techstrong.ai/features/microsoft-ships-agent-framework-1-0-a-production-ready-foundation-for-multi-agent-ai/"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Runtime hosts agents and tools on any framework.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Serverless runtime for deploying agents at scale.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "computer-browser-use",
+   "support": "yes",
+   "note": "Built-in Browser Tool.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "code-execution",
+   "support": "yes",
+   "note": "Built-in Code Interpreter.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "Gateway converts APIs, Lambda and services into MCP-compatible tools.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "memory-context",
+   "support": "yes",
+   "note": "Managed short- and long-term memory.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "human-approvals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "enterprise-controls",
+   "support": "yes",
+   "note": "Identity service and Cedar-based Policy for fine-grained access control.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Managed AWS service; samples repo is open.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "AgentCore CLI and SDK/API.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "observability-evals",
+   "support": "yes",
+   "note": "OpenTelemetry observability plus built-in and custom evaluators.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Built-in Web Search Tool.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "model-choice",
+   "support": "yes",
+   "note": "Framework- and model-agnostic.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Gateway and Identity for AWS and third-party apps.",
+   "sourceUrl": "https://github.com/awslabs/amazon-bedrock-agentcore-samples"
+  },
+  {
+   "productSlug": "bedrock-agentcore",
+   "featureSlug": "public-pricing",
+   "support": "yes",
+   "note": "Consumption-based pricing published.",
+   "sourceUrl": "https://aws.amazon.com/bedrock/agentcore/pricing/"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Plans, browses and writes a report with source links.",
+   "sourceUrl": "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "background-runs",
+   "support": "partial",
+   "note": "Long-running; user can watch progress and interrupt.",
+   "sourceUrl": "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "mcp-tools",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "User reviews and edits the research plan and can filter sites.",
+   "sourceUrl": "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "enterprise-controls",
+   "support": "partial",
+   "note": "Available to Business/Enterprise/Edu plans; admin controls not verified.",
+   "sourceUrl": "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary.",
+   "sourceUrl": "https://openai.com/index/introducing-deep-research/"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "api-sdk",
+   "support": "partial",
+   "note": "OpenAI published an API deep-research blog PDF; availability not verified here.",
+   "sourceUrl": "https://openai.com/index/introducing-deep-research/"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Cited reports from web research.",
+   "sourceUrl": "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt"
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "enterprise-connectors",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "openai-deep-research",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Included in plans; tiers Limited/Expanded/Maximum, exact counts not found.",
+   "sourceUrl": "https://openai.com/chatgpt/pricing"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "autonomous-execution",
+   "support": "yes",
+   "note": "Plans and iterates searches then synthesizes a cited report.",
+   "sourceUrl": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "background-runs",
+   "support": "yes",
+   "note": "Long jobs run with background=true and are polled by interaction ID.",
+   "sourceUrl": "https://ai.google.dev/gemini-api/docs/deep-research"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "scheduling-triggers",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "computer-browser-use",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "code-execution",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "mcp-tools",
+   "support": "yes",
+   "note": "April 2026 release added MCP server support and File Search.",
+   "sourceUrl": "https://ai.google.dev/gemini-api/docs/changelog"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "memory-context",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "multi-agent",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "human-approvals",
+   "support": "yes",
+   "note": "Collaborative planning added in April 2026 release.",
+   "sourceUrl": "https://ai.google.dev/gemini-api/docs/changelog"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "enterprise-controls",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "open-source",
+   "support": "no",
+   "note": "Proprietary API.",
+   "sourceUrl": "https://ai.google.dev/gemini-api/docs/deep-research"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "api-sdk",
+   "support": "yes",
+   "note": "Available via Gemini Interactions API.",
+   "sourceUrl": "https://ai.google.dev/api/interactions-api"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "voice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "observability-evals",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "web-research",
+   "support": "yes",
+   "note": "Cited text reports and images.",
+   "sourceUrl": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "model-choice",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "no-code-builder",
+   "support": "unknown",
+   "note": "No evidence found in the sources reviewed; not verified.",
+   "sourceUrl": null
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "enterprise-connectors",
+   "support": "partial",
+   "note": "Surfaced in Gemini Enterprise over enterprise data; File Search over own files.",
+   "sourceUrl": "https://cloud.google.com/blog/products/ai-machine-learning/whats-new-in-gemini-enterprise"
+  },
+  {
+   "productSlug": "gemini-deep-research",
+   "featureSlug": "public-pricing",
+   "support": "partial",
+   "note": "Public preview on paid tiers; consumer limits conflict across sources.",
+   "sourceUrl": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/"
+  }
+ ],
+ "swot": [
+  {
+   "scope": "segment",
+   "refSlug": "coding-agents",
+   "strengths": [
+    "Every major vendor now offers cloud/background agents plus MCP, e.g. Claude Code, Cursor Automations, Copilot cloud agent and Devin.",
+    "Distribution is bundled into existing subscriptions (Claude plans, ChatGPT plans, GitHub Copilot)."
+   ],
+   "weaknesses": [
+    "Pricing is volatile and hard to compare: Copilot moved to AI credits, Cursor restructured plans, Devin retired Core.",
+    "Consumer free tiers are being withdrawn (Gemini CLI free access ended 2026-06-18)."
+   ],
+   "opportunities": [
+    "Scheduled and event-triggered agents (Cursor Automations, Claude cloud scheduled tasks, Devin Automations) expand use from interactive coding to CI-style operations.",
+    "Enterprise-grade deployment (dedicated VPC, Bedrock/Vertex routing, managed settings) opens regulated buyers."
+   ],
+   "threats": [
+    "Platform vendors bundle agents (GitHub delegating to Claude and Codex) and may commoditize standalone tools.",
+    "Usage-based billing makes heavy agent use unpredictable for buyers, pressuring margins and loyalty."
+   ],
+   "sourceUrls": [
+    "https://claude.com/pricing",
+    "https://github.com/features/copilot/plans",
+    "https://cursor.com/docs/cloud-agent/automations",
+    "https://docs.devin.ai/release-notes/2026",
+    "https://github.com/google-gemini/gemini-cli/discussions/27274",
+    "https://code.claude.com/docs/en/third-party-integrations"
+   ]
+  },
+  {
+   "scope": "segment",
+   "refSlug": "general-computer-use-agents",
+   "strengths": [
+    "Capable browser/computer agents exist as products (Perplexity Comet, Manus) and as APIs (Claude computer use GA)."
+   ],
+   "weaknesses": [
+    "Products churn quickly: OpenAI's ChatGPT agent was reportedly replaced by ChatGPT Work.",
+    "Computer-use agents depend on screenshots (about 1,000-1,800 tokens each) and need sandboxing."
+   ],
+   "opportunities": [
+    "Free distribution (Comet free since Oct 2025) and Meta's Manus acquisition could bring agents to mass-market channels."
+   ],
+   "threats": [
+    "Prompt injection is a stated, ongoing risk requiring isolation and human confirmation.",
+    "Platform vendors can absorb standalone agent features into their assistants."
+   ],
+   "sourceUrls": [
+    "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
+    "https://www.perplexity.ai/hub/blog/mitigating-prompt-injection-in-comet",
+    "https://www.perplexity.ai/changelog/what-we-shipped-october-3rd",
+    "https://www.techradar.com/pro/meta-buys-manus-for-usd2-billion-to-power-high-stakes-ai-agent-race?rand=141",
+    "https://help.openai.com/en/articles/11752874-chatgpt-agent",
+    "https://www.usecarly.com/blog/chatgpt-agent-mode/"
+   ]
+  },
+  {
+   "scope": "segment",
+   "refSlug": "enterprise-workflow-agents",
+   "strengths": [
+    "Vendors own the business data and identity layer: Salesforce CRM, Microsoft Power Platform/M365, Google Workspace, Glean's permission-aware index.",
+    "MCP is spreading across platforms (Agentforce native client, Copilot Studio, Glean MCP server)."
+   ],
+   "weaknesses": [
+    "Consumption pricing is complex (Flex Credits, Copilot Credits, quote-based seats), and Glean and Gemini Enterprise do not publish current prices."
+   ],
+   "opportunities": [
+    "Governance features such as observability, credit limits and admin-controlled MCP can differentiate in security-sensitive firms.",
+    "Agent marketplaces (AgentExchange, Agent Gallery) create ecosystem lock-in."
+   ],
+   "threats": [
+    "Suite lock-in disadvantages cross-ecosystem buyers, and builder platforms like AgentCore can bypass suites.",
+    "Agents running with user or maker credentials create access-control and cost-control risks."
+   ],
+   "sourceUrls": [
+    "https://www.salesforce.com/agentforce/pricing/",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-messages-management",
+    "https://docs.glean.com/administration/platform/mcp/security",
+    "https://docs.cloud.google.com/gemini/enterprise/docs/release-notes",
+    "https://www.salesforce.com/agentforce/observability/",
+    "https://microsoft.github.io/mcscatblog/posts/copilot-harness-cost-governance/"
+   ]
+  },
+  {
+   "scope": "segment",
+   "refSlug": "customer-support-agents",
+   "strengths": [
+    "Outcome-based pricing aligns spend with results: Intercom Fin at $0.99 per outcome, Sierra pay-per-outcome.",
+    "All three offer voice plus text channels and testing tooling."
+   ],
+   "weaknesses": [
+    "Rates for Sierra and Decagon are not public and outcome definitions can be opaque."
+   ],
+   "opportunities": [
+    "Voice and procedure/AOP authoring extend automation beyond FAQ deflection to transactions."
+   ],
+   "threats": [
+    "Helpdesk and CRM incumbents bundle agents (Agentforce, Zendesk AI agents) with competing price points.",
+    "Per-resolution billing rises as agents improve, inviting buyer pushback."
+   ],
+   "sourceUrls": [
+    "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing",
+    "https://sierra.ai/blog/outcome-based-pricing-for-ai-agents",
+    "https://decagon.ai/blog/decagon-voice",
+    "https://www.intercom.com/help/en/articles/14077180-simulations-vs-batch-tests-vs-previews",
+    "https://www.cloudtalk.io/blog/sierra-ai-pricing/",
+    "https://www.salesforce.com/agentforce/pricing/"
+   ]
+  },
+  {
+   "scope": "segment",
+   "refSlug": "builder-frameworks-platforms",
+   "strengths": [
+    "Strong open-source base: LangGraph, OpenAI Agents SDK and Microsoft Agent Framework are all MIT-licensed.",
+    "Managed infrastructure (AgentCore) is framework- and model-agnostic."
+   ],
+   "weaknesses": [
+    "Fragmentation: AutoGen and Semantic Kernel moved to maintenance mode in favour of Microsoft Agent Framework, forcing migrations."
+   ],
+   "opportunities": [
+    "Observability, evaluation and policy layers (OpenTelemetry, AgentCore Evaluation/Policy, LangSmith) are monetizable add-ons."
+   ],
+   "threats": [
+    "Model vendors ship opinionated SDKs (Claude Agent SDK, OpenAI Agents SDK) that may pull builders into their ecosystems.",
+    "Cloud-native runtimes may commoditize independent frameworks."
+   ],
+   "sourceUrls": [
+    "https://github.com/langchain-ai/langgraph",
+    "https://github.com/openai/openai-agents-python",
+    "https://github.com/microsoft/agent-framework",
+    "https://techstrong.ai/features/microsoft-ships-agent-framework-1-0-a-production-ready-foundation-for-multi-agent-ai/",
+    "https://github.com/awslabs/amazon-bedrock-agentcore-samples",
+    "https://github.com/anthropics/claude-agent-sdk-python"
+   ]
+  },
+  {
+   "scope": "segment",
+   "refSlug": "research-agents",
+   "strengths": [
+    "Deep research is shipped by the largest model vendors with citations and editable plans."
+   ],
+   "weaknesses": [
+    "Usage limits and plan names change often and are poorly documented, and exact quotas were not verifiable."
+   ],
+   "opportunities": [
+    "API access (Gemini Interactions API with MCP and File Search) lets research agents be embedded in products."
+   ],
+   "threats": [
+    "Research features are being folded into broader agents (deep research inside ChatGPT Work, Gemini Enterprise), reducing standalone differentiation."
+   ],
+   "sourceUrls": [
+    "https://help.openai.com/en/articles/10500283-deep-research-in-chatgpt",
+    "https://ai.google.dev/gemini-api/docs/deep-research",
+    "https://ai.google.dev/gemini-api/docs/changelog",
+    "https://cloud.google.com/blog/products/ai-machine-learning/whats-new-in-gemini-enterprise"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "claude-code",
+   "strengths": [
+    "Broad surfaces (terminal, IDE, desktop, web) with subagents, hooks, MCP and scheduled cloud tasks.",
+    "Deployable via Teams/Enterprise or Bedrock, Vertex and Foundry with managed settings."
+   ],
+   "weaknesses": [
+    "Included in paid plans only (Free excludes Claude Code), and subscription limits can push heavy users to API-rate billing.",
+    "Claude models only."
+   ],
+   "opportunities": [
+    "Agent SDK and Slack/GitHub integrations extend it into automation and team workflows."
+   ],
+   "threats": [
+    "Bundled competitors (Copilot, Codex via ChatGPT) and Cursor compete on price and distribution.",
+    "Subscription rate limits remain a pressure point for power users."
+   ],
+   "sourceUrls": [
+    "https://code.claude.com/docs/en/overview",
+    "https://claude.com/pricing",
+    "https://code.claude.com/docs/en/third-party-integrations",
+    "https://code.claude.com/docs/en/agent-sdk/overview"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "openai-codex",
+   "strengths": [
+    "Open-source CLI (Apache-2.0) plus IDE, desktop and cloud surfaces under one ChatGPT sign-in.",
+    "Documented approval modes and enterprise managed configuration."
+   ],
+   "weaknesses": [
+    "Usage allowances are shared and change often; sources disagree on tiers and limits."
+   ],
+   "opportunities": [
+    "GitHub-integrated code review and large ChatGPT user base for cross-sell."
+   ],
+   "threats": [
+    "Competes with Claude Code and Cursor on agent quality, and with GitHub Copilot on distribution."
+   ],
+   "sourceUrls": [
+    "https://github.com/openai/codex",
+    "https://developers.openai.com/codex/pricing",
+    "https://developers.openai.com/codex/agent-approvals-security",
+    "https://developers.openai.com/codex/enterprise/managed-configuration"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "github-copilot-agent",
+   "strengths": [
+    "Native to GitHub issues and PRs, with firewalled ephemeral environments and approval gating for workflows.",
+    "Multi-model support and delegation to third-party agents on Pro+/Max."
+   ],
+   "weaknesses": [
+    "Shift to usage-billed AI credits adds cost uncertainty; free tier excludes the cloud agent."
+   ],
+   "opportunities": [
+    "Huge installed base and pooled organization credits for Business/Enterprise."
+   ],
+   "threats": [
+    "Reliance on partners' models while those partners ship competing agents (Claude Code, Codex)."
+   ],
+   "sourceUrls": [
+    "https://github.com/features/copilot/plans",
+    "https://docs.github.com/en/copilot/responsible-use/agents",
+    "https://github.blog/ai-and-ml/github-copilot/github-copilot-coding-agent-101-getting-started-with-agentic-workflows-on-github/"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "cursor",
+   "strengths": [
+    "Cloud agents and Automations (cron plus GitHub/Slack/Linear events) with MCP and memory.",
+    "Enterprise SSO/SCIM, MCP allowlists and Protected Git Scopes."
+   ],
+   "weaknesses": [
+    "Pricing restructured with conflicting public figures (Plus/Premium/Super vs legacy Pro/Pro+/Ultra)."
+   ],
+   "opportunities": [
+    "Mobile app and Bugbot expand beyond the editor into review and operations."
+   ],
+   "threats": [
+    "Depends on third-party frontier models whose vendors sell their own agents."
+   ],
+   "sourceUrls": [
+    "https://cursor.com/docs/cloud-agent/automations",
+    "https://cursor.com/docs/enterprise",
+    "https://cursor.com/help/account-and-billing/pricing",
+    "https://cursor.com/docs/cloud-agent/mobile"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "devin",
+   "strengths": [
+    "Mature autonomous cloud agent with MCP marketplace, API, schedules/Automations and single-tenant VPC deployment."
+   ],
+   "weaknesses": [
+    "Pricing history is complicated (ACUs, retired Core plan, Windsurf-to-Devin Desktop rebrand)."
+   ],
+   "opportunities": [
+    "Windsurf/Devin Desktop adds an IDE surface alongside cloud agents."
+   ],
+   "threats": [
+    "Foundation-model and platform vendors ship competing cloud coding agents."
+   ],
+   "sourceUrls": [
+    "https://devin.ai/pricing",
+    "https://docs.devin.ai/work-with-devin/devin-mcp",
+    "https://docs.devin.ai/enterprise/deployment/overview",
+    "https://docs.devin.ai/release-notes/2026"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "chatgpt-work",
+   "strengths": [
+    "Goal-to-deliverable agent inside the largest consumer assistant; always asks before consequential actions."
+   ],
+   "weaknesses": [
+    "Predecessor ChatGPT agent was retired quickly; users report Work cannot drive a logged-in browser session (secondary sources)."
+   ],
+   "opportunities": [
+    "Connected apps and bundled plan allowance can attract knowledge workers."
+   ],
+   "threats": [
+    "Browser-native competitors (Perplexity Comet) and Manus under Meta."
+   ],
+   "sourceUrls": [
+    "https://help.openai.com/en/articles/11752874-chatgpt-agent",
+    "https://www.digitalapplied.com/blog/chatgpt-work-openai-agent-launch-2026",
+    "https://www.usecarly.com/blog/chatgpt-agent-mode/"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "copilot-studio",
+   "strengths": [
+    "Low-code builder with multi-agent orchestration, computer use, MCP and event triggers; admin-level credit limits."
+   ],
+   "weaknesses": [
+    "Credit metering varies by action type and can reach more than 100 credits per response."
+   ],
+   "opportunities": [
+    "Microsoft 365 footprint and Power Platform governance."
+   ],
+   "threats": [
+    "Salesforce and Google suites compete for the same buyers."
+   ],
+   "sourceUrls": [
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-messages-management",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/architecture/multi-agent-patterns",
+    "https://microsoft.github.io/mcscatblog/posts/copilot-harness-cost-governance/",
+    "https://learn.microsoft.com/en-us/power-platform/release-plan/2026wave1/microsoft-copilot-studio/use-mcp-compliant-tools-agent-workflows"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "agentforce",
+   "strengths": [
+    "Atlas reasoning engine on top of CRM data; native MCP client; Observability with tracing and Datadog/Splunk hooks; voice."
+   ],
+   "weaknesses": [
+    "Flex Credits per-action pricing is intricate; Flex Credits and per-conversation pricing cannot mix in one org (secondary source)."
+   ],
+   "opportunities": [
+    "AgentExchange and Slack can extend agent reach inside Salesforce customers."
+   ],
+   "threats": [
+    "Support-specialist vendors (Sierra, Decagon, Fin) sell per outcome and may undercut."
+   ],
+   "sourceUrls": [
+    "https://www.salesforce.com/agentforce/pricing/",
+    "https://www.salesforce.com/news/press-releases/2025/06/23/agentforce-3-announcement/",
+    "https://www.salesforce.com/agentforce/observability/",
+    "https://www.salesforce.com/platform/agentforce-platform/"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "sierra",
+   "strengths": [
+    "Outcome-based model, voice and chat, no-code Agent Studio plus developer SDK."
+   ],
+   "weaknesses": [
+    "Rates not public; billable-resolution definitions unclear to buyers (secondary reports)."
+   ],
+   "opportunities": [
+    "Voice benchmark leadership and developer SDK for complex flows."
+   ],
+   "threats": [
+    "Salesforce Agentforce, Decagon and Intercom Fin compete at lower or published prices."
+   ],
+   "sourceUrls": [
+    "https://sierra.ai/blog/outcome-based-pricing-for-ai-agents",
+    "https://sierra.ai/blog/serving-customer-experience-and-engineering-teams-all-from-one-platform",
+    "https://www.cloudtalk.io/blog/sierra-ai-pricing/"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "intercom-fin",
+   "strengths": [
+    "Transparent $0.99 per outcome pricing that works on other helpdesks; Procedures, Simulations and voice."
+   ],
+   "weaknesses": [
+    "Cost scales with success and sources disagree on minimums."
+   ],
+   "opportunities": [
+    "Helpdesk-agnostic offer can win accounts on Zendesk and Salesforce."
+   ],
+   "threats": [
+    "Incumbent helpdesks and Sierra/Decagon undercutting or out-featuring."
+   ],
+   "sourceUrls": [
+    "https://fin.ai/learn/per-resolution-vs-per-conversation-ai-pricing",
+    "https://www.intercom.com/help/en/articles/12495167-fin-procedures-explained",
+    "https://www.intercom.com/help/en/articles/14077180-simulations-vs-batch-tests-vs-previews",
+    "https://www.intercom.com/help/en/articles/16248514-fin-voice-faqs"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "langgraph",
+   "strengths": [
+    "MIT-licensed, durable execution and human-in-the-loop; deployment options from cloud to self-hosted."
+   ],
+   "weaknesses": [
+    "Low-level framework with no no-code builder; more engineering required."
+   ],
+   "opportunities": [
+    "LangSmith observability and Deployment monetize production usage."
+   ],
+   "threats": [
+    "Vendor SDKs and cloud runtimes (OpenAI Agents SDK, AgentCore, Microsoft Agent Framework) compete."
+   ],
+   "sourceUrls": [
+    "https://github.com/langchain-ai/langgraph",
+    "https://www.langchain.com/pricing",
+    "https://www.langchain.com/blog/langgraph-platform-ga"
+   ]
+  },
+  {
+   "scope": "product",
+   "refSlug": "bedrock-agentcore",
+   "strengths": [
+    "Framework- and model-agnostic managed stack: Runtime, Gateway, Identity, Memory, Browser, Code Interpreter, Observability, Evaluation, Policy."
+   ],
+   "weaknesses": [
+    "AWS-only service; consumption pricing needs careful estimation and pricing pages are in flux."
+   ],
+   "opportunities": [
+    "Lets enterprises run open-source frameworks (LangGraph, CrewAI, Strands) on managed infrastructure."
+   ],
+   "threats": [
+    "Competes with Azure Foundry hosted agents and Google's agent platform."
+   ],
+   "sourceUrls": [
+    "https://github.com/awslabs/amazon-bedrock-agentcore-samples",
+    "https://aws.amazon.com/bedrock/agentcore/pricing/",
+    "https://aws.amazon.com/about-aws/whats-new/2025/10/amazon-bedrock-agentcore-available/",
+    "https://aws.amazon.com/about-aws/whats-new/2026/10/agentcore-memory-consumption-based-pricing/"
+   ]
+  }
+ ]
+}

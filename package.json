@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:market-seed": "tsx scripts/market-bootstrap.ts",
+    "vercel-build": "tsx scripts/market-bootstrap.ts --if-configured && next build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
@@ -34,6 +36,7 @@
     "@types/react-dom": "^19",
     "postcss": "^8.5",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "5.7.3"
   }
 }
