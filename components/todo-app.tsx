@@ -24,6 +24,7 @@ import { HashtagHint, HashtagShortcutsPanel, useCustomHashtags } from '@/compone
 import { parseHashtags } from '@/lib/hashtags'
 import { authClient } from '@/lib/auth-client'
 import { UserMenu } from '@/components/user-menu'
+import { ColorModeToggle } from '@/components/color-mode-toggle'
 import { DEFAULT_COMPLETION_SOUND, isCompletionSoundId, playCompletionBell, type CompletionSoundId } from '@/lib/completion-bell'
 import type { IconSlot } from '@/lib/custom-theme/icons'
 import { useFireworks } from '@/components/use-fireworks'
@@ -335,6 +336,7 @@ export function TodoApp({ initialTasks, userName }: { initialTasks: TaskView[]; 
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-icon"><ThemedIcon slot="brand" aria-hidden="true" /></span> daylist</div>
           <span className="topbar-date">{dateLabel}</span>
+          <ColorModeToggle />
           <UserMenu userName={userName} showTaskIcons={showTaskIcons} onShowTaskIconsChange={handleShowTaskIconsChange} completionSound={completionSound} onCompletionSoundChange={handleCompletionSoundChange} />
         </header>
 

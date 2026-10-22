@@ -44,11 +44,11 @@ html[data-background] { --bg-grain: url("data:image/svg+xml,<svg xmlns='http://w
 .background-option[data-background='none'] { --bg-art: none; }
 .background-swatch > svg:not(.background-check) { width: 16px; height: 16px; }
 .background-check { position: absolute; top: -7px; right: -7px; display: none; width: 18px; height: 18px; box-sizing: content-box; border: 2px solid var(--card); border-radius: 50%; background: var(--primary); padding: 2px; color: var(--primary-foreground); stroke-width: 3; }
-.background-option:hover .background-swatch { border-color: color-mix(in oklch, var(--primary) 45%, transparent); }
+.background-option:hover .background-swatch { border-color: color-mix(in srgb, var(--primary) 45%, transparent); }
 .background-option input:checked + .background-swatch { border-color: var(--primary); }
 .background-option input:checked + .background-swatch .background-check { display: block; }
 .background-option input:checked ~ .background-name { color: var(--foreground); font-weight: 700; }
-.background-option input:focus-visible + .background-swatch { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 2px; }
+.background-option input:focus-visible + .background-swatch { outline: 3px solid color-mix(in srgb, var(--ring) 48%, transparent); outline-offset: 2px; }
 
 /*
  * Applied background. The attribute is only present for a real background (never "none"), so none of
@@ -57,21 +57,21 @@ html[data-background] { --bg-grain: url("data:image/svg+xml,<svg xmlns='http://w
  * -2 (scrim) and -1 (content panel); the completion fireworks canvas is also -1 but later in the
  * document, so its sparks still show above the panel and behind the cards.
  */
-html[data-background] { --glass: color-mix(in oklch, var(--background) 93%, transparent); }
+html[data-background] { --glass: color-mix(in srgb, var(--background) 93%, transparent); }
 html[data-background] body::before,
 html[data-background] body::after { content: ''; position: fixed; inset: 0; pointer-events: none; }
 html[data-background] body::before { z-index: -3; background: var(--bg-grain), var(--bg-art) center / cover no-repeat; background-size: 180px 180px, cover; background-repeat: repeat, no-repeat; }
-html[data-background] body::after { z-index: -2; background: color-mix(in oklch, var(--background) 18%, transparent); }
-html[data-background] .side-rail { background: color-mix(in oklch, var(--sidebar) 84%, transparent); backdrop-filter: blur(18px) saturate(1.15); }
+html[data-background] body::after { z-index: -2; background: color-mix(in srgb, var(--background) 18%, transparent); }
+html[data-background] .side-rail { background: color-mix(in srgb, var(--sidebar) 84%, transparent); backdrop-filter: blur(18px) saturate(1.15); }
 html[data-background] .topbar { border-bottom-color: transparent; }
 html[data-background] .topbar-date { border-radius: 999px; white-space: nowrap; background: var(--glass); padding: 6px 12px; backdrop-filter: blur(14px); }
 html[data-background] .dashboard-content { position: relative; width: min(866px, calc(100% - 2 * clamp(12px, 3vw, 36px))); margin-bottom: 28px; }
-html[data-background] .dashboard-content::before { content: ''; position: absolute; z-index: -1; inset: 0; border: 1px solid color-mix(in oklch, var(--border) 70%, transparent); border-radius: 26px; background: var(--glass); box-shadow: 0 24px 60px -32px color-mix(in oklch, var(--foreground) 45%, transparent); backdrop-filter: blur(22px) saturate(1.15); }
-html[data-background] .quick-add-card, html[data-background] .task-row { background: color-mix(in oklch, var(--card) 80%, transparent); }
+html[data-background] .dashboard-content::before { content: ''; position: absolute; z-index: -1; inset: 0; border: 1px solid color-mix(in srgb, var(--border) 70%, transparent); border-radius: 26px; background: var(--glass); box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--shadow-ink) 45%, transparent); backdrop-filter: blur(22px) saturate(1.15); }
+html[data-background] .quick-add-card, html[data-background] .task-row { background: color-mix(in srgb, var(--card) 80%, transparent); }
 
 @media (max-width: 680px) {
   html[data-background] .topbar-date { padding: 4px 9px; }
-  html[data-background] .side-rail { background: color-mix(in oklch, var(--card) 86%, transparent); }
+  html[data-background] .side-rail { background: color-mix(in srgb, var(--card) 86%, transparent); }
   html[data-background] .dashboard-content::before { border-radius: 20px; }
 }
 @media (max-width: 380px) {

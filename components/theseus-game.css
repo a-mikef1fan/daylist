@@ -12,7 +12,7 @@
 .theseus-level.is-active { border-color: var(--sage-deep); background: var(--sage-deep); color: var(--on-sage-deep); }
 .theseus-level svg { width: 15px; height: 15px; }
 .theseus-board { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--card); padding: 6px; line-height: 0; box-shadow: 0 10px 26px oklch(0.28 0.04 157 / 3%); }
-.theseus-board:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 3px; }
+.theseus-board:focus-visible { outline: 3px solid color-mix(in srgb, var(--ring) 48%, transparent); outline-offset: 3px; }
 .theseus-svg { display: block; width: 100%; height: auto; max-height: 68vh; margin: 0 auto; }
 .theseus-svg[data-outcome='lost'] { filter: saturate(.8); }
 .theseus-piece { transition: transform .14s ease-out; }
@@ -41,8 +41,8 @@
 /* Leaderboard tab. */
 .theseus-tabs { display: inline-flex; gap: 4px; margin-top: 14px; border-radius: 10px; background: var(--secondary); padding: 3px; }
 .theseus-tab { min-height: 32px; border: 0; border-radius: 8px; background: transparent; padding: 0 14px; color: var(--muted-foreground); cursor: pointer; font-size: 12px; font-weight: 650; }
-.theseus-tab[aria-pressed='true'] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px color-mix(in oklch, var(--foreground) 10%, transparent); }
-.theseus-tab:focus-visible { outline: 3px solid color-mix(in oklch, var(--ring) 48%, transparent); outline-offset: 1px; }
+.theseus-tab[aria-pressed='true'] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px color-mix(in srgb, var(--shadow-ink) 10%, transparent); }
+.theseus-tab:focus-visible { outline: 3px solid color-mix(in srgb, var(--ring) 48%, transparent); outline-offset: 1px; }
 .theseus-leaders .theseus-help { margin-top: 14px; }
 .theseus-leaders-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 10px; background: var(--secondary); padding: 14px 12px; color: var(--muted-foreground); font-size: 13px; line-height: 1.5; }
 .theseus-leaders-note.is-error { background: color-mix(in oklch, var(--destructive) 14%, var(--card)); color: var(--destructive); }

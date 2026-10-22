@@ -12,6 +12,7 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Per-user data: every task query is scoped to the signed-in user
 - Theseus & the Minotaur leaderboard: wins are saved per user; the server replays each submitted move list with the game rules before storing it. Ranked by the farthest level reached with every level before it solved, then fewest total steps (one step is one turn, a move or a wait), then earliest to reach that state
 - Color themes: pick one of eight palettes from account menu > User preferences; the choice is remembered per browser (`localStorage`)
+- Light, dark, or system appearance: cycle it with the sun/moon/monitor button in the top bar; the choice is remembered per browser (`localStorage`) and works with every color theme (a generated Describe a theme palette brings its own light or dark look and takes precedence)
 - Backgrounds: pick a wallpaper (Alpine, Ocean, Aurora, Forest, Starry, Dunes, Clouds, City, Bloom) from account menu > User preferences, or None for the plain page. A first-time visitor gets a random scene, which is saved so it stays the same until they change it (choosing None is saved too). The scenes are inline SVG, so there are no image files or network requests; the page gets a theme-colored scrim and frosted panels so text stays readable in every color theme and in dark custom themes. Remembered per browser (`localStorage`, key `daylist:background`)
 - Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
 
@@ -111,6 +112,8 @@ components/
   auth-screen.tsx             Sign-in / sign-up UI
   theme-provider.tsx          Applies and persists the selected color theme (`data-theme` on `<html>`)
   theme-picker.tsx            Color theme swatch picker, shown in User preferences
+  color-mode-provider.tsx     Applies and persists light, dark, or system appearance (`dark` class on `<html>`)
+  color-mode-toggle.tsx       Top bar button that cycles light, dark, and system
   background-provider.tsx     Applies and persists the selected background (`data-background` on `<html>`)
   background-picker.tsx       Background preview picker, shown in User preferences
   custom-theme-provider.tsx   Applies, previews and persists a generated theme
@@ -135,6 +138,7 @@ lib/
   db/index.ts                 pg pool and Drizzle client
   db/schema.ts                Drizzle schema and task types
   themes.ts                   Theme ids, storage key, and the pre-paint init script
+  color-mode.ts               Appearance modes, storage key, and the pre-paint init script
   recurrence.ts               Repeat options, how the rule is stored in `description`, and next-occurrence date math
   custom-theme/               Theme schema + sanitising, colour/contrast maths, CSS compiler, font and icon allow-lists, Claude call
   rate-limit.ts               In-memory sliding-window limiter

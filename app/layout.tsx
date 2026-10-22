@@ -2,8 +2,10 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
 import { BackgroundProvider } from '@/components/background-provider'
+import { ColorModeProvider } from '@/components/color-mode-provider'
 import { CustomThemeProvider } from '@/components/custom-theme-provider'
 import { ThemeProvider } from '@/components/theme-provider'
+import { COLOR_MODE_INIT_SCRIPT } from '@/lib/color-mode'
 import { CUSTOM_THEME_INIT_SCRIPT } from '@/lib/custom-theme/css'
 import { BACKGROUND_INIT_SCRIPT } from '@/lib/backgrounds'
 import { THEME_INIT_SCRIPT } from '@/lib/themes'
@@ -28,8 +30,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f7f7f3',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f7f3' },
+    { media: '(prefers-color-scheme: dark)', color: '#101512' },
+  ],
   width: 'device-width',
   initialScale: 1,
 }
@@ -39,15 +44,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: COLOR_MODE_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: BACKGROUND_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CUSTOM_THEME_INIT_SCRIPT }} />
       </head>
       <body className="antialiased">
-        <ThemeProvider>
-          <BackgroundProvider>
-            <CustomThemeProvider>{children}</CustomThemeProvider>
-          </BackgroundProvider>
-        </ThemeProvider>
+        <ColorModeProvider>
+          <ThemeProvider>
+            <BackgroundProvider>
+              <CustomThemeProvider>{children}</CustomThemeProvider>
+            </BackgroundProvider>
+          </ThemeProvider>
+        </ColorModeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
