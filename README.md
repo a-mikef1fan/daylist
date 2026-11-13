@@ -15,6 +15,16 @@ A calm, private to-do list. Sign up with email and password, add tasks with a du
 - Backgrounds: pick a wallpaper (Alpine, Ocean, Aurora, Forest, Starry, Dunes, Clouds, City, Bloom) from account menu > User preferences, or None for the plain page. A first-time visitor gets a random scene, which is saved so it stays the same until they change it (choosing None is saved too). The scenes are inline SVG, so there are no image files or network requests; the page gets a theme-colored scrim and frosted panels so text stays readable in every color theme and in dark custom themes. Remembered per browser (`localStorage`, key `daylist:background`)
 - Describe a theme: click **Theme** in the top bar, describe a mood in plain words (for example "cozy autumn cabin") and Claude restyles the whole app: colours, fonts, corner radius and icons. Preview it, keep or revert it, reset to the default. Saved in this browser's `localStorage`
 
+## How to play Theseus & the Minotaur
+
+Open **Theseus & the Minotaur** from the game switcher in the app. The mazes come from Robert Abbott's *Mad Mazes*.
+
+- **Goal:** lead Theseus to the exit, the single gap in the maze's outer border, without being caught.
+- **Each turn:** Theseus moves one square (or waits), then the Minotaur takes two steps toward him. It closes the sideways gap first and only moves up or down when it cannot, or does not need to, move sideways.
+- **Lose:** the Minotaur lands on Theseus. Undo the last move, or restart the level.
+- **Controls:** arrow keys or W A S D to move, Space to wait, Z (or Backspace) to undo, R to restart, N or Enter for the next level after a win. Click the level buttons to jump between levels, and use the on-screen pad if you are not on a keyboard.
+- **Scoring:** a move into a wall does not count as a turn. Wins are saved per user and ranked on the leaderboard (see Features).
+
 ## Tech stack
 
 - [Next.js](https://nextjs.org) 16 (App Router, server actions) with React 19 and TypeScript
